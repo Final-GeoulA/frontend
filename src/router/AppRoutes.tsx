@@ -19,15 +19,12 @@ import BoardList from "../contents/Board/Board";
 import Recommend from "../contents/Recommend/Recommend";
 import Search from "../contents/Search/Search";
 import Board from "../contents/Board/Board";
-<<<<<<< Updated upstream
 
 import Boarddetail from "../contents/Board/Boarddetail";
 import Recommenddetail from "../contents/Recommend/Recommenddetail";
 import BoardForm from "../contents/Board/BoardForm";
 
-=======
 import SkinReport from "../contents/Mypage/SkinReport"
->>>>>>> Stashed changes
 
 const AppRoutes: React.FC = () => {
   const routeList = [
