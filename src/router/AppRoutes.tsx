@@ -19,6 +19,7 @@ import Recommend from "../contents/Recommend/Recommend";
 import MainPage from "../contents/MainPage/MainPage";
 import Search from "../contents/Search/Search";
 import Board from "../contents/Board/Board";
+import BoardForm from "../contents/Board/BoardForm";
 
 
 const AppRoutes: React.FC = () => {
@@ -39,6 +40,7 @@ const AppRoutes: React.FC = () => {
 
 
     { path: "/board", element: <Board /> },
+    { path: "/board/form", element: <BoardForm /> },
 
     
 
