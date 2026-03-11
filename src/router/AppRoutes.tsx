@@ -8,15 +8,15 @@ import SkinInfo from "../contents/SkinInfo/SkinInfo";
 
 import Login from "../contents/Login/Login";
 import SignUp from "../contents/SignUp/SignUp";
-
-
 import FindID from "../contents/Login/Find";
+
+import MainPage from "../contents/MainPage/MainPage";
+import ServiceQuestion from "../contents/MainPage/ServiceQuestion";
 
 import BoardList from "../contents/Board/Board";
 
 
 import Recommend from "../contents/Recommend/Recommend";
-import MainPage from "../contents/MainPage/MainPage";
 import Search from "../contents/Search/Search";
 import Board from "../contents/Board/Board";
 
@@ -26,6 +26,8 @@ const AppRoutes: React.FC = () => {
 
     // 홈 화면
     { path: "/", element: <MainPage /> },
+    // 서비스 문의
+    { path: "/ServiceQuestion", element: <ServiceQuestion /> },
 
 
     // 피부 백과 화면

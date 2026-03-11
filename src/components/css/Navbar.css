@@ -1,0 +1,83 @@
+nav {
+  border: none !important;
+  box-shadow: none !important;
+}
+/* navbar 전체 */
+.navbar-wrapper {
+  width: 100%;
+  border-bottom: 1px solid #e9e9e9;
+  background: white;
+}
+
+.navbar-inner {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 10px;
+}
+
+/* 로고 */
+.navbar-logo {
+  font-size: 26px;
+  font-weight: 700;
+  text-decoration: none;
+  color: #50CDBA;
+}
+
+/* 메뉴 영역 */
+.navbar-menu {
+  display: flex;
+  gap: 55px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* 메뉴 글자 */
+.navbar-menu li a {
+  text-decoration: none;
+  color: #333;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: color 0.2s ease;
+}
+
+/* 메뉴 hover */
+.navbar-menu li a:hover {
+  color: #50CDBA;
+}
+
+/* 로그인 영역 */
+.navbar-auth {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* 로그인 / 회원가입 */
+.auth-link {
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  color: #333;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+
+/* 마이페이지 */
+.mypage-link {
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  color: #333;
+}
+
+.welcome-text {
+  font-size: 14px;
+  color: #444;
+}
