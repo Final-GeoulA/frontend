@@ -1,3 +1,7 @@
+// npm install chart.js react-chartjs-2
+// 
+
+
 import React, { useEffect, useState, useRef } from 'react';
 import {
     BarElement, CategoryScale, Chart as ChartJS, ArcElement, Tooltip, Legend, Title, ChartOptions,
