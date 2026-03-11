@@ -23,6 +23,7 @@ import Board from "../contents/Board/Board";
 import Boarddetail from "../contents/Board/Boarddetail";
 import Recommenddetail from "../contents/Recommend/Recommenddetail";
 import BoardForm from "../contents/Board/BoardForm";
+import SkinAnalysis from "../contents/SkinAnalysis/SkinAnalysis";
 
 
 const AppRoutes: React.FC = () => {
@@ -30,9 +31,12 @@ const AppRoutes: React.FC = () => {
 
     // 홈 화면
     { path: "/", element: <MainPage /> },
+
+	// 촬영 or 사진 업로드
+	{ path: "/skinanalysis", element: <SkinAnalysis /> },
+
     // 서비스 문의
     { path: "/ServiceQuestion", element: <ServiceQuestion /> },
-
 
     // 피부 백과 화면
     { path: "/skininfo", element: <SkinInfo /> },
@@ -49,15 +53,15 @@ const AppRoutes: React.FC = () => {
     { path: "/boarddetail", element: <Boarddetail /> },
     { path: "/board/form", element: <BoardForm /> },
 
-    
 
     { path: "/mypage", element: <Mypage /> },
 
+	// 로그인과 회원가입
     { path: "/login", element: <Login /> },
-    { path: "/Find", element: <FindID /> },
     { path: "/signup", element: <SignUp /> },
 
-
+	// 불명
+    { path: "/Find", element: <FindID /> },
   ];
 
   return (
