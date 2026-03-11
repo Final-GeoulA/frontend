@@ -19,11 +19,15 @@ import BoardList from "../contents/Board/Board";
 import Recommend from "../contents/Recommend/Recommend";
 import Search from "../contents/Search/Search";
 import Board from "../contents/Board/Board";
+<<<<<<< Updated upstream
 
 import Boarddetail from "../contents/Board/Boarddetail";
 import Recommenddetail from "../contents/Recommend/Recommenddetail";
 import BoardForm from "../contents/Board/BoardForm";
 
+=======
+import SkinReport from "../contents/Mypage/SkinReport"
+>>>>>>> Stashed changes
 
 const AppRoutes: React.FC = () => {
   const routeList = [
@@ -52,6 +56,8 @@ const AppRoutes: React.FC = () => {
     
 
     { path: "/mypage", element: <Mypage /> },
+    //피부 변화 리포트 화면
+    { path: "/skinreport", element: <SkinReport /> },
 
     { path: "/login", element: <Login /> },
     { path: "/Find", element: <FindID /> },
