@@ -8,17 +8,21 @@ import SkinInfo from "../contents/SkinInfo/SkinInfo";
 
 import Login from "../contents/Login/Login";
 import SignUp from "../contents/SignUp/SignUp";
-
-
 import FindID from "../contents/Login/Find";
+
+import MainPage from "../contents/MainPage/MainPage";
+import ServiceQuestion from "../contents/MainPage/ServiceQuestion";
 
 import BoardList from "../contents/Board/Board";
 
 
 import Recommend from "../contents/Recommend/Recommend";
-import MainPage from "../contents/MainPage/MainPage";
 import Search from "../contents/Search/Search";
 import Board from "../contents/Board/Board";
+
+import Boarddetail from "../contents/Board/Boarddetail";
+import Recommenddetail from "../contents/Recommend/Recommenddetail";
+import BoardForm from "../contents/Board/BoardForm";
 
 
 const AppRoutes: React.FC = () => {
@@ -26,6 +30,8 @@ const AppRoutes: React.FC = () => {
 
     // 홈 화면
     { path: "/", element: <MainPage /> },
+    // 서비스 문의
+    { path: "/ServiceQuestion", element: <ServiceQuestion /> },
 
 
     // 피부 백과 화면
@@ -36,9 +42,12 @@ const AppRoutes: React.FC = () => {
 
     //제품추천
     { path: '/recommend', element: <Recommend /> },
+    { path: '/recommenddetail', element: <Recommenddetail /> },
 
 
     { path: "/board", element: <Board /> },
+    { path: "/boarddetail", element: <Boarddetail /> },
+    { path: "/board/form", element: <BoardForm /> },
 
     
 
