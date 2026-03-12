@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import './MainPage.css'
+import './style/MainPage.css'
 
 const MainPage: React.FC = () => {
 
@@ -45,29 +45,28 @@ const MainPage: React.FC = () => {
         </div>
 
         <div className="top-image">
-          <img src="/images/main/skincare.png" alt="skincare" />
+          <img src="/image/Main/skincare.png" alt="skincare" />
         </div>
       </section>
-
 
       {/* 과정 설명 */}
       <section className="skin-steps">
         <div className="step">
           <span className="step-label">Step 1</span>
           <p className='step-info-text'>사진 업로드 후 피부 진단</p>
-          <img src="/images/main/main01.png" alt="step1" className='step-img1'/>
+          <img src="/image/Main/main01.png" alt="step1" className='step-img1'/>
         </div>
 
         <div className="step">
           <span className="step-label">Step 2</span>
           <p className='step-info-text'>챗봇을 통해 피부 제품 추천</p>
-          <img src="/images/main/main02.png" alt="step2" className='step-img2' />
+          <img src="/image/Main/main02.png" alt="step2" className='step-img2' />
         </div>
 
         <div className="step">
           <span className="step-label">Step 3</span>
           <p className='step-info-text'>피부과 검색 및 병원 저장</p>
-          <img src="/images/main/main03.png" alt="step3" className='step-img3' />
+          <img src="/image/Main/main03.png" alt="step3" className='step-img3' />
         </div>
       </section>
 
@@ -83,7 +82,7 @@ const MainPage: React.FC = () => {
             style={{cursor:"pointer"}}
           >
             서비스에 궁금한 점이 있어요
-            <img src="/images/main/opinion01.png" className='opinion-img' />
+            <img src="/image/Main/opinion01.png" className='opinion-img' />
           </div>
 
           <div 
@@ -92,7 +91,7 @@ const MainPage: React.FC = () => {
             style={{cursor:"pointer"}}
           >
             이런 기능도 만들어 주세요
-            <img src="/images/main/opinion02.png" className='opinion-img' />
+            <img src="/image/Main/opinion02.png" className='opinion-img' />
           </div>
 
           <div 
@@ -101,7 +100,7 @@ const MainPage: React.FC = () => {
             style={{cursor:"pointer"}}
           >
             이런 점이 불편해요
-            <img src="/images/main/opinion03.png" className='opinion-img' />
+            <img src="/image/Main/opinion03.png" className='opinion-img' />
           </div>
 
           <div 
@@ -110,7 +109,7 @@ const MainPage: React.FC = () => {
             style={{cursor:"pointer"}}
           >
             이런 오류가 있어요
-            <img src="/images/main/opinion04.png" className='opinion-img' />
+            <img src="/image/Main/opinion04.png" className='opinion-img' />
           </div>
 
         </div>
@@ -142,7 +141,7 @@ const MainPage: React.FC = () => {
         className="chatbot-btn"
         onClick={() => navigate("")}
       >
-        <img src="/images/main/chat.png" alt="chatbot"/>
+        <img src="/image/Main/chat.png" alt="chatbot"/>
       </div>
 
     </div>

@@ -51,8 +51,8 @@ const SkinReport: React.FC = () => {
     // 확정된 실제 선택 날짜
     const [startDate, setStartDate] = useState<Date | null>(new Date('2026-02-13'));
     const [endDate, setEndDate] = useState<Date | null>(new Date('2026-02-18'));
-    const before = 'img/before.png'
-    const after = 'img/after.png'
+    const before = '/image/Mypage/before.png'
+    const after = '/image/Mypage/after.png'
 
     // 달력 팝업 안에서 움직일 임시 날짜
     const [tempStartDate, setTempStartDate] = useState<Date | null>(null);
@@ -110,7 +110,7 @@ const SkinReport: React.FC = () => {
             datasets: [{
                 label: '건수',
                 data: data,
-                borderColor: '#12c2e9', // 레퍼런스와 비슷한 쨍한 하늘색
+                borderColor: '#50CDBA', 
                 borderWidth: 3, // 선 굵게
                 tension: 0, // 곡선 없이 직선으로 이어지게
             }]
@@ -142,10 +142,10 @@ const SkinReport: React.FC = () => {
 
     return (
         <div>
-            <h2 style={{ fontWeight: 'bold', color: '#1a1a3a', marginBottom: '20px' }}>피부 변화 리포트</h2>
+            <h4 style={{ fontWeight: 'bold', color: '#1a1a3a', marginBottom: '20px' }}>피부 변화 리포트</h4>
             <div style={{
                 position: 'relative', // 드롭다운을 이 박스 기준으로 띄우기 위함
-                width: '65%', // 화면을 넓게 쓰도록 수정 (원하시면 줄여도 됩니다)
+                width: '100%', // 화면을 넓게 쓰도록 수정 (원하시면 줄여도 됩니다)
                 height: '400px',
                 backgroundColor: '#ffffff',
                 borderRadius: '16px',
@@ -185,7 +185,7 @@ const SkinReport: React.FC = () => {
             </div>
                             
             <h2 style={{ fontWeight: 'bold', color: '#1a1a3a', marginBottom: '20px' }}>피부 상태 변화</h2>
-            <div style={{ width: '65%' }}>
+            <div style={{ width: '100%' }}>
                 <div style={{ display: 'flex', border: '1px solid #ced4da', borderRadius: '8px', overflow: 'hidden', marginBottom: '30px', height: '50px' }}>
                     
                     {/* Start Date 영역 */}
