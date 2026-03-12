@@ -11,13 +11,12 @@ const Gallery: React.FC = () => {
   const [selectedSort, setSelectedSort] = useState('상품명');
   const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 상태
 
-  // 그리드형식 이미지
+  // 그리드형식 
   const products = [
-    {id:1,name:"leesangmin.png",brand:"sangmin1",img:"Recommend_image/leesangmin.png",heart:false},
-    {id:2,name:"sangmin2",brand:"sangmin2",img:"Recommend_image/sangmin2.png",heart:false},
-    {id:3,name:"sangmin3",brand:"sangmin3",img:"Recommend_image/sangmin3.png",heart:false},
-    {id:4,name:"sangmin4",brand:"sangmin4",img:"Recommend_image/sangmin4.png",heart:false},
-    {id:5,name:"sangmin5",brand:"sangmin5",img:"Recommend_image/leesangmin.png",heart:false}
+    {id:1,name:"넘버즈인 1번 수딩세럼",brand:"넘버즈인",img:"/image/Recommend/numbuzin.jpg",heart:false},
+    {id:2,name:"파티온 트러블 크림",brand:"파티온",img:"/image/Recommend/fation.jpg",heart:false},
+    {id:3,name:"바이오가 바디워시",brand:"바이오가",img:"/image/Recommend/biorga.png",heart:false},
+    {id:4,name:"이지덤 스팟패치",brand:"이지덤",img:"/image/Recommend/easyderm.png",heart:false}
   ]
   // Dropdown 영역
   const sortOptions = [

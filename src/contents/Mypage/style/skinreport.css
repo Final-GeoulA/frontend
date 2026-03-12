@@ -39,7 +39,7 @@
 /* 선택된 날짜 (파란색 동그라미) */
 .custom-datepicker .react-datepicker__day--selected,
 .custom-datepicker .react-datepicker__day--keyboard-selected {
-    background-color: #4da6ff !important;
+    background-color: #50CDBA !important;
     color: #fff !important;
 }
 
