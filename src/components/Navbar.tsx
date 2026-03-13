@@ -37,7 +37,7 @@ const Navbar: React.FC = () => {
           </li>
 
           <li>
-            <Link to="/board">게시판</Link>
+            <Link to="/board">커뮤니티</Link>
           </li>
 
         </ul>

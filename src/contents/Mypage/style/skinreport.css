@@ -1,0 +1,54 @@
+/* SkinReport.css */
+.custom-datepicker {
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+    font-family: sans-serif;
+    padding-bottom: 10px;
+    background-color: #fff !important;
+}
+
+.custom-datepicker .react-datepicker__header {
+    background-color: white !important;
+    border-bottom: none !important;
+    padding: 0 !important;
+}
+
+.custom-datepicker .react-datepicker__day-names {
+    margin-top: 10px;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 10px;
+}
+
+.custom-datepicker .react-datepicker__day-name {
+    color: #888 !important;
+    font-size: 12px !important;
+    width: 34px !important;
+}
+
+.custom-datepicker .react-datepicker__day {
+    width: 34px !important;
+    height: 34px !important;
+    line-height: 34px !important;
+    border-radius: 50% !important;
+    color: #333 !important;
+    font-size: 14px !important;
+    margin: 2px !important;
+}
+
+/* 선택된 날짜 (파란색 동그라미) */
+.custom-datepicker .react-datepicker__day--selected,
+.custom-datepicker .react-datepicker__day--keyboard-selected {
+    background-color: #50CDBA !important;
+    color: #fff !important;
+}
+
+.custom-datepicker .react-datepicker__day:hover {
+    background-color: #f0f4f8 !important;
+    border-radius: 50% !important;
+}
+
+/* 화살표 꼬리표 숨기기 */
+.react-datepicker__triangle {
+    display: none !important;
+}

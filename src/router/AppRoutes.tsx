@@ -1,39 +1,46 @@
 import React from "react";
+import { Route, Routes, Navigate  } from "react-router-dom";
 
-import Mypage from "../contents/Mypage/MyPage";
-import { Route, Routes } from "react-router-dom";
-import SkinInfo from "../contents/SkinInfo/SkinInfo";
-
-
-
+// 로그인, 회원가입
 import Login from "../contents/Login/Login";
 import SignUp from "../contents/SignUp/SignUp";
 import FindID from "../contents/Login/Find";
 
+// 메인 페이지
 import MainPage from "../contents/MainPage/MainPage";
 import ServiceQuestion from "../contents/MainPage/ServiceQuestion";
 
-import BoardList from "../contents/Board/Board";
+// 피부 백과
+import SkinInfo from "../contents/SkinInfo/SkinInfo";
 
-
-import Recommend from "../contents/Recommend/Recommend";
-import Search from "../contents/Search/Search";
+// 커뮤니티
 import Board from "../contents/Board/Board";
-
-import Boarddetail from "../contents/Board/Boarddetail";
-import Recommenddetail from "../contents/Recommend/Recommenddetail";
 import BoardForm from "../contents/Board/BoardForm";
-import SkinAnalysis from "../contents/SkinAnalysis/SkinAnalysis";
+import Boarddetail from "../contents/Board/Boarddetail";
 
+// 제품 추천
+import Recommend from "../contents/Recommend/Recommend";
+import Recommenddetail from "../contents/Recommend/Recommenddetail";
+
+// 병원. 약국 찾기
+import Search from "../contents/Search/Search";
+
+// 마이페이지
+import Mypage from "../contents/Mypage/MyPage";
+import SkinAnalysis from "../contents/SkinAnalysis/SkinAnalysis";
+import SkinReport from "../contents/Mypage/SkinReport";
 
 const AppRoutes: React.FC = () => {
+
+
+  
   const routeList = [
 
     // 홈 화면
     { path: "/", element: <MainPage /> },
 
-	// 촬영 or 사진 업로드
-	{ path: "/skinanalysis", element: <SkinAnalysis /> },
+    // 촬영 or 사진 업로드
+    { path: "/skinanalysis", element: <SkinAnalysis /> },
 
     // 서비스 문의
     { path: "/ServiceQuestion", element: <ServiceQuestion /> },
@@ -48,13 +55,11 @@ const AppRoutes: React.FC = () => {
     { path: '/recommend', element: <Recommend /> },
     { path: '/recommenddetail', element: <Recommenddetail /> },
 
-
+    // 커뮤니티
+    
     { path: "/board", element: <Board /> },
     { path: "/boarddetail", element: <Boarddetail /> },
     { path: "/board/form", element: <BoardForm /> },
-
-
-    { path: "/mypage", element: <Mypage /> },
 
 	// 로그인과 회원가입
     { path: "/login", element: <Login /> },
@@ -64,13 +69,29 @@ const AppRoutes: React.FC = () => {
     { path: "/Find", element: <FindID /> },
   ];
 
-  return (
-    <Routes>
-      {routeList.map((route, idx) => (
-        <Route key={idx} {...route} />
-      ))}
-    </Routes>
-  );
+return (
+  <Routes>
+
+    {/* 기존 routeList */}
+    {routeList.map((route, idx) => (
+      <Route key={idx} {...route} />
+    ))}
+
+    {/* 마이페이지 Layout */}
+    <Route path="/mypage" element={<Mypage />}>
+
+      {/* 첫 화면 → skinreport */}
+      <Route index element={<Navigate to="skinreport" replace />} />
+
+      <Route path="skinreport" element={<SkinReport />} />
+      <Route path="savedhospitals" element={<Search />} />
+      <Route path="recommend" element={<Recommend />} />
+      <Route path="board" element={<Board />} />
+
+    </Route>
+
+  </Routes>
+);
 };
 
 export default AppRoutes;

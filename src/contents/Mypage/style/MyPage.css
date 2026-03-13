@@ -1,0 +1,67 @@
+.mypage-wrapper{
+  display:flex;
+  min-height:100vh;
+}
+
+/* 사이드바 */
+.sidebar{
+  width:260px;
+  height: 100vh;
+  flex: 0 0 300px;
+  background:#f7f7f7;
+  padding:30px 20px;
+  border-right:1px solid #e5e5e5;
+}
+
+/* 프로필 */
+.profile{
+  background: #5ddbc8;
+  border-radius:14px;
+  padding:25px;
+  text-align:center;
+  color:white;
+  font-weight: bold;
+  margin-bottom:30px;
+}
+
+.profile-img{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  background:#ddd;
+  margin:0 auto 10px;
+}
+
+/* 메뉴 */
+.menu{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.menu a{
+  text-decoration:none;
+  color:#6b6b7a;
+  font-size:15px;
+  padding:12px 14px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  transition:0.2s;
+}
+
+/* 현재 페이지 */
+.menu a.active{
+  background:#d4f3ee;
+  color:#3b3b4f;
+  font-weight:600;
+}
+
+/* 오른쪽 컴포넌트 */
+.content{
+    padding-left: 80px;
+    flex: 1;  /* 남은 공간 모두 사용 */
+  position: relative;
+  overflow: hidden;
+}
