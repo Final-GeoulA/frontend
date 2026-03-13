@@ -5,13 +5,13 @@ const Camera: React.FC = () => {
 	const webcamRef = useRef<Webcam>(null);
 
 	return (
-		<div>
+		<div style={{paddingBottom: '36px'}}>
 			<Webcam
 				audio={false}
 				ref={webcamRef}
 				screenshotFormat='image/jpeg'
-				width={570}
-				height={480}
+				width='100%'
+				height={450}
 				onUserMedia={() => { console.log('카메라 동작') }}
 				onUserMediaError={(err) => { console.log("카메라 연결 실패 :", err) }}
 			/>

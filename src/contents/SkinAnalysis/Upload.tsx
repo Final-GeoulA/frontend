@@ -1,7 +1,7 @@
 import React, { RefObject, useState } from 'react'
 const TEAL = "#5BC8BF";
 
-const Upload: React.FC<any> = ({ fileRef }: { fileRef: RefObject<HTMLInputElement | null> }) => {
+const Upload: React.FC<any> = ({ props }: { props: RefObject<HTMLInputElement | null> }) => {
 	const [uploaded, setUploaded] = useState<string | null>(null);
 	const [dragging, setDragging] = useState(false);
 
@@ -61,7 +61,7 @@ const Upload: React.FC<any> = ({ fileRef }: { fileRef: RefObject<HTMLInputElemen
 					onDragOver={e => { e.preventDefault(); setDragging(true); }}
 					onDragLeave={() => setDragging(false)}
 					onDrop={handleDrop}
-					onClick={() => fileRef.current?.click()}
+					onClick={() => props.current?.click()}
 					style={{
 						border: `2px dashed ${dragging ? TEAL : "#d0d0d0"}`,
 						borderRadius: 14,
@@ -78,7 +78,7 @@ const Upload: React.FC<any> = ({ fileRef }: { fileRef: RefObject<HTMLInputElemen
 						클릭하거나 사진을 여기로 드래그하세요
 					</p>
 					<input
-						ref={fileRef}
+						ref={props}
 						type="file"
 						accept="image/*"
 						style={{ display: "none" }}
