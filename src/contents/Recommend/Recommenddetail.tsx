@@ -2,18 +2,7 @@ import React, { useState } from 'react'
 import { Navbar } from 'react-bootstrap'
 import style from './board.module.css'
 import { Link } from 'react-router-dom'
-interface RecommandItem {
-  num: number;
-  title: string;
-  writer: string;
-  nickname: string;
-  contents: string;
-  reip: string;
-  hit: string;
-  elike: string;
-  gdate: string;
-  getImgvo: string[] | null;
-}
+
 
 const Recommenddetail: React.FC = () => {
   return (
@@ -68,7 +57,7 @@ const Recommenddetail: React.FC = () => {
               {/* 이미지 영역 */}
               <div style={{ position: "relative", height: 160, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <span style={{ padding: "20px 10px" }}>
-                    <img src="/image/noscana.jpg" 
+                    <img src="/image/Recommend/numbuzin.jpg" 
                                     alt="노스카나" 
                                     style={{ width: "100%", height: "100%", objectFit: "cover" }} 
                                 /></span>
