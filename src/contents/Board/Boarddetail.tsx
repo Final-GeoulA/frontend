@@ -76,7 +76,7 @@ const Boarddetail: React.FC = () => {
               <img src={`/image/elike.png` }
               style={{ width: '30px', height: 'auto' }} alt='elike'/>33</div>
             </div>
-            <p style={{ margin: 0, fontSize: 14, color: "#444", paddingLeft: 48 }}>난 찬성 안해요!</p>
+            <p style={{ margin: 0, fontSize: 14, color: "#444", paddingLeft: 48 }}>저는 그렇게 생각 안 합니다 !</p>
           </div>
         {/* 댓글 입력 */}
         <div style={{ background: "#fff", borderRadius: 14, border: "1px solid #eee", padding: "20px 28px", marginTop: 8 }}>

@@ -36,7 +36,7 @@ const Board = () => {
         <tbody>
           {posts.map((post) => (
             <tr key={post.id}>
-              <td className="title">{post.title}</td>
+              <td className="title"><Link to ="/boarddetail">{post.title}</Link></td>
               <td>{post.writer}</td>
               <td>{post.date}</td>
               <td>{post.views}</td>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import './style/MainPage.css'
+import { Link } from 'react-router-dom';
 
 const MainPage: React.FC = () => {
 
