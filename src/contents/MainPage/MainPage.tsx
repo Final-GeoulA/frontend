@@ -41,7 +41,7 @@ const MainPage: React.FC = () => {
           <h1>내 피부 사진으로</h1>
           <h1 className="highlight">피부 상태를 분석해보세요</h1>
           <p>Analyze your skin from a simple face scan</p>
-          <button className="scan-btn">Scan My Skin</button>
+          <Link to='/skinanalysis' className="scan-btn">Scan My Skin</Link>
         </div>
 
         <div className="top-image">
