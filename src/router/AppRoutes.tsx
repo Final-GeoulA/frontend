@@ -31,6 +31,9 @@ import SkinAnalysis from "../contents/SkinAnalysis/SkinAnalysis";
 import SkinReport from "../contents/Mypage/SkinReport";
 
 const AppRoutes: React.FC = () => {
+
+
+  
   const routeList = [
 
     // 홈 화면
@@ -53,6 +56,7 @@ const AppRoutes: React.FC = () => {
     { path: '/recommenddetail', element: <Recommenddetail /> },
 
     // 커뮤니티
+    
     { path: "/board", element: <Board /> },
     { path: "/boarddetail", element: <Boarddetail /> },
     { path: "/board/form", element: <BoardForm /> },
