@@ -1,0 +1,136 @@
+.search-title {
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-top: 20px;
+}
+
+.search-info {
+  color: #666;
+  margin-bottom: 30px;
+}
+.map-layout{
+  position:relative;
+  width:100%;
+  height:100vh;
+}
+
+.map-wrapper{
+  display:flex;
+  width:100%;
+  height:100%;
+}
+
+/* 왼쪽 패널 */
+.sidebar{
+  width:320px;
+  background:white;
+  display:flex;
+  flex-direction:column;
+  border-right:1px solid #ddd;
+}
+
+/* 헤더 */
+.sidebar-header{
+  background:#50CDBA;
+  color:white;
+  padding:15px;
+  font-weight:bold;
+  font-size:18px;
+}
+
+/* 검색창 */
+.search-box{
+  display:flex;
+  padding:10px;
+  border-bottom:1px solid #eee;
+}
+
+.search-box input{
+  flex:1;
+  padding:8px;
+  border:1px solid #ccc;
+  border-radius:4px;
+}
+
+.search-box button{
+  margin-left:8px;
+  padding:8px 12px;
+  border:none;
+  background:#50CDBA;
+  color:white;
+  border-radius:4px;
+  cursor:pointer;
+}
+
+/* 결과 리스트 */
+.result-list{
+  overflow-y:auto;
+  flex:1;
+}
+
+/* 결과 아이템 */
+.result-item{
+  padding:12px;
+  border-bottom:1px solid #eee;
+}
+
+.place-name{
+  font-weight:bold;
+  margin-bottom:5px;
+}
+
+.place-address{
+  font-size:13px;
+  color:#666;
+}
+
+.place-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.bookmark{
+  font-size:20px;
+  cursor:pointer;
+  color:#50CDBA;
+}
+
+.bookmark:hover{
+  transform:scale(1.2);
+}
+
+/* 지도 */
+#map{
+  flex:1;
+  height:90%;
+}
+
+/* 현재 위치 버튼 */
+.gps-btn{
+  position:fixed;
+  bottom:30px;
+  right:30px;
+
+  width:100px;
+  height:50px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:50%;
+  font-size:16px;
+  font-weight: 600;
+  background: #74dacacb;
+  border:2px solid #50CDBA;
+
+  box-shadow:0 2px 8px rgba(0,0,0,0.25);
+
+  z-index:9999;
+  cursor:pointer;
+}
+
+.gps-btn:hover{
+  background:#50CDBA;
+}
