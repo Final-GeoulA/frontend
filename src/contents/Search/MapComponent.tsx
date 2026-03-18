@@ -30,6 +30,7 @@ const MapComponent: React.FC = () => {
     script.src =
       "//dapi.kakao.com/v2/maps/sdk.js?appkey=836d89a37130cf3be86c76f8b6848b19&autoload=false&libraries=services";
     script.async = true;
+
     script.onload = () => {
       window.kakao.maps.load(() => {
         initMap();
@@ -41,6 +42,7 @@ const MapComponent: React.FC = () => {
   }, []);
 
   const initMap = () => {
+
     const container = document.getElementById("map");
     if (!container) return;
 
@@ -50,15 +52,19 @@ const MapComponent: React.FC = () => {
     };
 
     const map = new window.kakao.maps.Map(container, options);
+
     mapRef.current = map;
+
     infoWindowRef.current = new window.kakao.maps.InfoWindow({
       zIndex: 1
     });
 
     moveToCurrentLocation();
+
   };
 
   const moveToCurrentLocation = () => {
+
     if (!navigator.geolocation) {
       alert("GPS를 지원하지 않는 브라우저입니다.");
       return;
@@ -84,7 +90,9 @@ const MapComponent: React.FC = () => {
       });
 
       currentMarkerRef.current = marker;
+
     });
+
   };
 
   const createBookmarkMarker = () => {
@@ -95,9 +103,11 @@ const MapComponent: React.FC = () => {
     const imageSize = new window.kakao.maps.Size(24, 35);
 
     return new window.kakao.maps.MarkerImage(imageSrc, imageSize);
+
   };
 
   const drawMarkers = (data: any[], bookmarkState: any) => {
+
     const map = mapRef.current;
 
     markersRef.current.forEach((m) => m.setMap(null));
@@ -105,7 +115,7 @@ const MapComponent: React.FC = () => {
 
     const bounds = new window.kakao.maps.LatLngBounds();
 
-    data.forEach((place: any, index:number) => {
+    data.forEach((place: any, index: number) => {
 
       const position = new window.kakao.maps.LatLng(place.y, place.x);
 
@@ -133,23 +143,34 @@ const MapComponent: React.FC = () => {
       bounds.extend(position);
 
     });
+
     map.setBounds(bounds);
+
   };
 
   const searchPlaces = () => {
+
     if (!keyword.trim()) return;
+
     const ps = new window.kakao.maps.services.Places();
+
     ps.keywordSearch(keyword, (data: any, status: any) => {
+
       if (status === window.kakao.maps.services.Status.OK) {
+
         setPlaces(data);
         drawMarkers(data, bookmarks);
+
       }
+
     });
+
   };
 
-  const moveToPlace = (place:any, index:number) => {
+  const moveToPlace = (place: any, index: number) => {
 
     const map = mapRef.current;
+
     const position = new window.kakao.maps.LatLng(place.y, place.x);
 
     map.setCenter(position);
@@ -169,31 +190,73 @@ const MapComponent: React.FC = () => {
 
   };
 
-  const toggleBookmark = (placeId: string) => {
-    setBookmarks((prev) => {
-      const updated = {
-        ...prev,
-        [placeId]: !prev[placeId]
-      };
+  /* 북마크 저장 API */
+  const toggleBookmark = async (place: any) => {
+    try {
+      const isBookmarked = bookmarks[place.id];
 
-      drawMarkers(places, updated);
+      let response;
 
-      return updated;
-    });
+      if (isBookmarked) {
+        response = await fetch(
+          `http://localhost/geoulA/api/hospital/delete?placeId=${place.id}&userId=9`,
+          {
+            method: "DELETE"
+          }
+        );
+      } else {
+        response = await fetch("http://localhost/geoulA/api/hospital/save?userId=9", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            placeId: place.id,
+            name: place.place_name,
+            address: place.address_name,
+            lat: parseFloat(place.y),
+            lon: parseFloat(place.x)
+          })
+        });
+      }
+
+      if (!response.ok) {
+        throw new Error("북마크 처리 실패");
+      }
+
+      setBookmarks((prev) => {
+        const updated = {
+          ...prev,
+          [place.id]: !prev[place.id]
+        };
+
+        drawMarkers(places, updated);
+        return updated;
+      });
+
+    } catch (error) {
+      console.error(error);
+      alert("북마크 처리 중 오류가 발생했습니다.");
+    }
   };
 
   return (
+
     <div className="map-layout">
+
       <h4 className="search-title">병원·약국찾기</h4>
-      <p className="">병원과 약국을 검색하고 원하는 장소를 저장하세요</p>
+      <p className="search-info">병원과 약국을 검색하고 원하는 장소를 저장하세요</p>
+
       <div className="map-wrapper">
-        {/* 왼쪽 패널 */}
+
         <div className="sidebar">
+
           <div className="sidebar-header">
             GeoulA
           </div>
 
           <div className="search-box">
+
             <input
               type="text"
               placeholder="병원, 약국 검색"
@@ -217,42 +280,51 @@ const MapComponent: React.FC = () => {
               <div
                 key={place.id}
                 className="result-item"
-                onClick={()=>moveToPlace(place,index)}
+                onClick={() => moveToPlace(place, index)}
               >
 
                 <div className="place-header">
+
                   <div className="place-name">
                     {index + 1}. {place.place_name}
                   </div>
 
                   <div
                     className="bookmark"
-                    onClick={(e)=>{
+                    onClick={(e) => {
                       e.stopPropagation();
-                      toggleBookmark(place.id);
+                      toggleBookmark(place);
                     }}
                   >
                     {bookmarks[place.id] ? "♥" : "♡"}
                   </div>
+
                 </div>
 
                 <div className="place-address">
                   {place.address_name}
                 </div>
+
               </div>
+
             ))}
+
           </div>
+
         </div>
-        {/* 지도 */}
+
         <div id="map"></div>
+
       </div>
 
-      {/* 현재 위치 버튼 */}
       <div className="gps-btn" onClick={moveToCurrentLocation}>
         현재 위치
       </div>
+
     </div>
+
   );
+
 };
 
 export default MapComponent;
