@@ -1,10 +1,20 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import './style/MainPage.css'
 import { Link } from 'react-router-dom';
+import './style/Chatbot.css'
+import axios from 'axios';
+import Chat from './Chat';
 
 const MainPage: React.FC = () => {
 
+  const [messages, setMessages] = useState<any[]>([
+    { role: "bot", text: "안녕하세요! 무엇을 도와드릴까요?" }
+  ]);
+
+  const [input, setInput] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const modalBackground = useRef<HTMLDivElement>(null);
   const [openFaQIndex, setOpenFaQIndex] = useState<number | null>(null)
   const navigate = useNavigate();
   const faqData = [
@@ -30,10 +40,27 @@ const MainPage: React.FC = () => {
     }
   ]
 
-  const toggleFAQ = (index:number) => {
+  const toggleFAQ = (index: number) => {
     setOpenFaQIndex(openFaQIndex === index ? null : index)
   }
 
+  const sendMessage = async () => {
+
+    if (!input.trim()) return;
+
+    const userMessage = { role: "user", text: input };
+
+    setMessages(prev => [...prev, userMessage]);
+
+    setInput("");
+
+    // 여기서 GPT API 연결 가능
+    const botReply = { role: "bot", text: "추천 제품을 찾아볼게요!" };
+
+    setTimeout(() => {
+      setMessages(prev => [...prev, botReply]);
+    }, 500);
+  };
   return (
     <div className="skin-container">
       {/* 상단 이미지 추가 */}
@@ -55,7 +82,7 @@ const MainPage: React.FC = () => {
         <div className="step">
           <span className="step-label">Step 1</span>
           <p className='step-info-text'>사진 업로드 후 피부 진단</p>
-          <img src="/image/Main/main01.png" alt="step1" className='step-img1'/>
+          <img src="/image/Main/main01.png" alt="step1" className='step-img1' />
         </div>
 
         <div className="step">
@@ -77,37 +104,37 @@ const MainPage: React.FC = () => {
         <p className='service-title'>💡 여러분의 의견을 들려주세요</p>
 
         <div className="opinion-grid">
-          <div 
+          <div
             className="opinion-card green"
             onClick={() => navigate("/ServiceQuestion?q=question")}
-            style={{cursor:"pointer"}}
+            style={{ cursor: "pointer" }}
           >
             서비스에 궁금한 점이 있어요
             <img src="/image/Main/opinion01.png" className='opinion-img' />
           </div>
 
-          <div 
+          <div
             className="opinion-card yellow"
             onClick={() => navigate("/ServiceQuestion?q=add")}
-            style={{cursor:"pointer"}}
+            style={{ cursor: "pointer" }}
           >
             이런 기능도 만들어 주세요
             <img src="/image/Main/opinion02.png" className='opinion-img' />
           </div>
 
-          <div 
+          <div
             className="opinion-card purple"
             onClick={() => navigate("/ServiceQuestion?q=feedback")}
-            style={{cursor:"pointer"}}
+            style={{ cursor: "pointer" }}
           >
             이런 점이 불편해요
             <img src="/image/Main/opinion03.png" className='opinion-img' />
           </div>
 
-          <div 
+          <div
             className="opinion-card blue"
             onClick={() => navigate("/ServiceQuestion?q=bug")}
-            style={{cursor:"pointer"}}
+            style={{ cursor: "pointer" }}
           >
             이런 오류가 있어요
             <img src="/image/Main/opinion04.png" className='opinion-img' />
@@ -116,34 +143,54 @@ const MainPage: React.FC = () => {
         </div>
       </section>
 
-    {/* FAQ */}
-    <section className="skin-faq">
-      <h2>FAQS</h2>
-      {faqData.map((faq, index) => (
-        <div key={index} className="faq-item">
+      {/* FAQ */}
+      <section className="skin-faq">
+        <h2>FAQS</h2>
+        {faqData.map((faq, index) => (
+          <div key={index} className="faq-item">
 
-          <div className="faq-question" onClick={() => toggleFAQ(index)}>
-            <span>{faq.question}</span>
-            <span className={`arrow ${openFaQIndex === index ? "open" : ""}`}>V</span>
-          </div>
-
-          {openFaQIndex === index && (
-            <div className="faq-answer">
-              {faq.answer}
+            <div className="faq-question" onClick={() => toggleFAQ(index)}>
+              <span>{faq.question}</span>
+              <span className={`arrow ${openFaQIndex === index ? "open" : ""}`}>V</span>
             </div>
-          )}
 
-        </div>
-      ))}
-    </section>
+            {openFaQIndex === index && (
+              <div className="faq-answer">
+                {faq.answer}
+              </div>
+            )}
+
+          </div>
+        ))}
+      </section>
 
       {/* Chatbot Button */}
-      <div 
+      <div
         className="chatbot-btn"
-        onClick={() => navigate("")}
+        onClick={() => setModalOpen(true)}
       >
-        <img src="/image/Main/chat.png" alt="chatbot"/>
+        <img src="/image/Main/chat.png" alt="chatbot" />
       </div>
+
+      {modalOpen && (
+        <div
+          className="modal-container"
+          ref={modalBackground}
+        >
+          <div className="modal-content">
+
+            {/* 헤더 */}
+            <div className="chat-header">
+              AI 챗봇
+              <button onClick={() => setModalOpen(false)}>X</button>
+            </div>
+
+            <Chat />
+
+          </div>
+        </div>
+      )}
+
 
     </div>
   );
