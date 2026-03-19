@@ -29,6 +29,7 @@ import Search from "../contents/Search/Search";
 import Mypage from "../contents/Mypage/MyPage";
 import SkinAnalysis from "../contents/SkinAnalysis/SkinAnalysis";
 import SkinReport from "../contents/Mypage/SkinReport";
+import Chat from "../contents/MainPage/Chat";
 
 const AppRoutes: React.FC = () => {
 
@@ -67,6 +68,8 @@ const AppRoutes: React.FC = () => {
 
 	// 불명
     { path: "/Find", element: <FindID /> },
+
+    
   ];
 
 return (
