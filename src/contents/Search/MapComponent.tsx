@@ -1,3 +1,6 @@
+// user_id=2로 고정
+// 추후 로그인 기능 연동 후 실제 로그인 사용자 ID(user_id)로 변경 예정
+
 import React, { useEffect, useRef, useState } from "react";
 import "./style/MapComponent.css";
 
@@ -24,7 +27,6 @@ const MapComponent: React.FC = () => {
     }
 
     const script = document.createElement("script");
-
     script.src =
       "//dapi.kakao.com/v2/maps/sdk.js?appkey=836d89a37130cf3be86c76f8b6848b19&autoload=false&libraries=services";
     script.async = true;
@@ -48,80 +50,186 @@ const MapComponent: React.FC = () => {
     };
 
     const map = new window.kakao.maps.Map(container, options);
-
     mapRef.current = map;
 
     infoWindowRef.current = new window.kakao.maps.InfoWindow({
       zIndex: 1
     });
 
-    moveToCurrentLocation();
+    await moveToCurrentLocation();
 
-    // 초기 로딩 시 북마크 불러오기
-    await loadBookmarks(true);
+    const { bookmarkMap, savedPlaces } = await loadBookmarks();
+    const medicalPlaces = await loadMedicalPlacesOnly();
+    const merged = dedupePlaces([...savedPlaces, ...medicalPlaces]);
+
+    setBookmarks(bookmarkMap);
+    setPlaces(merged);
+    drawMarkers(merged, bookmarkMap);
   };
 
-  const moveToCurrentLocation = () => {
-    if (!navigator.geolocation) {
-      alert("GPS를 지원하지 않는 브라우저입니다.");
-      return;
-    }
+  const createCurrentLocationMarker = () => {
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36">
+        <circle cx="18" cy="18" r="10" fill="#ff3b30" stroke="white" stroke-width="4"/>
+      </svg>
+    `;
 
-    navigator.geolocation.getCurrentPosition((position) => {
-      const lat = position.coords.latitude;
-      const lng = position.coords.longitude;
+    const imageSrc = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    const imageSize = new window.kakao.maps.Size(36, 36);
+    const imageOption = { offset: new window.kakao.maps.Point(18, 18) };
 
-      const locPosition = new window.kakao.maps.LatLng(lat, lng);
-      const map = mapRef.current;
-
-      map.setCenter(locPosition);
-
-      if (currentMarkerRef.current) {
-        currentMarkerRef.current.setMap(null);
-      }
-
-      const marker = new window.kakao.maps.Marker({
-        map: map,
-        position: locPosition
-      });
-
-      currentMarkerRef.current = marker;
-    });
+    return new window.kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
   };
 
   const createBookmarkMarker = () => {
-    const imageSrc =
-      "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48">
+        <path d="M18 0C8 0 0 8 0 18c0 12 18 30 18 30s18-18 18-30C36 8 28 0 18 0z"
+              fill="#35c4ae" stroke="white" stroke-width="2"/>
 
-    const imageSize = new window.kakao.maps.Size(24, 35);
+        <!-- 하트 icon -->
+        <path d="M18 24
+                C16 22, 11 18.5, 11 15
+                C11 12.5, 13 11, 15.5 11
+                C17 11, 18 12, 18.8 13.2
+                C19.6 12, 20.6 11, 22.1 11
+                C24.6 11, 26.6 12.5, 26.6 15
+                C26.6 18.5, 21.6 22, 19.6 24
+                Z"
+              fill="white"/>
+      </svg>
+    `;
+    const imageSrc = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    const imageSize = new window.kakao.maps.Size(30, 38);
+    const imageOption = { offset: new window.kakao.maps.Point(14, 34) };
 
-    return new window.kakao.maps.MarkerImage(imageSrc, imageSize);
+    return new window.kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+  };
+
+  const createHospitalMarker = () => {
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48">
+        <path d="M18 0C8 0 0 8 0 18c0 12 18 30 18 30s18-18 18-30C36 8 28 0 18 0z"
+              fill="#fc944f" stroke="white" stroke-width="2"/>
+        <rect x="15" y="10" width="6" height="16" rx="1" fill="white"/>
+        <rect x="10" y="15" width="16" height="6" rx="1" fill="white"/>
+      </svg>
+    `;
+
+    const imageSrc = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    const imageSize = new window.kakao.maps.Size(24, 32);
+    const imageOption = { offset: new window.kakao.maps.Point(12, 32) };
+
+    return new window.kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+  };
+
+  const createPharmacyMarker = () => {
+    const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" viewBox="0 0 36 48">
+      <path d="M18 0C8 0 0 8 0 18c0 12 18 30 18 30s18-18 18-30C36 8 28 0 18 0z"
+            fill="#9780fd" stroke="white" stroke-width="2"/>
+      <!-- 알약 icon -->
+      <g transform="rotate(-45 18 18)">
+        <rect x="10" y="14" width="16" height="8" rx="4" fill="white"/>
+        <line x1="18" y1="14" x2="18" y2="22" stroke="#9780fd" stroke-width="2"/>
+      </g>
+    </svg>
+  `;
+    const imageSrc = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    const imageSize = new window.kakao.maps.Size(24, 32);
+    const imageOption = { offset: new window.kakao.maps.Point(12, 32) };
+
+    return new window.kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+  };
+
+  const moveToCurrentLocation = (): Promise<void> => {
+    return new Promise((resolve) => {
+      if (!navigator.geolocation) {
+        alert("GPS를 지원하지 않는 브라우저입니다.");
+        resolve();
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          const locPosition = new window.kakao.maps.LatLng(lat, lng);
+          const map = mapRef.current;
+
+          if (!map) {
+            resolve();
+            return;
+          }
+
+          map.setCenter(locPosition);
+
+          if (currentMarkerRef.current) {
+            currentMarkerRef.current.setMap(null);
+          }
+
+          const marker = new window.kakao.maps.Marker({
+            map: map,
+            position: locPosition,
+            image: createCurrentLocationMarker()
+          });
+
+          currentMarkerRef.current = marker;
+          resolve();
+        },
+        () => {
+          resolve();
+        }
+      );
+    });
+  };
+
+  const getMarkerImage = (place: any, bookmarkState: any) => {
+    if (bookmarkState[place.id]) {
+      return createBookmarkMarker();
+    }
+
+    if (place.type === "hospital") {
+      return createHospitalMarker();
+    }
+
+    if (place.type === "pharmacy") {
+      return createPharmacyMarker();
+    }
+
+    return undefined;
   };
 
   const drawMarkers = (data: any[], bookmarkState: any) => {
     const map = mapRef.current;
     if (!map) return;
-    if (!data || data.length === 0) return;
 
     markersRef.current.forEach((m) => m.setMap(null));
     markersRef.current = [];
+
+    if (!data || data.length === 0) return;
 
     const bounds = new window.kakao.maps.LatLngBounds();
 
     data.forEach((place: any) => {
       const position = new window.kakao.maps.LatLng(place.y, place.x);
-
       const marker = new window.kakao.maps.Marker({
         map: map,
         position: position,
-        image: bookmarkState[place.id] ? createBookmarkMarker() : undefined
+        image: getMarkerImage(place, bookmarkState)
       });
 
       window.kakao.maps.event.addListener(marker, "click", () => {
+        const categoryText =
+          place.type === "hospital" ? "병원"
+            : place.type === "pharmacy" ? "약국"
+            : "";
+
         const content = `
           <div style="padding:8px;font-size:13px;">
             <b>${place.place_name}</b><br/>
             ${place.address_name}
+            ${categoryText ? `<br/><span style="color:#666;">${categoryText}</span>` : ""}
           </div>
         `;
 
@@ -136,12 +244,20 @@ const MapComponent: React.FC = () => {
     map.setBounds(bounds);
   };
 
-  // 서버 북마크 불러오기
-  // isInitial = true 이면 검색 전에도 리스트/마커 표시
-  const loadBookmarks = async (isInitial: boolean = false) => {
+  const dedupePlaces = (data: any[]) => {
+    const placeMap = new Map();
+
+    data.forEach((place) => {
+      placeMap.set(String(place.id), place);
+    });
+
+    return Array.from(placeMap.values());
+  };
+
+  const loadBookmarks = async () => {
     try {
       const response = await fetch(
-        "http://localhost/geoulA/api/hospital/bookmarks?userId=9"
+        "http://localhost/geoulA/api/hospital/bookmarks?userId=2"
       );
 
       if (!response.ok) {
@@ -153,7 +269,6 @@ const MapComponent: React.FC = () => {
 
       const bookmarkMap: { [key: string]: boolean } = {};
 
-      // 서버 데이터를 카카오 검색 결과 형태와 비슷하게 맞춰주기
       const savedPlaces = data.map((hospital: any) => {
         bookmarkMap[String(hospital.placeId)] = true;
 
@@ -162,43 +277,96 @@ const MapComponent: React.FC = () => {
           place_name: hospital.name,
           address_name: hospital.address,
           y: String(hospital.lat),
-          x: String(hospital.lon)
+          x: String(hospital.lon),
+          type: hospital.name?.includes("약국") ? "pharmacy" : "hospital"
         };
       });
 
-      setBookmarks(bookmarkMap);
-
-      // 검색 전에도 저장 목록을 사이드바/지도에 표시
-      if (isInitial) {
-        setPlaces(savedPlaces);
-        drawMarkers(savedPlaces, bookmarkMap);
-      }
-
-      return bookmarkMap;
+      return { bookmarkMap, savedPlaces };
     } catch (error) {
       console.error(error);
-      return {};
+      return { bookmarkMap: {}, savedPlaces: [] };
     }
+  };
+
+  const loadMedicalPlacesOnly = async () => {
+    const map = mapRef.current;
+    if (!map) return [];
+
+    const ps = new window.kakao.maps.services.Places(map);
+
+    const searchByCategory = (categoryCode: string) => {
+      return new Promise<any[]>((resolve) => {
+        ps.categorySearch(
+          categoryCode,
+          (data: any, status: any) => {
+            if (status === window.kakao.maps.services.Status.OK) {
+              resolve(data);
+            } else {
+              resolve([]);
+            }
+          },
+          { useMapBounds: true }
+        );
+      });
+    };
+
+    const hospitalData = (await searchByCategory("HP8")).map((place) => ({
+      ...place,
+      type: "hospital"
+    }));
+
+    const pharmacyData = (await searchByCategory("PM9")).map((place) => ({
+      ...place,
+      type: "pharmacy"
+    }));
+
+    return dedupePlaces([...hospitalData, ...pharmacyData]);
   };
 
   const searchPlaces = async () => {
     if (!keyword.trim()) return;
 
-    const latestBookmarks = await loadBookmarks(false);
+    const { bookmarkMap } = await loadBookmarks();
     const ps = new window.kakao.maps.services.Places();
 
-    ps.keywordSearch(keyword, (data: any, status: any) => {
-      if (status === window.kakao.maps.services.Status.OK) {
-        console.log("검색 결과:", data);
-        setPlaces(data);
-        setBookmarks(latestBookmarks);
-        drawMarkers(data, latestBookmarks);
-      }
-    });
+    const searchConfigs = [
+      { keyword: `${keyword} 병원`, type: "hospital" },
+      { keyword: `${keyword} 약국`, type: "pharmacy" },
+      { keyword: `${keyword} 피부과`, type: "hospital" }
+    ];
+
+    const searchOne = (searchKeyword: string, type: string) => {
+      return new Promise<any[]>((resolve) => {
+        ps.keywordSearch(searchKeyword, (data: any, status: any) => {
+          if (status === window.kakao.maps.services.Status.OK) {
+            resolve(
+              data.map((place: any) => ({
+                ...place,
+                type
+              }))
+            );
+          } else {
+            resolve([]);
+          }
+        });
+      });
+    };
+
+    const results = await Promise.all(
+      searchConfigs.map((item) => searchOne(item.keyword, item.type))
+    );
+
+    const merged = dedupePlaces(results.flat());
+
+    setPlaces(merged);
+    setBookmarks(bookmarkMap);
+    drawMarkers(merged, bookmarkMap);
   };
 
   const moveToPlace = (place: any, index: number) => {
     const map = mapRef.current;
+    if (!map) return;
 
     const position = new window.kakao.maps.LatLng(place.y, place.x);
 
@@ -207,10 +375,16 @@ const MapComponent: React.FC = () => {
 
     const marker = markersRef.current[index];
 
+    const categoryText =
+      place.type === "hospital" ? "병원"
+        : place.type === "pharmacy" ? "약국"
+        : "";
+
     const content = `
       <div style="padding:8px;font-size:13px;">
         <b>${place.place_name}</b><br/>
         ${place.address_name}
+        ${categoryText ? `<br/><span style="color:#666;">${categoryText}</span>` : ""}
       </div>
     `;
 
@@ -225,14 +399,14 @@ const MapComponent: React.FC = () => {
 
       if (isBookmarked) {
         response = await fetch(
-          `http://localhost/geoulA/api/hospital/delete?placeId=${place.id}&userId=9`,
+          `http://localhost/geoulA/api/hospital/delete?placeId=${place.id}&userId=2`,
           {
             method: "DELETE"
           }
         );
       } else {
         response = await fetch(
-          "http://localhost/geoulA/api/hospital/save?userId=9",
+          "http://localhost/geoulA/api/hospital/save?userId=2",
           {
             method: "POST",
             headers: {
@@ -253,9 +427,17 @@ const MapComponent: React.FC = () => {
         throw new Error("북마크 처리 실패");
       }
 
-      const latestBookmarks = await loadBookmarks(false);
-      setBookmarks(latestBookmarks);
-      drawMarkers(places, latestBookmarks);
+      const { bookmarkMap, savedPlaces } = await loadBookmarks();
+      const merged = dedupePlaces(
+        places.map((p) => {
+          const saved = savedPlaces.find((sp: any) => String(sp.id) === String(p.id));
+          return saved ? { ...p, type: saved.type || p.type } : p;
+        })
+      );
+
+      setBookmarks(bookmarkMap);
+      setPlaces(merged);
+      drawMarkers(merged, bookmarkMap);
     } catch (error) {
       console.error(error);
       alert("북마크 처리 중 오류가 발생했습니다.");
@@ -274,14 +456,13 @@ const MapComponent: React.FC = () => {
           <div className="search-box">
             <input
               type="text"
-              placeholder="병원, 약국 검색"
+              placeholder="지역명 또는 병원·약국 검색"
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") searchPlaces();
               }}
             />
-
             <button onClick={searchPlaces}>🔍</button>
           </div>
 
@@ -317,7 +498,20 @@ const MapComponent: React.FC = () => {
         <div id="map"></div>
       </div>
 
-      <div className="gps-btn" onClick={moveToCurrentLocation}>
+      <div
+        className="gps-btn"
+        onClick={async () => {
+          await moveToCurrentLocation();
+
+          const { bookmarkMap, savedPlaces } = await loadBookmarks();
+          const medicalPlaces = await loadMedicalPlacesOnly();
+          const merged = dedupePlaces([...savedPlaces, ...medicalPlaces]);
+
+          setBookmarks(bookmarkMap);
+          setPlaces(merged);
+          drawMarkers(merged, bookmarkMap);
+        }}
+      >
         현재 위치
       </div>
     </div>
