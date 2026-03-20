@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 interface Member {
     nickname: string;
     email: string;
-    num: number;
+    user_id: number;
 }
 //컨텍스트 타입
 interface AuthContextProps {
@@ -13,7 +13,7 @@ interface AuthContextProps {
     isLoggedIn: boolean;
     login: (email: string, password: string) => Promise<'success' | 'fail' | 'error'>;
     logout: () => void;
-    updateMemberName: (name: string) => void;
+    updateMemberName: (nickname: string) => void;
     updateMemberEmail: (email: string) => void;
 }
 //컨텍스트 생성
@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             if (res.data?.email) {
                 setMember({
-                    num: res.data.num,  
+                    user_id: res.data.num,  
                     email: res.data.email,
                     nickname: res.data.nickname
                 });

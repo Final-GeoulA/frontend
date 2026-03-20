@@ -1,8 +1,10 @@
 import React from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import './style/MyPage.css';
+import { useAuth } from "../../components/AuthProvider";
 
 const MyPage: React.FC = () => {
+  const {member} = useAuth()
   return (
     <div className="mypage-wrapper">
 
@@ -10,7 +12,7 @@ const MyPage: React.FC = () => {
       <aside className="sidebar">
         <div className="profile">
           <div className="profile-img"></div>
-          <p>user123님</p>
+          <p>{member?.nickname}</p>
         </div>
 
         <nav className="menu">

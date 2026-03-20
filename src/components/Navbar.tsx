@@ -6,7 +6,6 @@ import "./css/Navbar.css";
 const Navbar: React.FC = () => {
   const { member, logout } = useAuth();
   const navigate = useNavigate();
-
   const handleLogout = async () => {
     await logout();
     alert("로그아웃 되었습니다.");
@@ -45,9 +44,10 @@ const Navbar: React.FC = () => {
         {/* 로그인 영역 */}
         <div className="navbar-auth">
           {member ? (
+            
             <>
               <span className="welcome-text">
-                {member.nickname}님
+                {member?.nickname}님
               </span>
 
               <button onClick={handleLogout} className="auth-link">
@@ -58,6 +58,7 @@ const Navbar: React.FC = () => {
             <>
               <Link to="/login" className="auth-link">
                 로그인
+                
               </Link>
 
               <Link to="/signup" className="auth-link">
