@@ -33,14 +33,7 @@ const SignUp: React.FC = () => {
 	// const [idMessage, setIdMessage] = useState('');
 	const [isEmailVerified, setIsEmailVerified] = useState(false);
 	const navigate = useNavigate();
-
-	// const [authCode, setAuthCode] = useState("");
-	// const [password, setPassword] = useState("");
-	// const [passwordConfirm, setPasswordConfirm] = useState("");
-	// const [nickname, setNickname] = useState("");
-	const [gender, setGender] = useState("");
-	const [age, setAge] = useState("20대");
-	const [skinType, setSkinType] = useState("복합성");
+	
 	const [showPw, setShowPw] = useState(false);
 	const [showPwConfirm, setShowPwConfirm] = useState(false);
 
