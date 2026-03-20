@@ -7,9 +7,28 @@ const TEAL_LIGHT = "#e8f8f7";
 const TEAL_BORDER = "#a8e0db";
 
 const Login: React.FC = () => {
-	const [email, setEmail] = useState("balamia@gmail.com");
+	const {login,checkLogin} = useAuth();
+	const navigate = useNavigate();
+	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [showPw, setShowPw] = useState(false);
+
+	// ---------- 일반 로그인 ----------
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const result = await login(email, password);
+      if (result === "success") {
+        alert("로그인되었습니다.");
+        navigate("/", { replace: true });
+      } else {
+        alert("아이디/비밀번호 오류");
+      }
+    } catch (err) {
+      console.error("handleLogin error:", err);
+      alert("로그인 중 오류가 발생했습니다.");
+    }
+  };
 
 	return (
 		<div style={{ minHeight: "100vh", background: "#f7f7f7", fontFamily: "'Pretendard', 'Apple SD Gothic Neo', sans-serif" }}>
@@ -71,7 +90,7 @@ const Login: React.FC = () => {
 					</div>
 
 					{/* Button */}
-					<button style={{
+					<button onClick={handleLogin} style={{
 						width: "100%", padding: "15px", background: TEAL,
 						color: "#fff", border: "none", borderRadius: 10,
 						fontSize: 16, fontWeight: 700, cursor: "pointer", letterSpacing: "0.5px",

@@ -23,7 +23,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const checkLogin = async () => {
         //withCredentials:true server와의 session통신
         try {
-            const res = await axios.get(`${process.env.REACT_APP_BACK_END_URL}/api/login/session`, {
+            const res = await axios.get(`${process.env.REACT_APP_BACK_END_URL}/login/session`, {
                 withCredentials: true
             });
             console.log("세션 응답:", res.data);
@@ -43,7 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     const login = async (email: string, password: string): Promise<'success' | 'fail' | 'error'> => {
         try {
-            const res = await axios.post(`${process.env.REACT_APP_BACK_END_URL}/api/login/dologin`, { email, password }, { withCredentials: true })
+            const res = await axios.post(`${process.env.REACT_APP_BACK_END_URL}/login/dologin`, { email, password }, { withCredentials: true })
 
             if (res.data === 'success') {
 
@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }
     const logout = async () => {
-        await axios.get(`${process.env.REACT_APP_BACK_END_URL}/api/login/dologout`, { withCredentials: true });
+        await axios.get(`${process.env.REACT_APP_BACK_END_URL}/login/dologout`, { withCredentials: true });
         setMember(null);
     }
     //렌더링시 useEffect를 사용해서 초기화
