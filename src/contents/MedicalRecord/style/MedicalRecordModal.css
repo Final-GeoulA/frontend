@@ -1,0 +1,159 @@
+.medical-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  z-index: 999;
+  box-sizing: border-box;
+}
+
+.medical-modal {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  animation: modalFadeIn 0.2s ease;
+}
+
+.medical-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px 24px 18px;
+  background: linear-gradient(135deg, #50cdba 0%, #7be0d1 100%);
+  color: #ffffff;
+}
+
+.medical-modal-subtitle {
+  margin: 0 0 6px;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.medical-modal-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.medical-modal-close {
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.medical-modal-body {
+  padding: 22px 24px 24px;
+}
+
+.medical-modal-summary {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  background: #ecfbf8;
+  border-radius: 14px;
+  color: #1f766c;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.medical-modal-records {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.medical-modal-record-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #d9eeea;
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.medical-modal-record-left,
+.medical-modal-record-right {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.medical-modal-record-right {
+  align-items: flex-end;
+}
+
+.medical-modal-label {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.medical-modal-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.medical-modal-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: #50cdba;
+}
+
+.medical-modal-empty {
+  text-align: center;
+  padding: 32px 16px;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 600px) {
+  .medical-modal {
+    max-width: 100%;
+    border-radius: 20px;
+  }
+
+  .medical-modal-header {
+    padding: 20px 20px 16px;
+  }
+
+  .medical-modal-body {
+    padding: 18px 20px 20px;
+  }
+
+  .medical-modal-title {
+    font-size: 20px;
+  }
+
+  .medical-modal-record-item {
+    padding: 14px;
+  }
+
+  .medical-modal-value,
+  .medical-modal-price {
+    font-size: 15px;
+  }
+}

@@ -23,21 +23,12 @@ const Navbar: React.FC = () => {
 
         {/* 메뉴 탭 */}
         <ul className="navbar-menu">
-          <li>
-            <Link to="/skinInfo">피부 백과</Link>
-          </li>
-
-          <li>
-            <Link to="/search">병원 약국 찾기</Link>
-          </li>
-
-          <li>
-            <Link to="/recommend">제품추천</Link>
-          </li>
-
-          <li>
-            <Link to="/board">커뮤니티</Link>
-          </li>
+          <li>  <Link to="/skinanalysis">피부 분석</Link>  </li>
+          <li>  <Link to="/recommend">제품 추천</Link>  </li>
+          <li>  <Link to="/HospitalSearch">병원 약국 찾기</Link>  </li>
+          <li>  <Link to="/MedicalRecord">진료 관리</Link>   </li>
+          <li>  <Link to="/SkinRank">피부 랭킹</Link>  </li>
+          <li>  <Link to="/board">커뮤니티</Link>  </li>
 
         </ul>
 
