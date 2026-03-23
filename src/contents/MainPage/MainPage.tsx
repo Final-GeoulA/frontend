@@ -1,27 +1,19 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import './style/MainPage.css'
-import { Link } from 'react-router-dom';
-import './style/Chatbot.css'
-import axios from 'axios';
-import Chat from './Chat';
+import "./style/MainPage.css";
+import { Link } from "react-router-dom";
+import "./style/Chatbot.css";
+import axios from "axios";
+import Chat from "./Chat";
 
 const MainPage: React.FC = () => {
-
   const [messages, setMessages] = useState<any[]>([
-    { role: "bot", text: "안녕하세요! 무엇을 도와드릴까요?" }
+    { role: "bot", text: "안녕하세요! 무엇을 도와드릴까요?" },
   ]);
 
   const [input, setInput] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const modalBackground = useRef<HTMLDivElement>(null);
-  const [openFaQIndex, setOpenFaQIndex] = useState<number | null>(null)
-import React, { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import "./style/MainPage.css";
-import { Link } from "react-router-dom";
-
-const MainPage: React.FC = () => {
   const [openFaQIndex, setOpenFaQIndex] = useState<number | null>(null);
   const navigate = useNavigate();
 
@@ -53,12 +45,11 @@ const MainPage: React.FC = () => {
   };
 
   const sendMessage = async () => {
-
     if (!input.trim()) return;
 
     const userMessage = { role: "user", text: input };
 
-    setMessages(prev => [...prev, userMessage]);
+    setMessages((prev) => [...prev, userMessage]);
 
     setInput("");
 
@@ -66,7 +57,7 @@ const MainPage: React.FC = () => {
     const botReply = { role: "bot", text: "추천 제품을 찾아볼게요!" };
 
     setTimeout(() => {
-      setMessages(prev => [...prev, botReply]);
+      setMessages((prev) => [...prev, botReply]);
     }, 500);
   };
   return (
@@ -156,37 +147,28 @@ const MainPage: React.FC = () => {
         <h2>FAQS</h2>
         {faqData.map((faq, index) => (
           <div key={index} className="faq-item">
-
             <div className="faq-question" onClick={() => toggleFAQ(index)}>
               <span>{faq.question}</span>
-              <span className={`arrow ${openFaQIndex === index ? "open" : ""}`}>V</span>
+              <span className={`arrow ${openFaQIndex === index ? "open" : ""}`}>
+                V
+              </span>
             </div>
 
             {openFaQIndex === index && (
-              <div className="faq-answer">
-                {faq.answer}
-              </div>
+              <div className="faq-answer">{faq.answer}</div>
             )}
-
           </div>
         ))}
       </section>
 
       {/* Chatbot Button */}
-      <div
-        className="chatbot-btn"
-        onClick={() => setModalOpen(true)}
-      >
+      <div className="chatbot-btn" onClick={() => setModalOpen(true)}>
         <img src="/image/Main/chat.png" alt="chatbot" />
       </div>
 
       {modalOpen && (
-        <div
-          className="modal-container"
-          ref={modalBackground}
-        >
+        <div className="modal-container" ref={modalBackground}>
           <div className="modal-content">
-
             {/* 헤더 */}
             <div className="chat-header">
               AI 챗봇
@@ -194,12 +176,9 @@ const MainPage: React.FC = () => {
             </div>
 
             <Chat />
-
           </div>
         </div>
       )}
-
-
     </div>
   );
 };
