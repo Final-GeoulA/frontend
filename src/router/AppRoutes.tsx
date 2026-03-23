@@ -10,9 +10,6 @@ import FindID from "../contents/Login/Find";
 import MainPage from "../contents/MainPage/MainPage";
 import ServiceQuestion from "../contents/MainPage/ServiceQuestion";
 
-// 피부 백과
-import SkinInfo from "../contents/SkinInfo/SkinInfo";
-
 // 커뮤니티
 import Board from "../contents/Board/Board";
 import BoardForm from "../contents/Board/BoardForm";
@@ -23,7 +20,7 @@ import Recommend from "../contents/Recommend/Recommend";
 import Recommenddetail from "../contents/Recommend/Recommenddetail";
 
 // 병원. 약국 찾기
-import Search from "../contents/Search/Search";
+import HospitalSearch from "../contents/HospitalSearch/HospitalSearch";
 
 // 마이페이지
 import Mypage from "../contents/Mypage/MyPage";
@@ -31,9 +28,14 @@ import SkinAnalysis from "../contents/SkinAnalysis/SkinAnalysis";
 import SkinReport from "../contents/Mypage/SkinReport";
 import Chat from "../contents/MainPage/Chat";
 
+// 진료 관리
+import MedicalRecord from "../contents/MedicalRecord/MedicalRecord";
+import MedicalRecordModal from "../contents/MedicalRecord/MedicalRecordModal";
+
+// 피부 랭킹
+import SkinRank from "../contents/SkinRank/SkinRank";
+
 const AppRoutes: React.FC = () => {
-
-
   
   const routeList = [
 
@@ -46,21 +48,23 @@ const AppRoutes: React.FC = () => {
     // 서비스 문의
     { path: "/ServiceQuestion", element: <ServiceQuestion /> },
 
-    // 피부 백과 화면
-    { path: "/skininfo", element: <SkinInfo /> },
-
     //병원 약국 찾기 화면
-    { path: "/search", element: <Search /> },
+    { path: "/HospitalSearch", element: <HospitalSearch /> },
 
     //제품추천
     { path: '/recommend', element: <Recommend /> },
     { path: '/recommenddetail', element: <Recommenddetail /> },
 
     // 커뮤니티
-    
     { path: "/board", element: <Board /> },
     { path: "/boarddetail", element: <Boarddetail /> },
     { path: "/board/form", element: <BoardForm /> },
+
+    // 진료 관리
+    { path: "/MedicalRecord", element: <MedicalRecord/>},
+
+    // 피부 랭킹
+    { path: "/SkinRank", element: <SkinRank/>},
 
 	// 로그인과 회원가입
     { path: "/login", element: <Login /> },
@@ -87,7 +91,7 @@ return (
       <Route index element={<Navigate to="skinreport" replace />} />
 
       <Route path="skinreport" element={<SkinReport />} />
-      <Route path="savedhospitals" element={<Search />} />
+      <Route path="savedhospitals" element={<HospitalSearch />} />
       <Route path="recommend" element={<Recommend />} />
       <Route path="board" element={<Board />} />
 
