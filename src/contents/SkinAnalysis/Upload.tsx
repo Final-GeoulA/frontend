@@ -22,7 +22,7 @@ const Upload: React.FC<any> = ({ props }: { props: RefObject<HTMLInputElement | 
 	return (
 		<div>
 			<h1 style={{ fontSize: 30, fontWeight: 800, color: "#111", marginBottom: 12, letterSpacing: "-0.5px" }}>
-				사진을 업로드 하세요
+				사진을 촬영하세요
 			</h1>
 			<p style={{ fontSize: 15, color: "#555", lineHeight: 1.7, marginBottom: 4 }}>
 				한 장의 사진으로 피부 상태를 분석해 드립니다.

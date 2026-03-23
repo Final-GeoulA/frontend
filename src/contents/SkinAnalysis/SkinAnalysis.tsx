@@ -34,7 +34,7 @@ const SkinAnalysis: React.FC = () => {
 										background: "#fff", color: TEAL, cursor: "pointer"
 									}}
 								>
-									사진을 업로드 하세요
+									파일 업로드
 								</button>
 								<button
 									onClick={button_camera_on}
