@@ -2,195 +2,324 @@
 설치한 모듈
 yarn add react-icons
 */
-import React, { useState } from 'react';
-import { CiSearch } from "react-icons/ci"; // 돋보기 아이콘
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { IoHeartOutline, IoHeart } from "react-icons/io5"; //하트 아이콘
+import React, { useEffect, useState } from 'react';
+import { CiSearch } from "react-icons/ci";
+import { IoHeartOutline, IoHeart } from "react-icons/io5";
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+
+const TEAL = "#3BBFB2";
+
+interface Product {
+  product_id: number;
+  name: string;
+  brand: string;
+  category: string;
+  ingredient: string;
+  cost: string;
+  hit: number;
+  elike: number;
+  image: string;
+}
+
+interface Page {
+  totalItems: number;
+  totalPages: number;
+  startPage: number;
+  endPage: number;
+  currentPage: number;
+  data: Product[];
+}
 
 const Gallery: React.FC = () => {
   const [selectedSort, setSelectedSort] = useState('상품명');
-  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 상태
+  const [currentPage, setCurrentPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
+  const [Content, setContent] = useState<Page>({
+    totalItems: 0,
+    totalPages: 40,
+    startPage: 1,
+    endPage: 5,
+    currentPage: 1,
+    data: []
+  });
 
-  // 그리드형식 
-  const products = [
-    { id: 1, name: "넘버즈인 1번 수딩세럼", brand: "넘버즈인", img: "/image/Recommend/numbuzin.jpg", heart: false },
-    { id: 2, name: "파티온 트러블 크림", brand: "파티온", img: "/image/Recommend/fation.jpg", heart: false },
-    { id: 3, name: "바이오가 바디워시", brand: "바이오가", img: "/image/Recommend/biorga.png", heart: false },
-    { id: 4, name: "이지덤 스팟패치", brand: "이지덤", img: "/image/Recommend/easyderm.png", heart: false }
-  ]
-  // Dropdown 영역
+  const getPage = async (page: number) => {
+    try {
+      const res = await axios.get(
+        `${process.env.REACT_APP_IP_KTG}/geoulA/board/product/list?cPage=${page}`
+      );
+      setContent(res.data);
+    } catch (e) {
+      // 서버 미연결 시 더미 데이터
+    }
+  };
+
+  useEffect(() => { getPage(1); }, []);
+
+  const toggleHeart = (id: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setLikedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
   const sortOptions = [
-    { id: 'name', label: '상품명' },
+    { id: 'name',  label: '상품명' },
     { id: 'brand', label: '브랜드' },
-    { id: 'ingre', label: '성분' }
+    { id: 'ingre', label: '성분' },
   ];
-  //아이콘 영역
+
+  // 페이지네이션 범위
+  const totalPages = Content.totalPages || 40;
+  const pageNums: (number | string)[] = [];
+  const start = Content.startPage || 1;
+  const end   = Math.min(Content.endPage || 5, totalPages);
+  for (let i = start; i <= end; i++) pageNums.push(i);
+  if (end < totalPages) { pageNums.push('...'); pageNums.push(totalPages); }
+
   const SearchIcon = CiSearch as any;
-  const HeartIcon = IoHeart as any;
-  const EmptyheartIcon = IoHeartOutline as any;
-  const [heart, setHeart] = useState(false);
-  // 기존 products 더미데이터를 초기값
-  const [productList, setProductList] = useState(products);
-  //하트 클릭 핸들러 함수
-  const toggleHeart = (id: number) => {
-    setProductList(prev => prev.map(item => item.id === id ? { ...item, heart: !item.heart } : item))
-  }
+  const HeartIcon  = IoHeart as any;
+  const EmptyHeart = IoHeartOutline as any;
+
   return (
-    <div className="container py-4" style={{ maxWidth: '1100px' }}>
-      {/* --- 상단 컨트롤 영역 --- */}
-      <div className="row align-items-center gy-3 mb-4">
-        <div className="col-12 col-md-auto">
-          <h4 className="mb-0" style={{ fontWeight: '700', letterSpacing: '-0.5px' }}>제품 추천</h4>
-          <small>Products</small>
+    <div style={{
+      maxWidth: 1100,
+      margin: '0 auto',
+      padding: '40px 24px 64px',
+      fontFamily: "'Pretendard', 'Apple SD Gothic Neo', sans-serif",
+    }}>
+
+      {/* ── 헤더 ── */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: 12,
+        marginBottom: 32,
+      }}>
+        {/* 좌: 타이틀 */}
+        <div>
+          <h4 style={{ fontWeight: 800, margin: 0, fontSize: 22, letterSpacing: '-0.5px', color: '#111' }}>
+            제품 추천
+          </h4>
+          <small style={{ color: TEAL, fontWeight: 600, fontSize: 13 }}>Products</small>
         </div>
-        <div className="col-12 col-md d-flex flex-column flex-sm-row justify-content-md-end gap-2">
-          <div style={{ position: 'relative', flex: '1', maxWidth: '280px' }}>
-            <SearchIcon style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', fontSize: '18px', color: '#999' }} />
-            <input type="text" placeholder="Search products..." style={{ width: '100%', padding: '10px 10px 10px 42px', borderRadius: '12px', border: '1px solid #eee', backgroundColor: '#f8f9fa', fontSize: '14px', outline: 'none' }} />
+
+        {/* 우: 검색 + 정렬 */}
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          {/* 검색 */}
+          <div style={{ position: 'relative' }}>
+            <SearchIcon style={{
+              position: 'absolute', left: 12, top: '50%',
+              transform: 'translateY(-50%)', fontSize: 18, color: '#aaa'
+            }} />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search"
+              style={{
+                padding: '9px 14px 9px 38px',
+                borderRadius: 12,
+                border: '1.5px solid #E8EAEA',
+                background: '#FAFBFB',
+                fontSize: 14,
+                color: '#333',
+                outline: 'none',
+                width: 200,
+              }}
+            />
           </div>
-          <div className="dropdown">
-            <button className="btn dropdown-toggle shadow-sm w-100" type="button" data-bs-toggle="dropdown" style={{ minWidth: '160px', borderRadius: '12px', padding: '10px 15px', fontSize: '14px', backgroundColor: '#f8f9fa', border: '1px solid #eee', textAlign: 'left' }}>
-              <span className="text-muted me-1">Sort by:</span>
-              <strong>{selectedSort}</strong>
-            </button>
-            <ul className="dropdown-menu dropdown-menu-end border-0 shadow-lg mt-2 w-100" style={{ borderRadius: '12px', padding: '8px' }}>
-              {sortOptions.map((option) => (
-                <li key={option.id}>
-                  <button className="dropdown-item py-2" type="button" style={{ borderRadius: '8px', fontSize: '14px' }} onClick={() => setSelectedSort(option.label)}>{option.label}</button>
-                </li>
+
+          {/* 정렬 드롭다운 */}
+          <div style={{ position: 'relative' }}>
+            <select
+              value={selectedSort}
+              onChange={e => setSelectedSort(e.target.value)}
+              style={{
+                padding: '9px 36px 9px 14px',
+                borderRadius: 12,
+                border: '1.5px solid #E8EAEA',
+                background: '#FAFBFB',
+                fontSize: 14,
+                color: '#333',
+                outline: 'none',
+                appearance: 'none',
+                cursor: 'pointer',
+                minWidth: 150,
+              }}
+            >
+              {sortOptions.map(o => (
+                <option key={o.id} value={o.label}>
+                  Sort by: {o.label}
+                </option>
               ))}
-            </ul>
+            </select>
+            <span style={{
+              position: 'absolute', right: 12, top: '50%',
+              transform: 'translateY(-50%)', pointerEvents: 'none',
+              color: '#aaa', fontSize: 11
+            }}>▼</span>
           </div>
         </div>
       </div>
 
-      <hr style={{ borderTop: '1px solid #eee', margin: '0 0 30px 0' }} />
+      <hr style={{ borderTop: '1.5px solid #F0F0F0', margin: '0 0 28px' }} />
 
-      {/* --- 제품 리스트 영역 --- */}
-      <div className="row g-4 mb-5">
-        {productList.map((item) => (
-          <div key={item.id} className="col-6 col-md-4 col-lg-3">
-            <div className="card h-100 border-0 shadow-sm" style={{ borderRadius: '20px', overflow: 'hidden' }}>
-              <Link to="/recommenddetail">
-                {/* 이미지 영역 */}
-                <div style={{ width: '100%', height: '200px', backgroundColor: '#f8f9fa', overflow: 'hidden' }}>
-                  <img
-                    src={item.img}
-                    alt={item.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                </div>
-                {/* 텍스트 정보 영역 */}
-                <div className="card-body p-3">
-                  <p className="text-muted mb-1" style={{ fontSize: '12px' }}>{item.brand}</p>
-                  <div className='d-flex justify-content-between'>
-                    <h6 className="card-title mb-2" style={{ fontWeight: '600' }}>{item.name}</h6>
-                    {/* 하트 아이콘 버튼 */}
-                    <button
-                      onClick={() => toggleHeart(item.id)}
-                      style={{
+      {/* ── 제품 그리드 ── */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: 20,
+        marginBottom: 16,
+      }}>
+        {Content.data.map(item => (
+          <Link
+            key={item.product_id}
+            to="/recommenddetail"
+            style={{ textDecoration: 'none', color: 'inherit' }}
+          >
+            <div style={{
+              borderRadius: 18,
+              background: '#fff',
+              border: '1.5px solid #F0F2F2',
+              overflow: 'hidden',
+              transition: 'box-shadow 0.2s, transform 0.2s',
+              cursor: 'pointer',
+            }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLDivElement).style.boxShadow = '0 6px 24px rgba(0,0,0,0.09)';
+                (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
+                (e.currentTarget as HTMLDivElement).style.transform = 'none';
+              }}
+            >
+              {/* 이미지 */}
+              <div style={{
+                position: 'relative',
+                width: '100%', height: 190,
+                background: '#F6F8F8',
+                overflow: 'hidden',
+              }}>
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+                {/* 하트 버튼 */}
+                <button
+                  onClick={e => toggleHeart(item.product_id, e)}
+                  style={{
+                    position: 'absolute', bottom: 10, right: 10,
+                    background: 'rgba(255,255,255,0.85)',
+                    border: 'none', borderRadius: '50%',
+                    width: 32, height: 32,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', backdropFilter: 'blur(4px)',
+                    transition: 'transform 0.2s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.15)'}
+                  onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                >
+                  {likedIds.has(item.product_id)
+                    ? <HeartIcon style={{ color: '#FF4D6A', fontSize: 18 }} />
+                    : <EmptyHeart style={{ color: '#bbb', fontSize: 18 }} />
+                  }
+                </button>
+              </div>
 
-                        border: 'none',
-                        background: 'none',
-                        padding: '0',
-                        cursor: 'pointer',
-                        transition: 'transform 0.2s ease',
-                        marginTop: '-2px' // 텍스트 높이와 시각적으로 맞추기 위한 미세 조정
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.2)'}
-                      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1.0)'}
-                    >
-                      {item.heart ? (
-                        <HeartIcon style={{ color: '#ff4d4f', fontSize: '22px' }} />
-                      ) : (
-                        <EmptyheartIcon style={{ color: '#ccc', fontSize: '22px' }} />
-                      )}
-                    </button>
-                  </div>
-
-
-                </div>
-              </Link>
+              {/* 텍스트 */}
+              <div style={{ padding: '12px 14px 16px' }}>
+                <p style={{ margin: '0 0 4px', fontSize: 12, color: '#999', fontWeight: 500 }}>
+                  {item.brand}
+                </p>
+                <p style={{
+                  margin: 0, fontSize: 13, fontWeight: 600, color: '#222',
+                  lineHeight: 1.5,
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}>
+                  {item.name}
+                </p>
+              </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
-      <p style={{ fontSize: '11px', color: 'gray' }}>사용자 좋아요 수가 많은 순으로 정렬된 결과입니다.</p>
-      {/* --- 페이지네이션 영역 --- */}
-      <nav aria-label="Page navigation" className="d-flex justify-content-center justify-content-md-end mt-5">
-        <ul className="pagination gap-1" style={{ border: 'none', marginBottom: 0 }}>
-          {/* 이전 버튼 */}
-          <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-            <button
-              className="page-link shadow-sm text-center"
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              style={{
-                borderRadius: '10px',
-                border: '1px solid #eee',
-                color: '#666',
-                width: '40px',
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              &lt;
-            </button>
-          </li>
 
-          {/* 페이지 번호 */}
-          {[1, 2, 3, 4, 5].map((pageNum) => (
-            <li key={pageNum} className={`page-item ${currentPage === pageNum ? 'active' : ''}`}>
-              <button
-                className="page-link shadow-sm"
-                onClick={() => setCurrentPage(pageNum)}
-                style={{
-                  borderRadius: '10px',
-                  border: '1px solid #eee',
-                  width: '40px',
-                  height: '40px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: '600',
-                  fontSize: '14px',
-                  transition: 'all 0.2s ease',
-                  backgroundColor: currentPage === pageNum ? '#333' : '#fff',
-                  color: currentPage === pageNum ? '#fff' : '#666',
-                  borderColor: currentPage === pageNum ? '#333' : '#eee',
-                }}
-              >
-                {pageNum}
-              </button>
-            </li>
-          ))}
+      {/* 정렬 안내 */}
+      <p style={{ fontSize: 11, color: '#aaa', margin: '4px 0 40px' }}>
+        사용자 좋아요 수가 많은 순으로 정렬된 결과입니다.
+      </p>
 
-          {/* 다음 버튼 */}
-          <li className={`page-item ${currentPage === 5 ? 'disabled' : ''}`}>
-            <button
-              className="page-link shadow-sm text-center"
-              onClick={() => setCurrentPage(prev => Math.min(5, prev + 1))}
-              style={{
-                borderRadius: '10px',
-                border: '1px solid #eee',
-                color: '#666',
-                width: '40px',
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}
-            >
-              &gt;
-            </button>
-          </li>
-        </ul>
-      </nav>
+      {/* ── 페이지네이션 ── */}
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6 }}>
+        {/* 이전 */}
+        <PagBtn
+          label="‹"
+          disabled={currentPage === 1}
+          active={false}
+          onClick={() => { setCurrentPage(p => Math.max(1, p - 1)); getPage(currentPage - 1); }}
+        />
+
+        {pageNums.map((p, i) =>
+          typeof p === 'number' ? (
+            <PagBtn
+              key={i}
+              label={String(p)}
+              active={p === currentPage}
+              onClick={() => { setCurrentPage(p); getPage(p); }}
+            />
+          ) : (
+            <span key={i} style={{ fontSize: 14, color: '#bbb', padding: '0 2px' }}>…</span>
+          )
+        )}
+
+        {/* 다음 */}
+        <PagBtn
+          label="›"
+          disabled={currentPage === totalPages}
+          active={false}
+          onClick={() => { setCurrentPage(p => Math.min(totalPages, p + 1)); getPage(currentPage + 1); }}
+        />
+      </div>
     </div>
   );
 };
 
-export default Gallery;
+/* ── 페이지 버튼 ── */
+const PagBtn: React.FC<{
+  label: string;
+  active: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+}> = ({ label, active, disabled, onClick }) => (
+  <button
+    disabled={disabled}
+    onClick={onClick}
+    style={{
+      width: 38, height: 38,
+      borderRadius: 10,
+      border: active ? `1.5px solid ${TEAL}` : '1.5px solid #E2E8E8',
+      background: active ? TEAL : '#fff',
+      color: active ? '#fff' : disabled ? '#ccc' : '#555',
+      fontWeight: active ? 700 : 500,
+      fontSize: 14, cursor: disabled ? 'default' : 'pointer',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      transition: 'all 0.15s',
+    }}
+  >
+    {label}
+  </button>
+);
 
+export default Gallery;
