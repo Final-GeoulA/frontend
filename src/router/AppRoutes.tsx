@@ -5,6 +5,7 @@ import { Route, Routes, Navigate  } from "react-router-dom";
 import Login from "../contents/Login/Login";
 import SignUp from "../contents/SignUp/SignUp";
 import FindID from "../contents/Login/Find";
+import Passwordless from "../contents/Login/Passwordless"
 
 // 메인 페이지
 import MainPage from "../contents/MainPage/MainPage";
@@ -27,6 +28,7 @@ import Mypage from "../contents/Mypage/MyPage";
 import SkinAnalysis from "../contents/SkinAnalysis/SkinAnalysis";
 import SkinReport from "../contents/Mypage/SkinReport";
 import Chat from "../contents/MainPage/Chat";
+import PasswordlessReg from "../contents/Login/PasswordlessReg";
 
 // 진료 관리
 import MedicalRecord from "../contents/MedicalRecord/MedicalRecord";
@@ -69,6 +71,8 @@ const AppRoutes: React.FC = () => {
 	// 로그인과 회원가입
     { path: "/login", element: <Login /> },
     { path: "/signup", element: <SignUp /> },
+    { path: "/login/pwl", element: <Passwordless /> },
+    { path: "/signup/pwl", element: <PasswordlessReg /> },
 
 	// 불명
     { path: "/Find", element: <FindID /> },
