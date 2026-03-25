@@ -59,7 +59,7 @@ const AppRoutes: React.FC = () => {
 
     // 커뮤니티
     { path: "/board", element: <Board /> },
-    { path: "/boarddetail", element: <Boarddetail /> },
+    { path: "/boarddetail/:num", element: <Boarddetail /> },
     { path: "/board/form", element: <BoardForm /> },
 
     // 진료 관리
