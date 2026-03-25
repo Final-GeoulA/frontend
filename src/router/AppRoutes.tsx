@@ -5,7 +5,9 @@ import { Route, Routes, Navigate } from "react-router-dom";
 import Login from "../contents/Login/Login";
 import SignUp from "../contents/SignUp/SignUp";
 import FindID from "../contents/Login/Find";
-import Passwordless from "../contents/Login/Passwordless";
+
+import Passwordless from "../contents/Login/Passwordless"
+import AdminLogin from "../contents/Login/AdminLogin";
 
 // 메인 페이지
 import MainPage from "../contents/MainPage/MainPage";
@@ -79,6 +81,7 @@ const AppRoutes: React.FC = () => {
     { path: "/signup", element: <SignUp /> },
     { path: "/login/pwl", element: <Passwordless /> },
     { path: "/signup/pwl", element: <PasswordlessReg /> },
+    { path: "/admin/login", element: <AdminLogin /> },
 
     // 불명
     { path: "/Find", element: <FindID /> },
