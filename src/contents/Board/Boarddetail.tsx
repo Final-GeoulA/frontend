@@ -5,7 +5,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../components/AuthProvider'
 
 interface BoardSkinVO {
-  num: number;
+  board_skin_id: number;
   title: string;
   writer: string;
   content: string;
@@ -52,7 +52,7 @@ const Boarddetail: React.FC = () => {
   const fetchComments = (page: number) => {
     axios
       .get(`${process.env.REACT_APP_BACK_END_URL}/board/skin/commlist`, {
-        params: { num, cPage: page },
+        params: { board_skin_id: num, cPage: page },
         withCredentials: true,
       })
       .then((res) => {
