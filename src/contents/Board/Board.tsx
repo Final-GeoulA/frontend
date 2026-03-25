@@ -4,7 +4,7 @@ import "./Board.css";
 import { Link } from "react-router-dom";
 
 interface Post {
-  num: number;
+  board_skin_id: number;
   title: string;
   writer: string;
   bdate: string;
@@ -20,7 +20,11 @@ const Board = () => {
   const [searchType, setSearchType] = useState("2"); // 1:작성자, 2:제목, 3:내용
   const [searchValue, setSearchValue] = useState("");
 
-  const fetchList = (page: number, sType = searchType, sValue = searchValue) => {
+  const fetchList = (
+    page: number,
+    sType = searchType,
+    sValue = searchValue
+  ) => {
     axios
       .get(`${process.env.REACT_APP_BACK_END_URL}/board/skin/list`, {
         params: { cPage: page, searchType: sType, searchValue: sValue },
@@ -51,7 +55,6 @@ const Board = () => {
 
   return (
     <div className="community-container">
-
       <div className="community-header">
         <h2>커뮤니티</h2>
 
@@ -63,7 +66,10 @@ const Board = () => {
             onChange={(e) => setSearchValue(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
-          <select value={searchType} onChange={(e) => setSearchType(e.target.value)}>
+          <select
+            value={searchType}
+            onChange={(e) => setSearchType(e.target.value)}
+          >
             <option value="2">Sort by : 제목</option>
             <option value="1">Sort by : 작성자</option>
             <option value="3">Sort by : 내용</option>
@@ -83,9 +89,11 @@ const Board = () => {
 
         <tbody>
           {posts.map((post) => (
-            <tr key={post.num}>
+            <tr key={post.board_skin_id}>
               <td className="title">
-                <Link to={`/boarddetail/${post.num}`}>{post.title}</Link>
+                <Link to={`/boarddetail/${post.board_skin_id}`}>
+                  {post.title}
+                </Link>
               </td>
               <td>{post.writer}</td>
               <td>{post.bdate}</td>
@@ -121,10 +129,11 @@ const Board = () => {
 
       <div className="write-btn-wrap">
         <button className="write-btn">
-          <Link to="/board/form" className="write-btn">글쓰기</Link>
+          <Link to="/board/form" className="write-btn">
+            글쓰기
+          </Link>
         </button>
       </div>
-
     </div>
   );
 };
