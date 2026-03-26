@@ -75,13 +75,19 @@
 
 .medical-modal-record-item {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
+  flex-direction: column;
+  gap: 14px;
   padding: 16px;
   border: 1px solid #d9eeea;
   border-radius: 16px;
   background: #ffffff;
+}
+
+.medical-modal-record-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
 }
 
 .medical-modal-record-left,
@@ -110,6 +116,26 @@
   font-size: 16px;
   font-weight: 700;
   color: #50cdba;
+}
+
+.medical-modal-memo-box {
+  padding: 12px 14px;
+  background: #f8fafb;
+  border: 1px solid #edf2f4;
+  border-radius: 14px;
+}
+
+.medical-modal-memo {
+  margin: 6px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #374151;
+  white-space: pre-line;
+  word-break: keep-all;
+}
+
+.medical-modal-memo-empty {
+  color: #9ca3af;
 }
 
 .medical-modal-empty {
@@ -150,6 +176,15 @@
 
   .medical-modal-record-item {
     padding: 14px;
+  }
+
+  .medical-modal-record-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .medical-modal-record-right {
+    align-items: flex-start;
   }
 
   .medical-modal-value,

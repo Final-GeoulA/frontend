@@ -33,6 +33,7 @@ import PasswordlessReg from "../contents/Login/PasswordlessReg";
 // 진료 관리
 import MedicalRecord from "../contents/MedicalRecord/MedicalRecord";
 import MedicalRecordModal from "../contents/MedicalRecord/MedicalRecordModal";
+import MedicalRecordUpload from "../contents/MedicalRecord/MedicalRecordUpload";
 
 // 피부 랭킹
 import SkinRank from "../contents/SkinRank/SkinRank";
@@ -64,7 +65,8 @@ const AppRoutes: React.FC = () => {
 
     // 진료 관리
     { path: "/MedicalRecord", element: <MedicalRecord/>},
-
+    { path: "/MedicalRecordUpload", element: <MedicalRecordUpload/>},
+    
     // 피부 랭킹
     { path: "/SkinRank", element: <SkinRank/>},
 

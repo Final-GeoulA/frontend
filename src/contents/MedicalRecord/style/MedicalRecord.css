@@ -147,6 +147,7 @@
 }
 
 .record-hospital {
+  font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -154,7 +155,7 @@
 }
 
 .record-amount {
-  font-size: 12px;
+  font-size: 14px;
   color: #1f766c;
 }
 
@@ -165,22 +166,62 @@
   font-weight: 700;
 }
 
-@media (max-width: 768px) {
-  .medical-record-card {
-    padding: 20px;
-  }
+/* 진료 기록 추가 */
+.medical-record-nav-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
-  .medical-record-title {
-    font-size: 24px;
-  }
+.medical-record-add-btn {
+  height: 58px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 16px;
+  background: #50CDBA;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(80, 205, 186, 0.22);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
 
-  .calendar-grid,
-  .calendar-weekdays {
-    gap: 8px;
-  }
+.medical-record-add-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: #50CDBA;
+  opacity: 0.96;
+}
 
-  .calendar-cell {
-    min-height: 110px;
-    padding: 10px;
-  }
+.medical-record-add-btn:active {
+  transform: translateY(0);
+}
+ 
+/* 월별 진료비 합계 */
+.medical-record-summary {
+  margin-bottom: 20px;
+}
+
+.medical-record-summary-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #ecfbf8 0%, #f4fffd 100%);
+  border: 1px solid #d9eeea;
+  border-radius: 18px;
+}
+
+.summary-label {
+  font-size: 16px;
+  color: #4b5563;
+  font-weight: 600;
+}
+
+.summary-value {
+  font-size: 22px;
+  color: #50cdba;
+  font-weight: 800;
 }
