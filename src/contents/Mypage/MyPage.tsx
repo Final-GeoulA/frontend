@@ -11,8 +11,10 @@ const MyPage: React.FC = () => {
       {/* 왼쪽 탭바 */}
       <aside className="sidebar">
         <div className="profile">
-          <div className="profile-img"></div>
-          <p>{member?.nickname}</p>
+          <p className="profile-nickname">{member?.nickname}</p>
+          <span className={`grade-badge ${member?.user_grade_id === 2 ? "grade-premium" : "grade-normal"}`}>
+            {member?.user_grade_id === 2 ? "프리미엄" : "일반"}
+          </span>
         </div>
 
         <nav className="menu">

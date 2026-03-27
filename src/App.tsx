@@ -1,16 +1,17 @@
 import { BrowserRouter as Router } from 'react-router-dom';
 
 import AppRoutes from './router/AppRoutes';
-import Layout from './components/Layout';
+import Navbar from './components/Navbar';
 import { AuthProvider } from './components/AuthProvider';
 
 function App() {
   return (
     <AuthProvider>
     <Router>
-      <Layout>
+      <Navbar />
+      <main style={{ padding: "20px" }}>
         <AppRoutes />
-      </Layout>
+      </main>
     </Router>
     </AuthProvider>
   );
