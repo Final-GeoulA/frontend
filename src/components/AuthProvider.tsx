@@ -5,6 +5,7 @@ interface Member {
     nickname: string;
     email: string;
     user_id: number;
+    user_grade_id: number;
 }
 //컨텍스트 타입
 interface AuthContextProps {
@@ -30,9 +31,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             if (res.data?.email) {
                 setMember({
-                    user_id: res.data.user_id,  
+                    user_id: res.data.user_id ?? res.data.num,
                     email: res.data.email,
-                    nickname: res.data.nickname
+                    nickname: res.data.nickname,
+                    user_grade_id: res.data.user_grade_id
                 });
             } else {
                 setMember(null);
@@ -82,6 +84,5 @@ export const useAuth = () => {
     if (!context) throw new Error("useAuth은 LoginProvider 안에서만 사용해야 합니다.");
     return context;
 };
-
 
 

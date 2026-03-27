@@ -1,24 +1,78 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./Board.css";
 import { Link } from "react-router-dom";
 
+interface Post {
+  board_skin_id: number;
+  title: string;
+  writer: string;
+  bdate: string;
+  hit: number;
+}
+
 const Board = () => {
-  const posts = [
-    { id: 1, title: "트러블 피부에 잘 맞았던 제품 공유", writer: "YkYkh", date: "2026.02.25", views: 31 },
-    { id: 2, title: "요즘 갑자기 올라오는 트러블 원인", writer: "Yahoo", date: "2026.02.24", views: 25 },
-    { id: 3, title: "트러블 피부에 잘 맞았던 제품 공유", writer: "Microsoft", date: "2026.02.25", views: 31 },
-  ];
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [startPage, setStartPage] = useState(1);
+  const [endPage, setEndPage] = useState(1);
+  const [searchType, setSearchType] = useState("2"); // 1:작성자, 2:제목, 3:내용
+  const [searchValue, setSearchValue] = useState("");
+
+  const fetchList = (
+    page: number,
+    sType = searchType,
+    sValue = searchValue
+  ) => {
+    axios
+      .get(`${process.env.REACT_APP_BACK_END_URL}/board/skin/list`, {
+        params: { cPage: page, searchType: sType, searchValue: sValue },
+        withCredentials: true,
+      })
+      .then((res) => {
+        setPosts(res.data.data);
+        setCurrentPage(res.data.currentPage);
+        setTotalPages(res.data.totalPages);
+        setStartPage(res.data.startPage);
+        setEndPage(res.data.endPage);
+      })
+      .catch((err) => console.error(err));
+  };
+
+  useEffect(() => {
+    fetchList(1);
+  }, []);
+
+  const handleSearch = () => {
+    fetchList(1);
+  };
+
+  const pages = [];
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  }
 
   return (
     <div className="community-container">
-
       <div className="community-header">
         <h2>커뮤니티</h2>
 
         <div className="community-controls">
-          <input className="search" placeholder="Search" />
-          <select>
-            <option>Sort by : 제목</option>
+          <input
+            className="search"
+            placeholder="Search"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          />
+          <select
+            value={searchType}
+            onChange={(e) => setSearchType(e.target.value)}
+          >
+            <option value="2">Sort by : 제목</option>
+            <option value="1">Sort by : 작성자</option>
+            <option value="3">Sort by : 내용</option>
           </select>
         </div>
       </div>
@@ -35,30 +89,51 @@ const Board = () => {
 
         <tbody>
           {posts.map((post) => (
-            <tr key={post.id}>
-              <td className="title"><Link to ="/boarddetail">{post.title}</Link></td>
+            <tr key={post.board_skin_id}>
+              <td className="title">
+                <Link to={`/boarddetail/${post.board_skin_id}`}>
+                  {post.title}
+                </Link>
+              </td>
               <td>{post.writer}</td>
-              <td>{post.date}</td>
-              <td>{post.views}</td>
+              <td>{post.bdate}</td>
+              <td>{post.hit}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
       <div className="pagination">
-        <button>{"<"}</button>
-        <button className="active">1</button>
-        <button>2</button>
-        <button>3</button>
-        <button>{">"}</button>
+        <button
+          disabled={currentPage <= 1}
+          onClick={() => fetchList(currentPage - 1)}
+        >
+          {"<"}
+        </button>
+        {pages.map((p) => (
+          <button
+            key={p}
+            className={p === currentPage ? "active" : ""}
+            onClick={() => fetchList(p)}
+          >
+            {p}
+          </button>
+        ))}
+        <button
+          disabled={currentPage >= totalPages}
+          onClick={() => fetchList(currentPage + 1)}
+        >
+          {">"}
+        </button>
       </div>
 
       <div className="write-btn-wrap">
         <button className="write-btn">
-            <Link to="/board/form" className="write-btn">글쓰기</Link>
-            </button>
+          <Link to="/board/form" className="write-btn">
+            글쓰기
+          </Link>
+        </button>
       </div>
-
     </div>
   );
 };
