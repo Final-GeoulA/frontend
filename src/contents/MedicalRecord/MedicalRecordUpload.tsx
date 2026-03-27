@@ -1,6 +1,3 @@
-// userId=21로 고정
-// 추후 로그인 기능 연동 후 실제 로그인 사용자 ID(userId)로 변경 예정
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './style/MedicalRecordUpload.css';
@@ -94,7 +91,7 @@ const MedicalRecordUpload: React.FC = () => {
     const url = `${process.env.REACT_APP_BACK_END_URL}/api/medical-record/save`;
 
     const requestData = {
-      userId,
+      // userId,
       hospitalName: hospital,
       paymentDate: date,
       price: Number(amount),
@@ -105,8 +102,13 @@ const MedicalRecordUpload: React.FC = () => {
     console.log('REQUEST DATA:', requestData);
 
     try {
-      const res = await axios.post(url, requestData);
-
+      const res = await axios.post(
+        url,
+        requestData,
+        {
+          withCredentials: true,  // 유저 세션 쿠키
+        }
+      );
       console.log('SAVE RESPONSE:', res.data);
 
       if (res.data.success) {

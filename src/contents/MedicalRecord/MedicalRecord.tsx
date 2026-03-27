@@ -1,11 +1,9 @@
-// useId=21로 고정
-// 추후 로그인 기능 연동 후 실제 로그인 사용자 ID(user_id)로 변경 예정
-
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './style/MedicalRecord.css';
 import MedicalRecordModal from './MedicalRecordModal';
+import { useAuth } from '../../components/AuthProvider';
 
 type RecordItem = {
   medicalRecordId?: number;
@@ -23,11 +21,21 @@ type CalendarCell = {
 
 const MedicalRecord: React.FC = () => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedCell, setSelectedCell] = useState<CalendarCell | null>(null);
   const [records, setRecords] = useState<RecordItem[]>([]);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
 
-  const userId = 21; // 나중에 로그인한 사용자 ID로 변경
+  const handleAddRecord = () => {
+    if (!isLoggedIn) {
+      setShowLoginPopup(true);
+      return;
+    }
+
+    navigate('/MedicalRecordUpload');
+  };
 
   useEffect(() => {
     const fetchMedicalRecords = async () => {
@@ -35,10 +43,15 @@ const MedicalRecord: React.FC = () => {
         const res = await axios.get(
           `${process.env.REACT_APP_BACK_END_URL}/api/medical-record/list`,
           {
-            params: { userId },
             withCredentials: true,
           }
         );
+
+        if (res.data?.success === false) {
+          console.error(res.data.message);
+          setRecords([]);
+          return;
+        }
 
         const mappedRecords: RecordItem[] = res.data.map((item: any) => ({
           medicalRecordId: item.medicalRecordId,
@@ -55,7 +68,7 @@ const MedicalRecord: React.FC = () => {
     };
 
     fetchMedicalRecords();
-  }, [userId]);
+  }, []);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -68,7 +81,6 @@ const MedicalRecord: React.FC = () => {
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
   const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
 
-  // 월별 진료비 합계
   const monthlyTotal = useMemo(() => {
     return records
       .filter((item) => {
@@ -137,14 +149,13 @@ const MedicalRecord: React.FC = () => {
 
             <button
               className="medical-record-add-btn"
-              onClick={() => navigate('/MedicalRecordUpload')}
+              onClick={handleAddRecord}
             >
               + 기록 추가
             </button>
           </div>
         </div>
 
-        {/* 월별 진료비 합계  */}
         <div className="medical-record-summary">
           <div className="medical-record-summary-card">
             <span className="summary-label">이번 달 진료비 합계</span>
@@ -202,6 +213,28 @@ const MedicalRecord: React.FC = () => {
         selectedDate={selectedCell?.fullDate || ''}
         records={selectedCell?.records || []}
       />
+
+      {showLoginPopup && (
+        <div className="login-popup-overlay">
+          <div className="login-popup">
+            <p className="login-popup-text">로그인 후 이용 가능한 기능입니다.</p>
+            <div className="login-popup-buttons">
+              <button
+                className="login-popup-cancel"
+                onClick={() => setShowLoginPopup(false)}
+              >
+                닫기
+              </button>
+              <button
+                className="login-popup-confirm"
+                onClick={() => navigate('/login')}
+              >
+                로그인하러 가기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

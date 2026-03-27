@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
             if (res.data?.email) {
                 setMember({
-                    user_id: res.data.num,  
+                    user_id: res.data.user_id,  
                     email: res.data.email,
                     nickname: res.data.nickname
                 });
