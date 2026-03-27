@@ -35,11 +35,10 @@ const Navbar: React.FC = () => {
         {/* 로그인 영역 */}
         <div className="navbar-auth">
           {member ? (
-            
             <>
-              <span className="welcome-text">
+              <Link to="/MyPage" className="welcome-text">
                 {member?.nickname}님
-              </span>
+              </Link>
 
               <button onClick={handleLogout} className="auth-link">
                 로그아웃
@@ -49,7 +48,6 @@ const Navbar: React.FC = () => {
             <>
               <Link to="/login" className="auth-link">
                 로그인
-                
               </Link>
 
               <Link to="/signup" className="auth-link">
@@ -57,11 +55,6 @@ const Navbar: React.FC = () => {
               </Link>
             </>
           )}
-
-          <Link to="/MyPage" className="mypage-link">
-            마이페이지
-          </Link>
-
         </div>
 
       </div>

@@ -5,6 +5,7 @@ interface Member {
   nickname: string;
   email: string;
   user_id: number;
+  user_grade_id: number;
 }
 //컨텍스트 타입
 interface AuthContextProps {
@@ -31,13 +32,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const res = await axios.get(`http://192.168.0.252/geoulA/login/session`, {
         withCredentials: true,
       });
-      console.log("세션 응답:", res.data);
 
       if (res.data?.email) {
         setMember({
           user_id: res.data.num,
           email: res.data.email,
           nickname: res.data.nickname,
+          user_grade_id: res.data.user_grade_id,
         });
       } else {
         setMember(null);
