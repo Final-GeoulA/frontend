@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../components/AuthProvider";
 
 const TEAL = "#5BC8BF";
 
@@ -8,7 +9,6 @@ const PasswordlessLogin: React.FC = () => {
   const [email, setEmail] = useState("");
   const [isWaiting, setIsWaiting] = useState(false); // 승인 대기 상태 여부
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  // const url = 'http://172.26.208.1/geoulA'
 
   // 컴포넌트 언마운트 시 폴링 멈춤 (메모리 누수 방지)
   useEffect(() => {
