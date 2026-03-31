@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../components/AuthProvider";
+import { Link } from "react-router-dom";
 
 const TEAL = "#5BC8BF";
 const TEAL_LIGHT = "#e8f8f7";
@@ -99,14 +100,14 @@ const Login: React.FC = () => {
 						}}>
 							로그인
 						</button>
-						<button style={{
+						<Link to={"/login/pwl"} style={{
 							width: "48%", padding: "15px", background: TEAL,
 							color: "#fff", border: "none", borderRadius: 10,
 							fontSize: 16, fontWeight: 700, cursor: "pointer", letterSpacing: "0.5px",
 							marginBottom: 20
 						}}>
 							패스워드리스 로그인
-						</button>
+						</Link>
 					</div>
 					<p style={{ textAlign: "center", fontSize: 14, color: "#888", margin: 0 }}>
 						아직 계정이 없으신가요?{" "}

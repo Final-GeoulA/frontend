@@ -14,6 +14,7 @@ interface FaceCompareResult {
     result: string;
     admin_name: string;
     bbox: number[];
+    message?: string;
 }
 
 const AdminLogin: React.FC = () => {
@@ -60,7 +61,7 @@ const AdminLogin: React.FC = () => {
             //서버로 전송할 때 post방식으로 바이너리 파일인 이미지 한장을 보내겠다
             formData.append('image', blob, 'capture.jpg');
             const response = await axios.post<FaceCompareResult>(
-                "http://192.168.0.45:9001/api/recogface/compare_face",
+                "http://192.168.0.30:9001/api/recogface/compare_face",
                 formData
             );
             setResult(response.data);
@@ -79,11 +80,14 @@ const AdminLogin: React.FC = () => {
             if (result !== null && result.result === 'ok') {
                 const currentEmail = result.admin_name;
                 const currentPassword = 'admin';
+                setResult(null);
                 try {
-                    const loginresult = await login(currentEmail,currentPassword);
+                    const loginresult = await login(currentEmail, currentPassword);
                     if (loginresult === 'success') {
-                        alert(`${result.admin_name} 관리자님, 로그인되었습니다`);
-                        navigate('/', { replace:true });
+                        // 0.8초 대기 후 실행
+                            alert(`${currentEmail} 관리자님, 로그인되었습니다`);
+                            navigate('/', { replace: true });
+
                     } else {
                         alert('로그인 실패');
                     }
@@ -93,54 +97,149 @@ const AdminLogin: React.FC = () => {
             }
         };
         loginAsAdmin();
-    },[result, login, navigate]);    
+    }, [result, login, navigate]);
 
     return (
-        <div style={{ textAlign: 'center' }}>
-            <h1>Face Compare</h1>
-            <div style={{ position: 'relative', display: 'inline-block' }}>
-                <Webcam audio={false} ref={webcamRef}
-                    screenshotFormat='image/jpeg'
-                    width={480} height={360}
-                    style={{ borderRadius: '8px' }}
-                />
-                {/* ROI */}
+        <div style={{ minHeight: "100vh", background: "#f7f7f7", fontFamily: "'Pretendard', 'Apple SD Gothic Neo', sans-serif" }}>
+            {/* 결과창 등장 애니메이션을 위한 스타일 태그 */}
+            <style>
+                {`
+                    @keyframes slideFadeIn {
+                        from { opacity: 0; transform: translateY(-10px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                `}
+            </style>
+
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "calc(100vh - 64px)", padding: "40px 16px" }}>
                 <div style={{
-                    position: 'absolute', top: '50%', left: '50%',
-                    width: '200px', height: '270px',
-                    border: '2px solid red',
-                    transform: 'translate(-50%, -50%)'
-                }}></div>
+                    background: "#fff", borderRadius: 16, padding: "48px 52px",
+                    width: "100%", maxWidth: 720,
+                    boxShadow: "4px 4px 24px rgba(0,0,0,0.08), -2px -2px 12px rgba(0,0,0,0.04)"
+                }}>
+                    <div style={{ textAlign: 'center' }}>
+                        <h1 style={{ marginBottom: '30px', color: '#333' }}>관리자 로그인</h1>
 
-                {/* 카운트 다운 */}
-                {countdown !== null && (
-                    <div
-                        style={{
-                            position: 'absolute', top: '5px', left: '150%',
-                            transform: 'translateX(-50%)',
-                            fontSize: '48px', color: 'blue'
-                        }}
-                    >{countdown}</div>)}
-            </div>
+                        <div style={{ position: 'relative', display: 'inline-block' }}>
+                            <Webcam audio={false} ref={webcamRef}
+                                screenshotFormat='image/jpeg'
+                                width={480} height={360}
+                                style={{ borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                                onUserMediaError={(error) => console.error("웹캠 로드 에러:", error)}
+                            />
+                            {/* ROI 가이드라인 */}
+                            <div style={{
+                                position: 'absolute', top: '50%', left: '50%',
+                                width: '200px', height: '270px',
+                                border: `3px dashed ${TEAL}`,
+                                borderRadius: '20px',
+                                transform: 'translate(-50%, -50%)',
+                                opacity: 0.8
+                            }}></div>
 
-            {/*  스크린샷을 찍는 버튼이 되겠다. */}
-            <div style={{ marginTop: '20px' }}>
-                <button
-                    onClick={() => startCountdown()}
-                    disabled={countdown !== null}
-                    style={{ padding: '10px 20px', fontSize: '18px' }}
-                >
-                    얼굴 비교 시작
-                </button>
-            </div>
+                            {/* 카운트다운 오버레이 */}
+                            {countdown !== null && (
+                                <div style={{
+                                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                                    display: 'flex', justifyContent: 'center', alignItems: 'center',
+                                    background: 'rgba(0,0,0,0.4)', borderRadius: '12px',
+                                    color: '#fff', fontSize: '80px', fontWeight: 'bold'
+                                }}>
+                                    {countdown}
+                                </div>
+                            )}
+                        </div>
 
-            {result && (
-                <div style={{ marginTop: '20px' }}>
-                    <h2>결과: {result.result}</h2>
-                    <p>Similarity: {result.similarity}</p>
-                    <p>BBox: [{result.bbox.join(', ')}]</p>
+                        {/* 스크린샷 찍는 버튼 */}
+                        <div style={{ marginTop: '24px' }}>
+                            <button onClick={() => startCountdown()}
+                                disabled={countdown !== null}
+                                style={{
+                                    width: "480px", maxWidth: "100%", padding: "16px",
+                                    background: countdown !== null ? '#ccc' : TEAL,
+                                    color: "#fff", border: "none", borderRadius: 12,
+                                    fontSize: 18, fontWeight: 700, cursor: countdown !== null ? 'not-allowed' : 'pointer',
+                                    letterSpacing: "0.5px", transition: 'background 0.3s'
+                                }}>
+                                {countdown !== null ? '촬영 중...' : '얼굴 인증 시작'}
+                            </button>
+                        </div>
+
+                        {/* 개선된 결과 출력 영역 */}
+                        {result && (
+                            <div style={{
+                                marginTop: '30px',
+                                padding: '24px',
+                                borderRadius: '12px',
+                                background: result.success
+                                    ? (result.result === 'ok' ? TEAL_LIGHT : '#fff0f0')
+                                    : '#fff0f0',
+                                border: `1px solid ${result.success
+                                    ? (result.result === 'ok' ? TEAL_BORDER : '#ffcdd2')
+                                    : '#ffcdd2'}`,
+                                animation: 'slideFadeIn 0.5s ease-out',
+                                width: '480px',
+                                maxWidth: '100%',
+                                margin: '30px auto 0'
+                            }}>
+                                {result.success ? (
+                                    <>
+                                        <h2 style={{
+                                            margin: '0 0 12px 0',
+                                            color: result.result === 'ok' ? '#20857a' : '#d32f2f',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                                        }}>
+                                            {result.result === 'ok' ? '✅ 인증 성공' : '❌ 인증 실패'}
+                                        </h2>
+
+                                        {result.result === 'ok' ? (
+                                            <p style={{ margin: '0 0 16px 0', color: '#444', fontSize: '16px' }}>
+                                                <b>{result.admin_name}</b> 관리자님, 환영합니다.
+                                            </p>
+                                        ) : (
+                                            <p style={{ margin: '0 0 16px 0', color: '#444', fontSize: '16px' }}>
+                                                등록된 관리자와 일치하지 않습니다.
+                                            </p>
+                                        )}0
+
+                                        {/* 유사도 프로그레스 바 */}
+                                        <div style={{ textAlign: 'left' }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '14px', color: '#666' }}>
+                                                <span>얼굴 유사도</span>
+                                                <span style={{ fontWeight: 'bold', color: result.result === 'ok' ? TEAL : '#d32f2f' }}>
+                                                    {(result.similarity * 100).toFixed(1)}%
+                                                </span>
+                                            </div>
+                                            <div style={{ background: '#e0e0e0', borderRadius: '8px', height: '12px', width: '100%', overflow: 'hidden' }}>
+                                                <div style={{
+                                                    background: result.result === 'ok' ? TEAL : '#d32f2f',
+                                                    width: `${Math.min(Math.max(result.similarity * 100, 0), 100)}%`,
+                                                    height: '100%',
+                                                    borderRadius: '8px',
+                                                    transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)'
+                                                }} />
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    // 얼굴 감지 실패 또는 마스크 착용 시
+                                    <>
+                                        <h2 style={{
+                                            margin: '0 0 12px 0', color: '#d32f2f',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
+                                        }}>
+                                            ⚠️ 인식 오류
+                                        </h2>
+                                        <p style={{ margin: 0, color: '#555', fontSize: '16px', lineHeight: '1.5' }}>
+                                            {result.message || "얼굴을 인식하지 못했습니다."}
+                                        </p>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
-            )}
+            </div>
         </div>
     )
 }
