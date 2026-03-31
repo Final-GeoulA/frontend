@@ -1,11 +1,16 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './style/MedicalRecord.css';
 import MedicalRecordModal from './MedicalRecordModal';
+import { useAuth } from '../../components/AuthProvider';
 
 type RecordItem = {
+  medicalRecordId?: number;
   date: string;
   hospital: string;
   amount: number;
+  memo?: string;
 };
 
 type CalendarCell = {
@@ -15,19 +20,55 @@ type CalendarCell = {
 };
 
 const MedicalRecord: React.FC = () => {
+  const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedCell, setSelectedCell] = useState<CalendarCell | null>(null);
+  const [records, setRecords] = useState<RecordItem[]>([]);
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
 
-  const records: RecordItem[] = [
-    { date: '2026-03-08', hospital: '미사랑병원', amount: 12000 },
-    { date: '2026-03-08', hospital: '연세의원', amount: 18000 },
-    { date: '2026-03-09', hospital: '한빛피부과', amount: 25000 },
-    { date: '2026-03-09', hospital: '새봄약국', amount: 8000 },
-    { date: '2026-03-12', hospital: '고운의원', amount: 15000 },
-    { date: '2026-03-15', hospital: '튼튼병원', amount: 32000 },
-    { date: '2026-03-21', hospital: '미소약국', amount: 6500 },
-    { date: '2026-03-27', hospital: '새봄병원', amount: 21000 },
-  ];
+  const handleAddRecord = () => {
+    if (!isLoggedIn) {
+      setShowLoginPopup(true);
+      return;
+    }
+
+    navigate('/MedicalRecordUpload');
+  };
+
+  useEffect(() => {
+    const fetchMedicalRecords = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_BACK_END_URL}/api/medical-record/list`,
+          {
+            withCredentials: true,
+          }
+        );
+
+        if (res.data?.success === false) {
+          console.error(res.data.message);
+          setRecords([]);
+          return;
+        }
+
+        const mappedRecords: RecordItem[] = res.data.map((item: any) => ({
+          medicalRecordId: item.medicalRecordId,
+          date: item.paymentDate,
+          hospital: item.hospitalName,
+          amount: item.price,
+          memo: item.memo,
+        }));
+
+        setRecords(mappedRecords);
+      } catch (error) {
+        console.error('진료 기록 조회 실패:', error);
+      }
+    };
+
+    fetchMedicalRecords();
+  }, []);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -39,6 +80,18 @@ const MedicalRecord: React.FC = () => {
 
   const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
   const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
+
+  const monthlyTotal = useMemo(() => {
+    return records
+      .filter((item) => {
+        const recordDate = new Date(item.date);
+        return (
+          recordDate.getFullYear() === year &&
+          recordDate.getMonth() === month
+        );
+      })
+      .reduce((sum, item) => sum + item.amount, 0);
+  }, [records, year, month]);
 
   const groupedRecords = useMemo(() => {
     const map: Record<string, RecordItem[]> = {};
@@ -83,14 +136,30 @@ const MedicalRecord: React.FC = () => {
             <h2 className="medical-record-title">진료 기록 캘린더</h2>
           </div>
 
-          <div className="medical-record-nav">
-            <button className="month-btn" onClick={prevMonth}>
-              &#10094;
+          <div className="medical-record-nav-wrap">
+            <div className="medical-record-nav">
+              <button className="month-btn" onClick={prevMonth}>
+                &#10094;
+              </button>
+              <span className="month-label">{monthLabel}</span>
+              <button className="month-btn" onClick={nextMonth}>
+                &#10095;
+              </button>
+            </div>
+
+            <button
+              className="medical-record-add-btn"
+              onClick={handleAddRecord}
+            >
+              + 기록 추가
             </button>
-            <span className="month-label">{monthLabel}</span>
-            <button className="month-btn" onClick={nextMonth}>
-              &#10095;
-            </button>
+          </div>
+        </div>
+
+        <div className="medical-record-summary">
+          <div className="medical-record-summary-card">
+            <span className="summary-label">이번 달 진료비 합계</span>
+            <strong className="summary-value">{monthlyTotal.toLocaleString()}원</strong>
           </div>
         </div>
 
@@ -106,7 +175,9 @@ const MedicalRecord: React.FC = () => {
           {calendarCells.map((cell, idx) => (
             <div
               key={idx}
-              className={`calendar-cell ${cell ? '' : 'empty-cell'} ${cell && cell.records.length > 0 ? 'clickable' : ''}`}
+              className={`calendar-cell ${cell ? '' : 'empty-cell'} ${
+                cell && cell.records.length > 0 ? 'clickable' : ''
+              }`}
               onClick={() => {
                 if (cell && cell.records.length > 0) setSelectedCell(cell);
               }}
@@ -119,7 +190,9 @@ const MedicalRecord: React.FC = () => {
                     {cell.records.slice(0, 2).map((record, index) => (
                       <div key={index} className="record-item">
                         <span className="record-hospital">{record.hospital}</span>
-                        <span className="record-amount">{record.amount.toLocaleString()}원</span>
+                        <span className="record-amount">
+                          {record.amount.toLocaleString()}원
+                        </span>
                       </div>
                     ))}
 
@@ -140,6 +213,28 @@ const MedicalRecord: React.FC = () => {
         selectedDate={selectedCell?.fullDate || ''}
         records={selectedCell?.records || []}
       />
+
+      {showLoginPopup && (
+        <div className="login-popup-overlay">
+          <div className="login-popup">
+            <p className="login-popup-text">로그인 후 이용 가능한 기능입니다.</p>
+            <div className="login-popup-buttons">
+              <button
+                className="login-popup-cancel"
+                onClick={() => setShowLoginPopup(false)}
+              >
+                닫기
+              </button>
+              <button
+                className="login-popup-confirm"
+                onClick={() => navigate('/login')}
+              >
+                로그인하러 가기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

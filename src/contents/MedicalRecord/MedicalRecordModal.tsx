@@ -5,6 +5,7 @@ type RecordItem = {
   date: string;
   hospital: string;
   amount: number;
+  memo?: string;
 };
 
 interface MedicalRecordModalProps {
@@ -49,13 +50,29 @@ const MedicalRecordModal: React.FC<MedicalRecordModalProps> = ({
               <div className="medical-modal-records">
                 {records.map((record, index) => (
                   <div key={index} className="medical-modal-record-item">
-                    <div className="medical-modal-record-left">
-                      <span className="medical-modal-label">병원명</span>
-                      <span className="medical-modal-value">{record.hospital}</span>
+                    <div className="medical-modal-record-top">
+                      <div className="medical-modal-record-left">
+                        <span className="medical-modal-label">병원명</span>
+                        <span className="medical-modal-value">{record.hospital}</span>
+                      </div>
+
+                      <div className="medical-modal-record-right">
+                        <span className="medical-modal-label">금액</span>
+                        <span className="medical-modal-price">
+                          {record.amount.toLocaleString()}원
+                        </span>
+                      </div>
                     </div>
-                    <div className="medical-modal-record-right">
-                      <span className="medical-modal-label">금액</span>
-                      <span className="medical-modal-price">{record.amount.toLocaleString()}원</span>
+
+                    <div className="medical-modal-memo-box">
+                      <span className="medical-modal-label">메모</span>
+                      <p
+                        className={`medical-modal-memo ${
+                          !record.memo ? 'medical-modal-memo-empty' : ''
+                        }`}
+                      >
+                        {record.memo || '진료 내용, 처방, 특이사항 등을 메모로 남겨보세요.'}
+                      </p>
                     </div>
                   </div>
                 ))}
