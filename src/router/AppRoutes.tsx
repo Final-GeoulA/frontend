@@ -41,6 +41,10 @@ import MedicalRecordUpload from "../contents/MedicalRecord/MedicalRecordUpload";
 import SkinRank from "../contents/SkinRank/SkinRank";
 import RequireAuth from "../components/RequireAuth";
 
+// 결제
+import Payment from "../contents/Payment/Payment";
+import PaymentSuccess from "../contents/Payment/PaymentSuccess";
+
 const AppRoutes: React.FC = () => {
   const routeList = [
     // 홈 화면
@@ -77,6 +81,10 @@ const AppRoutes: React.FC = () => {
 
     // 피부 랭킹
     { path: "/SkinRank", element: <SkinRank /> },
+
+    // 결제
+    { path: "/payment", element: <Payment /> },
+    { path: "/payment/success", element: <PaymentSuccess /> },
 
     // 로그인과 회원가입
     { path: "/login", element: <Login /> },

@@ -42,6 +42,25 @@
   color: white;
 }
 
+.upgrade-btn {
+  display: block;
+  width: 100%;
+  margin-top: 14px;
+  padding: 8px 0;
+  background: white;
+  color: #3dbfa8;
+  border: none;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.upgrade-btn:hover {
+  background: #f0faf8;
+}
+
 .grade-premium {
   background: #f5c518;
   color: #333;
