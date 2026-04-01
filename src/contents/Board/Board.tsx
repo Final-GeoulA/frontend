@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./Board.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 interface Post {
   board_skin_id: number;
@@ -9,6 +9,7 @@ interface Post {
   writer: string;
   bdate: string;
   hit: number;
+  textemotion:String;
 }
 
 const Board = () => {
@@ -19,7 +20,6 @@ const Board = () => {
   const [endPage, setEndPage] = useState(1);
   const [searchType, setSearchType] = useState("2"); // 1:작성자, 2:제목, 3:내용
   const [searchValue, setSearchValue] = useState("");
-
   const fetchList = (
     page: number,
     sType = searchType,
@@ -39,7 +39,7 @@ const Board = () => {
       })
       .catch((err) => console.error(err));
   };
-
+  console.log(posts)
   useEffect(() => {
     fetchList(1);
   }, []);
@@ -84,6 +84,7 @@ const Board = () => {
             <th>작성자</th>
             <th>작성일</th>
             <th>조회수</th>
+            <th>감정분석</th>
           </tr>
         </thead>
 
@@ -98,6 +99,7 @@ const Board = () => {
               <td>{post.writer}</td>
               <td>{post.bdate}</td>
               <td>{post.hit}</td>
+              <td>{post.textemotion}</td>
             </tr>
           ))}
         </tbody>
