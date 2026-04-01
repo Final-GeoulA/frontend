@@ -1,10 +1,11 @@
 import React from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import './style/MyPage.css';
 import { useAuth } from "../../components/AuthProvider";
 
 const MyPage: React.FC = () => {
   const {member} = useAuth()
+  const navigate = useNavigate();
   return (
     <div className="mypage-wrapper">
 
@@ -15,6 +16,9 @@ const MyPage: React.FC = () => {
           <span className={`grade-badge ${member?.user_grade_id === 2 ? "grade-premium" : "grade-normal"}`}>
             {member?.user_grade_id === 2 ? "프리미엄" : "일반"}
           </span>
+          {member?.user_grade_id !== 2 && (
+            <button className="upgrade-btn" onClick={() => navigate("/payment")}>프리미엄 결제</button>
+          )}
         </div>
 
         <nav className="menu">

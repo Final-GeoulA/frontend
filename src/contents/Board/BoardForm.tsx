@@ -40,7 +40,6 @@ const BoardForm = () => {
 
   return (
     <div className="write-container">
-
       <h2>커뮤니티 글쓰기</h2>
 
       <input
@@ -58,10 +57,11 @@ const BoardForm = () => {
       />
 
       <div className="write-bottom">
-
         <label className="upload-img" style={{ cursor: "pointer" }}>
           📷 사진 첨부
-          {file && <span style={{ marginLeft: 8, fontSize: 12 }}>{file.name}</span>}
+          {file && (
+            <span style={{ marginLeft: 8, fontSize: 12 }}>{file.name}</span>
+          )}
           <input
             type="file"
             accept="image/*"
@@ -73,9 +73,7 @@ const BoardForm = () => {
         <button className="submit-btn" onClick={handleSubmit}>
           업로드
         </button>
-
       </div>
-
     </div>
   );
 };

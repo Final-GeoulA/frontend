@@ -1,0 +1,107 @@
+.payment-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #f7f7f7;
+}
+
+.payment-card {
+  background: white;
+  border-radius: 16px;
+  padding: 48px 40px;
+  width: 380px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.payment-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #3b3b4f;
+  margin-bottom: 28px;
+}
+
+.payment-benefits {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+  text-align: left;
+}
+
+.payment-benefits li {
+  padding: 10px 0;
+  font-size: 14px;
+  color: #6b6b7a;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.payment-benefits li::before {
+  content: "✓ ";
+  color: #5ddbc8;
+  font-weight: bold;
+}
+
+.payment-price {
+  font-size: 16px;
+  color: #3b3b4f;
+  margin-bottom: 28px;
+}
+
+.price-amount {
+  font-size: 36px;
+  font-weight: 700;
+  color: #5ddbc8;
+}
+
+.payment-btn {
+  width: 100%;
+  padding: 14px;
+  background: #5ddbc8;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.payment-btn:hover {
+  background: #3ecfba;
+}
+
+.payment-cancel-btn {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  color: #aaa;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.payment-cancel-btn:hover {
+  background: #f7f7f7;
+}
+
+.payment-msg {
+  font-size: 18px;
+  font-weight: 600;
+  color: #3b3b4f;
+  margin-bottom: 12px;
+}
+
+.payment-msg.success {
+  color: #5ddbc8;
+}
+
+.payment-msg.fail {
+  color: #e05c5c;
+}
+
+.payment-sub {
+  font-size: 14px;
+  color: #aaa;
+}
