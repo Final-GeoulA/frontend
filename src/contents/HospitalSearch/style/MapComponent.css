@@ -124,13 +124,16 @@
   font-weight: 600;
   background: #74dacacb;
   border:2px solid #50CDBA;
-
   box-shadow:0 2px 8px rgba(0,0,0,0.25);
-
   z-index:9999;
   cursor:pointer;
 }
 
 .gps-btn:hover{
   background:#50CDBA;
+}
+
+.result-item.active {
+  background-color: #dbf1ec;
+  border-left: 4px solid #50CDBA;
 }
