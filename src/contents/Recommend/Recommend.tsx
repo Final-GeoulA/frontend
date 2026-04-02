@@ -50,6 +50,7 @@ const Gallery: React.FC = () => {
 		try {
 			const res = await axios.get(`${process.env.REACT_APP_IP_KTG}/geoulA/board/product/list?category=${category}&cPage=${page}${search === '' ? '' : `&type=${selectedSearchOpt}&keyword=${search}`}`);
 			setContent(res.data);
+			console.log(res.data)
 		} catch (e) {
 			// 서버 미연결 시 더미 데이터
 		}
@@ -338,16 +339,12 @@ const Gallery: React.FC = () => {
 				<div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
 					{/* 검색 */}
 					<div style={{ position: 'relative' }}>
-						<SearchIcon style={{
-							position: 'absolute', left: 12, top: '50%',
-							transform: 'translateY(-50%)', fontSize: 18, color: '#aaa'
-						}} />
 						<input
 							value={search}
 							onChange={e => setSearch(e.target.value)}
 							placeholder="Search"
 							style={{
-								padding: '9px 14px 9px 38px',
+								padding: '9px 14px 9px 14px',
 								borderRadius: 12,
 								border: '1.5px solid #E8EAEA',
 								background: '#FAFBFB',
@@ -357,6 +354,11 @@ const Gallery: React.FC = () => {
 								width: 200,
 							}}
 						/>
+						<SearchIcon onClick={() => getPage(category, Content.currentPage)} style={{
+							cursor: 'pointer',
+							position: 'absolute', right: 12, top: '50%',
+							transform: 'translateY(-50%)', fontSize: 18, color: '#aaa'
+						}} />
 					</div>
 
 					{/* 정렬 드롭다운 */}
