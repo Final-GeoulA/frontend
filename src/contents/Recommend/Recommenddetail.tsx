@@ -78,6 +78,19 @@ const Recommenddetail: React.FC = () => {
     } catch (e) {}
   };
 
+  const submitComment = async () => {
+    if (!comment.trim()) return;
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_BACK_END_URL}/board/product/commadd`,
+        { prodid, ucontent: comment },
+        { withCredentials: true }
+      );
+      setComment("");
+      getComments(1);
+    } catch (e) {}
+  };
+
   useEffect(() => {
     getPruduct(prodid);
     getComments(comments.currentPage);
@@ -175,10 +188,13 @@ const Recommenddetail: React.FC = () => {
             <input
               value={comment}
               onChange={(e) => setComment(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && submitComment()}
               placeholder="해당 제품의 사용 후기를 남겨보세요."
               className={styles.commentInput}
             />
-            <button className={styles.commentSubmitBtn}>등록하기</button>
+            <button onClick={submitComment} className={styles.commentSubmitBtn}>
+              등록하기
+            </button>
           </div>
         </div>
 
