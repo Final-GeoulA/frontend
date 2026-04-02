@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./style/SkinRank.css";
 
 interface SkinItem {
@@ -9,52 +9,45 @@ interface SkinItem {
   lose: number;
 }
 
-const initialData: SkinItem[] = [
-  { id: 1, image: "/image/SkinRank/skin1.jpeg", name: "피부1", win: 0, lose: 0 },
-  { id: 2, image: "/image/SkinRank/skin2.jpeg", name: "피부2", win: 0, lose: 0 },
-  { id: 3, image: "/image/SkinRank/skin3.jpeg", name: "피부3", win: 0, lose: 0 },
-  { id: 4, image: "/image/SkinRank/skin4.jpeg", name: "피부4", win: 0, lose: 0 },
-  { id: 5, image: "/image/SkinRank/skin1.jpeg", name: "피부5", win: 0, lose: 0 },
-  { id: 6, image: "/image/SkinRank/skin2.jpeg", name: "피부6", win: 0, lose: 0 },
-  { id: 7, image: "/image/SkinRank/skin3.jpeg", name: "피부7", win: 0, lose: 0 },
-  { id: 8, image: "/image/SkinRank/skin4.jpeg", name: "피부8", win: 0, lose: 0 },
-  { id: 9, image: "/image/SkinRank/skin1.jpeg", name: "피부9", win: 0, lose: 0 },
-  { id: 10, image: "/image/SkinRank/skin2.jpeg", name: "피부10", win: 0, lose: 0 },
-  { id: 11, image: "/image/SkinRank/skin3.jpeg", name: "피부11", win: 0, lose: 0 },
-  { id: 12, image: "/image/SkinRank/skin4.jpeg", name: "피부12", win: 0, lose: 0 },
-  { id: 13, image: "/image/SkinRank/skin1.jpeg", name: "피부13", win: 0, lose: 0 },
-  { id: 14, image: "/image/SkinRank/skin2.jpeg", name: "피부14", win: 0, lose: 0 },
-  { id: 15, image: "/image/SkinRank/skin3.jpeg", name: "피부15", win: 0, lose: 0 },
-  { id: 16, image: "/image/SkinRank/skin4.jpeg", name: "피부16", win: 0, lose: 0 },
-  { id: 17, image: "/image/SkinRank/skin1.jpeg", name: "피부17", win: 0, lose: 0 },
-  { id: 18, image: "/image/SkinRank/skin2.jpeg", name: "피부18", win: 0, lose: 0 },
-  { id: 19, image: "/image/SkinRank/skin3.jpeg", name: "피부19", win: 0, lose: 0 },
-  { id: 20, image: "/image/SkinRank/skin4.jpeg", name: "피부20", win: 0, lose: 0 },
-  { id: 21, image: "/image/SkinRank/skin1.jpeg", name: "피부21", win: 0, lose: 0 },
-  { id: 22, image: "/image/SkinRank/skin2.jpeg", name: "피부22", win: 0, lose: 0 },
-  { id: 23, image: "/image/SkinRank/skin3.jpeg", name: "피부23", win: 0, lose: 0 },
-  { id: 24, image: "/image/SkinRank/skin4.jpeg", name: "피부24", win: 0, lose: 0 },
-  { id: 25, image: "/image/SkinRank/skin1.jpeg", name: "피부25", win: 0, lose: 0 },
-  { id: 26, image: "/image/SkinRank/skin2.jpeg", name: "피부26", win: 0, lose: 0 },
-  { id: 27, image: "/image/SkinRank/skin3.jpeg", name: "피부27", win: 0, lose: 0 },
-  { id: 28, image: "/image/SkinRank/skin4.jpeg", name: "피부28", win: 0, lose: 0 },
-  { id: 29, image: "/image/SkinRank/skin1.jpeg", name: "피부29", win: 0, lose: 0 },
-  { id: 30, image: "/image/SkinRank/skin2.jpeg", name: "피부30", win: 0, lose: 0 },
-  { id: 31, image: "/image/SkinRank/skin3.jpeg", name: "피부31", win: 0, lose: 0 },
-  { id: 32, image: "/image/SkinRank/skin4.jpeg", name: "피부32", win: 0, lose: 0 },
-];
-
 const shuffle = (array: SkinItem[]) => {
   return [...array].sort(() => Math.random() - 0.5);
 };
 
 const SkinRank: React.FC = () => {
+  const [initialData, setInitialData] = useState<SkinItem[]>([]);
   const [roundSize, setRoundSize] = useState<number | null>(null);
   const [currentList, setCurrentList] = useState<SkinItem[]>([]);
   const [nextRound, setNextRound] = useState<SkinItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [ranking, setRanking] = useState<SkinItem[]>([]);
   const [showRanking, setShowRanking] = useState(false);
+
+  // 서버 데이터 가져오기
+  useEffect(() => {
+    fetch("http://192.168.0.56/geoulA/api/skinImg/list", {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("서버 응답:", data);
+        console.log("리스트 데이터:", data.list);
+
+        if (data.success && data.list) {
+          const mapped = data.list.map((item: any, index: number) => ({
+            id: item.userSkinImgId,
+            image: item.img,
+            name: item.nickname,
+            win: 0,
+            lose: 0,
+          }));
+
+          setInitialData(mapped);
+        } else {
+          console.log("데이터 없음 또는 로그인 필요");
+        }
+      })
+      .catch((err) => console.error("fetch 에러:", err));
+  }, []);
 
   const getWinRate = (item: SkinItem) => {
     const total = item.win + item.lose;
@@ -71,10 +64,10 @@ const SkinRank: React.FC = () => {
       }))
     );
 
-    const selected = shuffled.slice(0, size);
+    const selected = shuffled.slice(0, Math.min(size, shuffled.length));
 
     setCurrentList(selected);
-    setRoundSize(size);
+    setRoundSize(selected.length);
     setNextRound([]);
     setCurrentIndex(0);
     setRanking([]);
@@ -107,6 +100,7 @@ const SkinRank: React.FC = () => {
     }
   };
 
+  //시작 화면 (디자인 유지 + 로딩 표시 추가)
   if (!roundSize) {
     return (
       <div className="worldcup-page">
@@ -122,12 +116,14 @@ const SkinRank: React.FC = () => {
             선택하는 토너먼트입니다.
           </p>
 
+          {initialData.length === 0 && <p>이미지 불러오는 중...</p>}
+
           <div className="hero-card">
             <div className="hero-text-box">
               <div className="hero-mini-tag">Real User Skin Vote</div>
               <p className="rank-info">한 번의 선택으로 만드는 피부 랭킹</p>
               <p>
-                두 피부 중 더 좋아 보이는 쪽을 선택해 주세요.    <br/>
+                두 피부 중 더 좋아 보이는 쪽을 선택해 주세요. <br />
                 선택 결과를 바탕으로 최종 피부 랭킹이 완성됩니다.
               </p>
             </div>
@@ -147,6 +143,7 @@ const SkinRank: React.FC = () => {
     );
   }
 
+  // 랭킹 화면
   if (showRanking) {
     const finalRanking = [currentList[0], ...ranking];
 
@@ -155,9 +152,6 @@ const SkinRank: React.FC = () => {
         <div className="worldcup-container">
           <div className="hero-badge">Final Ranking</div>
           <h2>최종 랭킹</h2>
-          <p className="hero-subtext">
-            유저 투표 결과를 바탕으로 선정된 피부 랭킹입니다.
-          </p>
 
           <div className="ranking-list">
             {finalRanking.map((item, index) => (
@@ -187,15 +181,13 @@ const SkinRank: React.FC = () => {
     );
   }
 
+  // 우승 화면
   if (currentList.length === 1) {
     return (
       <div className="worldcup-page">
         <div className="worldcup-container">
           <div className="hero-badge">Winner</div>
           <h2>최종 우승</h2>
-          <p className="hero-subtext">
-            가장 많은 선택을 받은 피부가 최종 우승으로 선정되었습니다.
-          </p>
 
           <div className="winner-box">
             <img
@@ -207,7 +199,9 @@ const SkinRank: React.FC = () => {
             <div className="winner-name">{currentList[0].name}</div>
 
             <div className="winner-actions">
-              <button onClick={() => setShowRanking(true)}>랭킹 보기</button>
+              <button onClick={() => setShowRanking(true)}>
+                랭킹 보기
+              </button>
               <button onClick={resetGame}>다시 하기</button>
             </div>
           </div>
@@ -216,6 +210,7 @@ const SkinRank: React.FC = () => {
     );
   }
 
+  // 진행 화면
   const left = currentList[currentIndex];
   const right = currentList[currentIndex + 1];
 
@@ -224,12 +219,10 @@ const SkinRank: React.FC = () => {
       <div className="worldcup-container">
         <div className="hero-badge">Round of {currentList.length}</div>
         <h2>{currentList.length}강</h2>
-        <p className="hero-subtext">
-          더 좋아 보이는 피부를 선택해 다음 라운드로 진출시켜 주세요.
-        </p>
 
         <div className="battle">
           <div className="card" onClick={() => handleSelect(left, right)}>
+
             <img src={left.image} alt={left.name} />
             <div className="card-name">{left.name}</div>
           </div>
@@ -237,6 +230,7 @@ const SkinRank: React.FC = () => {
           <div className="vs">VS</div>
 
           <div className="card" onClick={() => handleSelect(right, left)}>
+
             <img src={right.image} alt={right.name} />
             <div className="card-name">{right.name}</div>
           </div>
