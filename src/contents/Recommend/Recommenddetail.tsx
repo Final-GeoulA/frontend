@@ -83,7 +83,7 @@ const Recommenddetail: React.FC = () => {
     try {
       await axios.post(
         `${process.env.REACT_APP_BACK_END_URL}/board/product/commadd`,
-        { prodid, ucontent: comment },
+        { product_id: Number(prodid), content: comment },
         { withCredentials: true }
       );
       setComment("");
