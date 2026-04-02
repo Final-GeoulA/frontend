@@ -1,14 +1,107 @@
 import React, { useRef, useState } from 'react'
 import Webcam from 'react-webcam';
+import axios from 'axios';
+
+const TEAL = "#5BC8BF";
 
 const Camera: React.FC = () => {
 	const webcamRef = useRef<Webcam>(null);
-	const [image, setImage] = useState<string|null|undefined>("");
+	const [captured, setCaptured] = useState<string | null>(null);
+	const [error, setError] = useState<string | null>(null);
+	const [uploading, setUploading] = useState(false);
+	const [uploadDone, setUploadDone] = useState(false);
 
 	const capture = () => {
-		const res = webcamRef.current?.getScreenshot();
-		setImage(res);
+		const screenshot = webcamRef.current?.getScreenshot();
+		if (screenshot) setCaptured(screenshot);
 	};
+
+	const retake = () => {
+		setCaptured(null);
+		setUploadDone(false);
+	};
+
+	const upload = async () => {
+		if (!captured) return;
+		setUploading(true);
+		try {
+			// base64 -> Blob
+			const res = await fetch(captured);
+			const blob = await res.blob();
+			const file = new File([blob], 'selfie.jpg', { type: 'image/jpeg' });
+
+			const formData = new FormData();
+			formData.append('file', file);
+
+			await axios.post(
+				`${process.env.REACT_APP_BACK_END_URL}/api/skin-img/upload`,
+				formData,
+				{ withCredentials: true }
+			);
+			setUploadDone(true);
+		} catch (e) {
+			alert('업로드에 실패했습니다.');
+		} finally {
+			setUploading(false);
+		}
+	};
+
+	if (error) {
+		return (
+			<div style={{ textAlign: 'center', padding: '48px 0', marginBottom: 36 }}>
+				<p style={{ fontSize: 16, color: '#e05', fontWeight: 600, marginBottom: 12 }}>
+					카메라에 접근할 수 없습니다.
+				</p>
+				<p style={{ fontSize: 14, color: '#666', lineHeight: 1.8 }}>
+					<strong>localhost:3000</strong>으로 접속하거나,<br />
+					Chrome 설정에서 해당 주소를 안전한 출처로 추가해 주세요.
+				</p>
+				<p style={{ fontSize: 13, color: '#aaa', marginTop: 12 }}>오류: {error}</p>
+			</div>
+		);
+	}
+
+	if (captured) {
+		return (
+			<div style={{ textAlign: 'center', marginBottom: 36 }}>
+				<img
+					src={captured}
+					alt="촬영된 사진"
+					style={{ maxWidth: '100%', maxHeight: 400, borderRadius: 12, objectFit: 'cover' }}
+				/>
+				{uploadDone ? (
+					<p style={{ marginTop: 16, fontSize: 15, color: TEAL, fontWeight: 600 }}>
+						저장 완료!
+					</p>
+				) : (
+					<div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 16 }}>
+						<button
+							onClick={retake}
+							style={{
+								padding: '10px 28px', fontSize: 15, fontWeight: 600,
+								border: `2px solid ${TEAL}`, borderRadius: 30,
+								background: '#fff', color: TEAL, cursor: 'pointer'
+							}}
+						>
+							다시 찍기
+						</button>
+						<button
+							onClick={upload}
+							disabled={uploading}
+							style={{
+								padding: '10px 28px', fontSize: 15, fontWeight: 600,
+								border: 'none', borderRadius: 30,
+								background: TEAL, color: '#fff', cursor: uploading ? 'not-allowed' : 'pointer',
+								opacity: uploading ? 0.7 : 1
+							}}
+						>
+							{uploading ? '저장 중...' : '분석하기'}
+						</button>
+					</div>
+				)}
+			</div>
+		);
+	}
 
 	return (
 		<div style={{ paddingBottom: '36px', position: 'relative' }}>
@@ -18,8 +111,12 @@ const Camera: React.FC = () => {
 				screenshotFormat='image/jpeg'
 				width='100%'
 				height={450}
-				onUserMedia={() => { console.log('카메라 동작') }}
-				onUserMediaError={(err) => { console.log("카메라 연결 실패 :", err) }}
+				videoConstraints={{ facingMode: 'user' }}
+				onUserMedia={() => setError(null)}
+				onUserMediaError={(err) => {
+					const msg = err instanceof Error ? err.message : String(err);
+					setError(msg);
+				}}
 			/>
 
 			<svg
@@ -33,10 +130,8 @@ const Camera: React.FC = () => {
 					</mask>
 				</defs>
 				<rect width="100%" height="100%" fill="rgba(0,0,0,0.45)" mask="url(#faceMask)" />
-				{/* 타원 흐릿하게 */}
 				<ellipse cx="320" cy="220" rx="110" ry="140"
 					fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-				{/* 코너 브라켓 4개 */}
 				<path d="M230 88 L200 88 L200 118" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" />
 				<path d="M410 88 L440 88 L440 118" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" />
 				<path d="M230 352 L200 352 L200 322" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" />
@@ -46,10 +141,22 @@ const Camera: React.FC = () => {
 				</text>
 			</svg>
 
-			<button onClick={capture}>촬영(함수만 구현상태)</button>
-			
+			<div style={{ position: 'absolute', bottom: 48, left: '50%', transform: 'translateX(-50%)' }}>
+				<button
+					onClick={capture}
+					style={{
+						padding: '12px 40px', fontSize: 16, fontWeight: 700,
+						background: TEAL, color: '#fff',
+						border: 'none', borderRadius: 30, cursor: 'pointer',
+						boxShadow: '0 4px 16px rgba(91,200,191,0.4)',
+						whiteSpace: 'nowrap'
+					}}
+				>
+					촬영하기
+				</button>
+			</div>
 		</div>
 	);
 };
 
-export default Camera
+export default Camera;

@@ -1,0 +1,287 @@
+/* Recommenddetail.module.css */
+
+.pageWrapper {
+  min-height: 100vh;
+  background: #F8F9FA;
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+}
+
+/* ── 페이지 헤더 ── */
+.pageHeader {
+  margin-bottom: 28px;
+}
+
+.pageTitle {
+  font-size: 26px;
+  font-weight: 800;
+  color: #111;
+  margin: 0;
+}
+
+.pageSubtitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3BBFB2;
+  margin: 4px 0 0;
+}
+
+/* ── 상품 카드 ── */
+.productCard {
+  background: #fff;
+  border-radius: 18px;
+  border: 1.5px solid #E8EEEE;
+  padding: 28px 32px;
+  margin-bottom: 32px;
+  display: flex;
+  gap: 28px;
+  align-items: flex-start;
+}
+
+.productImageWrapper {
+  width: 220px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #F0FAFA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 12px;
+}
+
+.productImage {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.productInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.productName {
+  font-size: 20px;
+  font-weight: 800;
+  color: #111;
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+
+.productBrand {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 16px;
+  font-weight: 500;
+}
+
+.ingredientBtn {
+  background: #3BBFB2;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 7px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 18px;
+}
+
+.ingredientBox {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  background: #F6FAFA;
+  border: 1px solid #D8EDED;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 12.5px;
+  color: #555;
+  line-height: 1.8;
+}
+
+/* ── 사용자 후기 ── */
+.reviewsSection {
+  margin-bottom: 24px;
+}
+
+.reviewsHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.reviewsTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111;
+}
+
+.reviewsCount {
+  font-size: 13px;
+  color: #888;
+  font-weight: 500;
+}
+
+.reviewsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reviewCard {
+  background: #fff;
+  border-radius: 14px;
+  border: 1.5px solid #EEF2F2;
+  padding: 18px 22px;
+}
+
+.reviewCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.reviewDate {
+  font-size: 12px;
+  color: #bbb;
+}
+
+.reviewContent {
+  margin: 0;
+  font-size: 14px;
+  color: #444;
+  padding-left: 46px;
+}
+
+/* ── 댓글 입력 ── */
+.commentSection {
+  background: #fff;
+  border-radius: 14px;
+  border: 1.5px solid #EEF2F2;
+  padding: 20px 24px;
+  margin-bottom: 32px;
+}
+
+.commentHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.commentIconWrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #E8F7F6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.commentTitle {
+  font-weight: 700;
+  font-size: 15px;
+  color: #333;
+}
+
+.commentInputRow {
+  display: flex;
+  gap: 10px;
+}
+
+.commentInput {
+  flex: 1;
+  padding: 12px 16px;
+  font-size: 14px;
+  border: 1.5px solid #E2EBEB;
+  border-radius: 10px;
+  outline: none;
+  color: #333;
+  background: #FAFCFC;
+}
+
+.commentSubmitBtn {
+  background: #3BBFB2;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* ── 페이지네이션 ── */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagDots {
+  font-size: 14px;
+  color: #aaa;
+  padding: 0 4px;
+}
+
+.pagBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1.5px solid #E2E8E8;
+  background: #fff;
+  color: #555;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pagBtn.active {
+  border-color: #3BBFB2;
+  background: #3BBFB2;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ── 하단 버튼 ── */
+.footerActions {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.actionBtn {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #b4d4f8;
+  color: white;
+  text-decoration: none;
+  border-radius: 25px;
+  font-weight: bold;
+  margin: 5px;
+  font-size: 12px;
+  text-align: center;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.actionBtn:hover {
+  background-color: #ff4070;
+  color: white;
+  transform: scale(1.05);
+}
