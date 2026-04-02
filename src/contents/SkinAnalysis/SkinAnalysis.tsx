@@ -1,56 +1,63 @@
-import { useState, useRef, ReactEventHandler } from "react";
+import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Upload from "./Upload";
 import Camera from "./Camera";
-const TEAL = "#5BC8BF";
+import "./style/SkinAnalysis.css";
 
 const SkinAnalysis: React.FC = () => {
-	const [cameraOn, setCameraOn] = useState<boolean>(false);
-	const fileRef = useRef<HTMLInputElement>(null);
+  const [cameraOn, setCameraOn] = useState<boolean>(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
-	const button_pic_upload = () => {
-		setCameraOn(false)
-		fileRef.current?.click()
-	}
+  const button_pic_upload = () => {
+    setCameraOn(false);
+    fileRef.current?.click();
+  };
 
-	const button_camera_on = () => {
-		setCameraOn(true)
-	}
+  const button_camera_on = () => {
+    setCameraOn(true);
+  };
 
-	return (
-		<div style={{ minHeight: "100vh", background: "#f7f7f7", fontFamily: "'Pretendard', 'Apple SD Gothic Neo', sans-serif" }}>
-			{/* Teal hero background */}
-			<div style={{ background: TEAL, padding: "64px 48px 80px" }}>
-				<div style={{ maxWidth: 900, margin: "0 auto" }}>
-					{/* Card */}
-					<div style={{ background: "#fff", borderRadius: 20, padding: "48px 56px", boxShadow: "0 8px 40px rgba(0,0,0,0.12)" }}>
-						<div>
-							{cameraOn ? <Camera />:<Upload props={fileRef}/>}
-							<div style={{ display: "flex", gap: 20 }}>
-								<button
-									onClick={button_pic_upload}
-									style={{
-										flex: 1, padding: "16px", fontSize: 16, fontWeight: 600,
-										border: `2px solid ${TEAL}`, borderRadius: 12,
-										background: "#fff", color: TEAL, cursor: "pointer"
-									}}
-								>
-									파일 업로드
-								</button>
-								<button
-									onClick={button_camera_on}
-									style={{
-									flex: 1, padding: "16px", fontSize: 16, fontWeight: 600,
-									border: `2px solid ${TEAL}`, borderRadius: 12,
-									background: TEAL, color: "#fff", cursor: "pointer"
-								}}>
-									셀카 찍기
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
-}
-export default SkinAnalysis
+  const goResultPage = () => {
+    navigate("/skinresult");
+  };
+
+  return (
+    <div className="skin-analysis-page">
+      <div className="skin-analysis-hero">
+        <div className="skin-analysis-container">
+          <div className="skin-analysis-card">
+            <div>
+              {cameraOn ? <Camera /> : <Upload props={fileRef} />}
+
+              <div className="skin-analysis-button-row">
+                <button
+                  onClick={button_pic_upload}
+                  className="skin-analysis-btn skin-analysis-btn-outline"
+                >
+                  파일 업로드
+                </button>
+
+                <button
+                  onClick={button_camera_on}
+                  className="skin-analysis-btn skin-analysis-btn-primary"
+                >
+                  셀카 찍기
+                </button>
+              </div>
+
+              <button
+                className="skin-analysis-submit-btn"
+                onClick={goResultPage}
+              >
+                피부 분석하기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SkinAnalysis;
