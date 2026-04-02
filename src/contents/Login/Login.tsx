@@ -62,7 +62,9 @@ const Login: React.FC = () => {
 					<div style={{ marginBottom: 28 }}>
 						<div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
 							<label style={{ fontSize: 14, fontWeight: 600, color: "#333" }}>비밀번호</label>
+							<Link to={"/find"} style={{textDecoration:'none'}}>
 							<span style={{ fontSize: 14, color: TEAL, cursor: "pointer", fontWeight: 600 }}>Forgot？</span>
+							</Link>
 						</div>
 						<div style={{ position: "relative" }}>
 							<input

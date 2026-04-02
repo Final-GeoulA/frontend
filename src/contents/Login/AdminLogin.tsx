@@ -61,7 +61,7 @@ const AdminLogin: React.FC = () => {
             //서버로 전송할 때 post방식으로 바이너리 파일인 이미지 한장을 보내겠다
             formData.append('image', blob, 'capture.jpg');
             const response = await axios.post<FaceCompareResult>(
-                "http://192.168.0.30:9001/api/recogface/compare_face",
+                `${process.env.REACT_DJANGO_URL}/api/recogface/compare_face`,
                 formData
             );
             setResult(response.data);
