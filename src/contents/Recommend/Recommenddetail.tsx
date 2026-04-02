@@ -37,7 +37,7 @@ interface CommentPage {
 }
 
 const Recommenddetail: React.FC = () => {
-  const { prodid } = useParams<string>();
+  const { prodid } = useParams<{ prodid: string }>();
   const [expanded, setExpanded] = useState(false);
   const [comment, setComment] = useState("");
   const [product, setProduct] = useState<Product | null>(null);
