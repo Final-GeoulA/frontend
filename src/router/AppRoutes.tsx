@@ -13,6 +13,10 @@ import AdminLogin from "../contents/Login/AdminLogin";
 import MainPage from "../contents/MainPage/MainPage";
 import ServiceQuestion from "../contents/MainPage/ServiceQuestion";
 
+// 피부 진단
+import SkinAnalysis from "../contents/SkinAnalysis/SkinAnalysis";
+import SkinResult from '../contents/SkinAnalysis/SkinResult';
+
 // 커뮤니티
 import Board from "../contents/Board/Board";
 import BoardForm from "../contents/Board/BoardForm";
@@ -27,7 +31,6 @@ import HospitalSearch from "../contents/HospitalSearch/HospitalSearch";
 
 // 마이페이지
 import Mypage from "../contents/Mypage/MyPage";
-import SkinAnalysis from "../contents/SkinAnalysis/SkinAnalysis";
 import SkinReport from "../contents/Mypage/SkinReport";
 import Chat from "../contents/MainPage/Chat";
 import PasswordlessReg from "../contents/Login/PasswordlessReg";
@@ -40,6 +43,7 @@ import MedicalRecordUpload from "../contents/MedicalRecord/MedicalRecordUpload";
 // 피부 랭킹
 import SkinRank from "../contents/SkinRank/SkinRank";
 import RequireAuth from "../components/RequireAuth";
+import ChangePassword from "../contents/Mypage/ChangePassword";
 
 // 결제
 import Payment from "../contents/Payment/Payment";
@@ -50,8 +54,9 @@ const AppRoutes: React.FC = () => {
     // 홈 화면
     { path: "/", element: <MainPage /> },
 
-    // 촬영 or 사진 업로드
+    // 피부 진단
     { path: "/skinanalysis", element: <SkinAnalysis /> },
+    { path: "/skinresult", element: <SkinResult /> },
 
     // 서비스 문의
     { path: "/ServiceQuestion", element: <ServiceQuestion /> },
@@ -92,9 +97,8 @@ const AppRoutes: React.FC = () => {
     { path: "/login/pwl", element: <Passwordless /> },
     { path: "/signup/pwl", element: <PasswordlessReg /> },
     { path: "/admin/login", element: <AdminLogin /> },
+    { path: "/find", element: <FindID /> },
 
-    // 불명
-    { path: "/Find", element: <FindID /> },
   ];
 
   return (
@@ -113,6 +117,7 @@ const AppRoutes: React.FC = () => {
         <Route path="savedhospitals" element={<HospitalSearch />} />
         <Route path="recommend" element={<Recommend />} />
         <Route path="board" element={<Board />} />
+        <Route path="changepassword" element={<ChangePassword />} />
       </Route>
     </Routes>
   );
