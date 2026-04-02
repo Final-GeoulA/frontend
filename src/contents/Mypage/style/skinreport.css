@@ -1,54 +1,281 @@
-/* SkinReport.css */
-.custom-datepicker {
-    border: none !important;
-    border-radius: 12px !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
-    font-family: sans-serif;
-    padding-bottom: 10px;
-    background-color: #fff !important;
+.skin-report-page {
+  width: 100%;
 }
 
-.custom-datepicker .react-datepicker__header {
-    background-color: white !important;
-    border-bottom: none !important;
-    padding: 0 !important;
+.skin-report-page-title {
+  font-weight: 700;
+  color: #1a1a3a;
+  margin: 0 0 20px 0;
+  font-size: 22px;
 }
 
-.custom-datepicker .react-datepicker__day-names {
-    margin-top: 10px;
-    border-top: 1px solid #f0f0f0;
-    padding-top: 10px;
+.skin-report {
+  width: 100%;
+  margin-bottom: 40px;
 }
 
-.custom-datepicker .react-datepicker__day-name {
-    color: #888 !important;
-    font-size: 12px !important;
-    width: 34px !important;
+.skin-report-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
 }
 
-.custom-datepicker .react-datepicker__day {
-    width: 34px !important;
-    height: 34px !important;
-    line-height: 34px !important;
-    border-radius: 50% !important;
-    color: #333 !important;
-    font-size: 14px !important;
-    margin: 2px !important;
+.skin-report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-/* 선택된 날짜 (파란색 동그라미) */
-.custom-datepicker .react-datepicker__day--selected,
-.custom-datepicker .react-datepicker__day--keyboard-selected {
-    background-color: #50CDBA !important;
-    color: #fff !important;
+.skin-report-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
 }
 
-.custom-datepicker .react-datepicker__day:hover {
-    background-color: #f0f4f8 !important;
-    border-radius: 50% !important;
+.skin-report-date-nav {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #f7faf9;
+  border: 1px solid #e4efec;
+  border-radius: 999px;
+  padding: 8px 14px;
 }
 
-/* 화살표 꼬리표 숨기기 */
-.react-datepicker__triangle {
-    display: none !important;
+.date-nav-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #50cdba;
+  color: #ffffff;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.date-nav-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+.date-nav-btn:disabled {
+  background: #d7e5e2;
+  cursor: not-allowed;
+}
+
+.skin-report-date {
+  min-width: 110px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.skin-report-chart-wrap {
+  width: 100%;
+  height: 230px;
+  margin-bottom: 14px;
+  padding: 0 4px; 
+}
+
+.skin-report-legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.legend-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fbfb;
+  border: 1px solid #e8f1ef;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+
+.legend-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.legend-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #50cdba;
+}
+
+.skin-state-section {
+  width: 100%;
+}
+
+.date-range-bar {
+  display: flex;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 30px;
+  height: 50px;
+  background: #fff;
+}
+
+.date-range-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
+}
+
+.date-range-text {
+  color: #adb5bd;
+  font-size: 15px;
+}
+
+.date-range-text.has-value {
+  color: #333;
+}
+
+.date-picker-icon-wrap {
+  width: 28px;
+  height: 28px;
+}
+
+.calendar-icon-input {
+  width: 28px;
+  height: 28px;
+  border: 1px dashed #57c7b6;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  color: #57c7b6;
+  background-color: #fff;
+}
+
+.date-range-arrow {
+  background-color: #f0f4f5;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  color: #6c757d;
+}
+
+.skin-compare-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.skin-compare-card {
+  flex: 1;
+  border: 1px solid #ced4da;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  background: #fff;
+}
+
+.skin-compare-date {
+  margin: 0 0 20px 0;
+  font-weight: 700;
+  font-size: 20px;
+  color: #222;
+}
+
+.skin-compare-image-box {
+  background-color: #f4f4f4;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.skin-compare-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+
+.skin-compare-arrow {
+  font-size: 40px;
+  color: #57c7b6;
+  margin: 0 20px;
+  font-weight: 700;
+}
+
+.datepicker-header {
+  padding: 15px 15px 5px 15px;
+  background-color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+.datepicker-header-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.datepicker-cancel {
+  color: #4da6ff;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.datepicker-confirm {
+  color: #007aff;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.datepicker-header-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.datepicker-current-month {
+  color: #007aff;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.datepicker-month-btn {
+  border: none;
+  background: none;
+  color: #007aff;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 8px;
+}
+
+/* 분석 결과 텍스트 */
+.skin-report-summary {
+  flex: 1;
+  min-width: 280px;
+  background: #f7faf9;
+  border: 1px solid #e4efec;
+  border-radius: 14px;
+  padding: 14px 18px;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
+.skin-report-summary-highlight {
+  color: #50cdba;
+  font-weight: 700;
 }

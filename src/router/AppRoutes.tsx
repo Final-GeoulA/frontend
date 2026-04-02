@@ -48,6 +48,7 @@ import ChangePassword from "../contents/Mypage/ChangePassword";
 // 결제
 import Payment from "../contents/Payment/Payment";
 import PaymentSuccess from "../contents/Payment/PaymentSuccess";
+import { elements } from "chart.js";
 
 const AppRoutes: React.FC = () => {
   const routeList = [
