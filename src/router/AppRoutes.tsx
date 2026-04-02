@@ -13,6 +13,10 @@ import AdminLogin from "../contents/Login/AdminLogin";
 import MainPage from "../contents/MainPage/MainPage";
 import ServiceQuestion from "../contents/MainPage/ServiceQuestion";
 
+// 피부 진단
+import SkinAnalysis from "../contents/SkinAnalysis/SkinAnalysis";
+import SkinResult from '../contents/SkinAnalysis/SkinResult';
+
 // 커뮤니티
 import Board from "../contents/Board/Board";
 import BoardForm from "../contents/Board/BoardForm";
@@ -27,7 +31,6 @@ import HospitalSearch from "../contents/HospitalSearch/HospitalSearch";
 
 // 마이페이지
 import Mypage from "../contents/Mypage/MyPage";
-import SkinAnalysis from "../contents/SkinAnalysis/SkinAnalysis";
 import SkinReport from "../contents/Mypage/SkinReport";
 import Chat from "../contents/MainPage/Chat";
 import PasswordlessReg from "../contents/Login/PasswordlessReg";
@@ -50,8 +53,9 @@ const AppRoutes: React.FC = () => {
     // 홈 화면
     { path: "/", element: <MainPage /> },
 
-    // 촬영 or 사진 업로드
+    // 피부 진단
     { path: "/skinanalysis", element: <SkinAnalysis /> },
+    { path: "/skinresult", element: <SkinResult /> },
 
     // 서비스 문의
     { path: "/ServiceQuestion", element: <ServiceQuestion /> },
