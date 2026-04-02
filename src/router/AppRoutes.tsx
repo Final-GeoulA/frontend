@@ -40,6 +40,7 @@ import MedicalRecordUpload from "../contents/MedicalRecord/MedicalRecordUpload";
 // 피부 랭킹
 import SkinRank from "../contents/SkinRank/SkinRank";
 import RequireAuth from "../components/RequireAuth";
+import ChangePassword from "../contents/Mypage/ChangePassword";
 
 // 결제
 import Payment from "../contents/Payment/Payment";
@@ -92,9 +93,8 @@ const AppRoutes: React.FC = () => {
     { path: "/login/pwl", element: <Passwordless /> },
     { path: "/signup/pwl", element: <PasswordlessReg /> },
     { path: "/admin/login", element: <AdminLogin /> },
+    { path: "/find", element: <FindID /> },
 
-    // 불명
-    { path: "/Find", element: <FindID /> },
   ];
 
   return (
@@ -113,6 +113,7 @@ const AppRoutes: React.FC = () => {
         <Route path="savedhospitals" element={<HospitalSearch />} />
         <Route path="recommend" element={<Recommend />} />
         <Route path="board" element={<Board />} />
+        <Route path="changepassword" element={<ChangePassword />} />
       </Route>
     </Routes>
   );
