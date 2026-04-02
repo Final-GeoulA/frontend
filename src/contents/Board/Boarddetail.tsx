@@ -9,7 +9,7 @@ interface BoardSkinVO {
   title: string;
   writer: string;
   content: string;
-  imgn?: string;
+  imgn: string;
   hit?: number;
   elike?: number;
   reip?: string;
@@ -214,8 +214,12 @@ const Boarddetail: React.FC = () => {
           </div>
           <div style={{ textAlign: "center", marginTop: 16 }}>
             <Link to="/board" className={style.button} style={{ margin: 5, fontSize: 12 }}>목록</Link>
+    
             {member?.nickname === post.writer && (
-              <button className={style.button} onClick={handleDeletePost} style={{ margin: 5, fontSize: 12 }}>삭제</button>
+              <>
+              <Link to="/board/form" state={{data:post}} className={style.button} style={{ margin: 5, fontSize: 12 }}>수정</Link>
+              <button className={style.button} onClick={handleDeletePost} style={{ margin: 5, fontSize: 12,border:"none" }}>삭제</button>
+              </>
             )}
           </div>
         </div>

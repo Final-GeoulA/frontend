@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import axios from "axios";
 import "./Board.css";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../components/AuthProvider";
 
 const BoardForm = () => {
@@ -9,6 +9,20 @@ const BoardForm = () => {
   const [content, setContent] = useState("");
   const [textemotion, setTextemotion] = useState("");
   const [file, setFile] = useState<File | null>(null);
+
+  //게시판 수정 로직
+  
+  const location = useLocation();
+  const Edit = location.state && location.state.data;
+  useEffect(() => {
+    if(location.state != null){
+      setTitle(location.state.data.title);
+      setContent(location.state.data.content);
+      setFile(location.state.data.imgn);
+    }   
+  },[]);
+ 
+
   const navigate = useNavigate();
   const { member } = useAuth();
 
@@ -37,18 +51,29 @@ const BoardForm = () => {
       if (file) {
         formData.append("mfile", file);
       }
-      await axios.post(
+      if(Edit){
+        formData.append("board_skin_id",location.state.data.board_skin_id)
+        await axios.post(   
+        `${process.env.REACT_APP_BACK_END_URL}/board/skin/update`,
+        formData,
+        { withCredentials: true }
+        );
+      }
+      else{
+        await axios.post(
         `${process.env.REACT_APP_BACK_END_URL}/board/skin/add`,
         formData,
         { withCredentials: true }
       );
-      navigate("/board");
+      }   
+       navigate("/board")  
     } catch (error) {
       console.error(error);
       alert("처리중 오류 발생");
     }
   };
-
+  // 글쓰기 수정 함수
+  
   return (
     <div className="write-container">
       <h2>커뮤니티 글쓰기</h2>
