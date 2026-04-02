@@ -78,6 +78,8 @@ nav {
 }
 
 .welcome-text {
-  font-size: 14px;
-  color: #444;
+  font-size: 17px;
+  font-weight: bold;
+  color: #1da593;
+  text-decoration: none;
 }

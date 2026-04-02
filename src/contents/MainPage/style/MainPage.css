@@ -27,14 +27,16 @@
 }
 
 .scan-btn{
-  margin-top:20px;
+  margin-top: 40px;
+  padding-top: 20px;
   padding:12px 24px;
   border:none;
   background:#50CDBA;
   color:white;
   border-radius:6px;
-  font-size:16px;
+  font-size:17px;
   cursor:pointer;
+  text-decoration: none;
 }
 
 .top-image img{
