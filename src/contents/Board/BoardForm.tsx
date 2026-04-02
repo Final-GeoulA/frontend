@@ -7,7 +7,7 @@ import { useAuth } from "../../components/AuthProvider";
 const BoardForm = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [textemotion,setTextemotion] = useState("");
+  const [textemotion, setTextemotion] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const navigate = useNavigate();
   const { member } = useAuth();
@@ -16,20 +16,24 @@ const BoardForm = () => {
     if (!title.trim() || !content.trim()) {
       alert("제목과 내용을 입력해주세요.");
       return;
-    } 
+    }
     try {
-      const res = await axios.post(`http://192.168.0.43:9001/text_emotion/Board_emotion`,{
-        content:content
-      })
-      console.log("감정 분석 결과",res.data);
+      const res = await axios.post(
+        `http://192.168.0.252:9001/text_emotion/Board_emotion`,
+        {
+          content: content,
+        }
+      );
+      console.log("감정 분석 결과", res.data);
       const result = res.data;
-      const emotionLabel = result.positive > result.negative ? "긍정😁" : "부정😟";
+      const emotionLabel =
+        result.positive > result.negative ? "긍정😁" : "부정😟";
 
       const formData = new FormData();
       formData.append("title", title);
       formData.append("content", content);
       formData.append("writer", member?.nickname ?? "익명");
-      formData.append("textemotion",emotionLabel); 
+      formData.append("textemotion", emotionLabel);
       if (file) {
         formData.append("mfile", file);
       }
@@ -38,11 +42,11 @@ const BoardForm = () => {
         formData,
         { withCredentials: true }
       );
-      navigate("/board")  
+      navigate("/board");
     } catch (error) {
       console.error(error);
       alert("처리중 오류 발생");
-    }   
+    }
   };
 
   return (
@@ -74,7 +78,11 @@ const BoardForm = () => {
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
           />
         </label>
-        <button className="submit-btn" value={textemotion} onClick={handleSubmit}>
+        <button
+          className="submit-btn"
+          value={textemotion}
+          onClick={handleSubmit}
+        >
           업로드
         </button>
       </div>

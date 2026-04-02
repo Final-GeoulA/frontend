@@ -61,7 +61,7 @@ const AppRoutes: React.FC = () => {
 
     //제품추천
     { path: "/recommend", element: <Recommend /> },
-    { path: "/recommenddetail", element: <Recommenddetail /> },
+    { path: "/recommenddetail/:prodid", element: <Recommenddetail /> },
 
     // 커뮤니티
     {
