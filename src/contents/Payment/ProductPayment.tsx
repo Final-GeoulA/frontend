@@ -4,7 +4,7 @@ import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
 import { useAuth } from "../../components/AuthProvider";
 import styles from "./ProductPayment.module.css";
 
-const CLIENT_KEY = "test_ck_Gv6LjeKD8a69GovzeBz03wYxAdXy";
+const CLIENT_KEY = "test_ck_KNbdOvk5rkmejPBPlX4z3n07xlzm";
 const TEAL = "#3BBFB2";
 
 interface Product {
@@ -59,7 +59,7 @@ const ProductPayment: React.FC = () => {
 
 		try {
 			const tossPayments = await loadTossPayments(CLIENT_KEY);
-			const payment = tossPayments.payment({ customerKey: String(member.user_id) });
+			const payment = tossPayments.payment({ customerKey: String("userid-"+member.user_id) });
 
 			await payment.requestPayment({
 				method: "CARD",
