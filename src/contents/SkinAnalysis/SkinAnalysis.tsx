@@ -18,8 +18,8 @@ const SkinAnalysis: React.FC = () => {
     setCameraOn(true);
   };
 
-  const goResultPage = (imgUrl: string) => {
-    navigate("/skinresult", { state: { imgUrl } });
+  const goResultPage = (imgUrl: string, prediction: any) => {
+    navigate("/skinresult", { state: { imgUrl, prediction } });
   };
 
   return (

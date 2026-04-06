@@ -5,7 +5,7 @@ const TEAL = "#5BC8BF";
 
 interface UploadProps {
 	props: RefObject<HTMLInputElement | null>;
-	onUploadDone?: (imgUrl: string) => void;
+	onUploadDone?: (imgUrl: string, prediction: any) => void;
 }
 
 const Upload: React.FC<UploadProps> = ({ props, onUploadDone }) => {
@@ -35,21 +35,34 @@ const Upload: React.FC<UploadProps> = ({ props, onUploadDone }) => {
 		}
 		setUploading(true);
 		try {
-			const formData = new FormData();
-			formData.append('file', uploadedFile);
+			const springForm = new FormData();
+			springForm.append('file', uploadedFile);
 
-			const response = await axios.post(
-				`${process.env.REACT_APP_BACK_END_URL}/api/skinImg/upload`,
-				formData,
-				{ withCredentials: true }
-			);
+			const djangoForm = new FormData();
+			djangoForm.append('image', uploadedFile);
 
-			if (!response.data.success) {
-				alert(response.data.message || '업로드에 실패했습니다.');
+			const [springRes, djangoRes] = await Promise.all([
+				axios.post(
+					`${process.env.REACT_APP_BACK_END_URL}/api/skinImg/upload`,
+					springForm,
+					{ withCredentials: true }
+				),
+				axios.post(
+					`${process.env.REACT_APP_DJANGO_END_URL}/api/skin/predict/`,
+					djangoForm
+				),
+			]);
+
+			if (!springRes.data.success) {
+				alert(springRes.data.message || '이미지 저장에 실패했습니다.');
+				return;
+			}
+			if (!djangoRes.data.success) {
+				alert('피부 분석에 실패했습니다.');
 				return;
 			}
 
-			onUploadDone?.(response.data.imgUrl);
+			onUploadDone?.(springRes.data.imgUrl, djangoRes.data);
 		} catch (e) {
 			alert('업로드에 실패했습니다.');
 		} finally {
