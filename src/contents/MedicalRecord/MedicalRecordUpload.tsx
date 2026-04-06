@@ -8,6 +8,7 @@ const MedicalRecordUpload: React.FC = () => {
 
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>('');
+  const [isDragging, setIsDragging] = useState(false);
 
   const [hospital, setHospital] = useState('');
   const [date, setDate] = useState('');
@@ -16,12 +17,12 @@ const MedicalRecordUpload: React.FC = () => {
 
   const [loadingOcr, setLoadingOcr] = useState(false);
 
-  const userId = 21; // 로그인 후 해당 유저로 수정 필요
 
-  // 이미지 선택 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const processImageFile = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드할 수 있습니다.');
+      return;
+    }
 
     setImage(file);
     setPreview(URL.createObjectURL(file));
@@ -47,13 +48,9 @@ const MedicalRecordUpload: React.FC = () => {
       if (res.data.success && res.data.parsed) {
         const parsed = res.data.parsed;
 
-        // OCR 결과를 입력칸에 자동 반영
         setHospital(parsed.hospitalName || '');
         setDate(parsed.paymentDate || '');
         setAmount(parsed.price ? String(parsed.price) : '');
-
-        // rawText를 메모에 자동으로 넣고 싶으면 아래 주석 해제
-        // setMemo(parsed.rawText || '');
 
         alert('OCR 인식이 완료되었습니다.');
       } else {
@@ -77,21 +74,44 @@ const MedicalRecordUpload: React.FC = () => {
     }
   };
 
+  // 클릭하여 업로드
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await processImageFile(file);
+  };
+
+  // 드래그 중
+  const handleDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  // 드래그 벗어남
+  const handleDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+
+    await processImageFile(file);
+  };
+
   const handleSubmit = async () => {
     if (!hospital || !date || !amount) {
-      alert('병원명, 날짜, 금액은 필수입니다.');
-      return;
-    }
-
-    if (Number(amount) <= 0) {
-      alert('금액은 0보다 커야 합니다.');
+      alert('병원명, 날짜, 금액을 입력해주세요.');
       return;
     }
 
     const url = `${process.env.REACT_APP_BACK_END_URL}/api/medical-record/save`;
 
     const requestData = {
-      // userId,
       hospitalName: hospital,
       paymentDate: date,
       price: Number(amount),
@@ -102,13 +122,10 @@ const MedicalRecordUpload: React.FC = () => {
     console.log('REQUEST DATA:', requestData);
 
     try {
-      const res = await axios.post(
-        url,
-        requestData,
-        {
-          withCredentials: true,  // 유저 세션 쿠키
-        }
-      );
+      const res = await axios.post(url, requestData, {
+        withCredentials: true,
+      });
+
       console.log('SAVE RESPONSE:', res.data);
 
       if (res.data.success) {
@@ -149,7 +166,12 @@ const MedicalRecordUpload: React.FC = () => {
           영수증을 업로드하면 자동으로 정보를 불러올 수 있어요
         </p>
 
-        <label className="medical-upload-box">
+        <label
+          className={`medical-upload-box ${isDragging ? 'dragging' : ''}`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+        >
           <input type="file" accept="image/*" onChange={handleImageChange} hidden />
 
           {preview ? (
@@ -157,7 +179,7 @@ const MedicalRecordUpload: React.FC = () => {
           ) : (
             <div className="medical-upload-placeholder">
               <p className="upload-main">영수증 사진 업로드</p>
-              <p className="upload-sub">클릭해서 파일 선택</p>
+              <p className="upload-sub">클릭하거나 파일을 드래그해서 업로드</p>
             </div>
           )}
         </label>

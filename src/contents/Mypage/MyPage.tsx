@@ -26,6 +26,7 @@ const MyPage: React.FC = () => {
           <NavLink to="savedhospitals">저장한 병원</NavLink>
           <NavLink to="recommend">저장한 제품</NavLink>
           <NavLink to="board">내가 쓴 게시글</NavLink>
+          <NavLink to="loginlog">로그인 기록</NavLink>
           <NavLink to="changepassword">비밀번호 변경</NavLink>
         </nav>
       </aside>
