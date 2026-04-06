@@ -108,7 +108,7 @@ const Login: React.FC = () => {
 							width: "48%", padding: "15px", background: TEAL,
 							color: "#fff", border: "none", borderRadius: 10,
 							fontSize: 16, fontWeight: 700, cursor: "pointer", letterSpacing: "0.5px",
-							marginBottom: 20
+							marginBottom: 20, textDecoration:'none'
 						}}>
 							패스워드리스 로그인
 						</Link>

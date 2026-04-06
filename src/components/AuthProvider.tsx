@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { createContext, useContext, useEffect, useState } from "react";
+
 //사용자 정보 타입
 interface Member {
   nickname: string;

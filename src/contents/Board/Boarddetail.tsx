@@ -154,9 +154,10 @@ const Boarddetail: React.FC = () => {
                 </div>
               </div>
             )}
-            <div style={{ fontSize: 15, color: "#444", lineHeight: 1.9, whiteSpace: "pre-wrap" }}>
-              {post.content}
-            </div>
+            <div
+              style={{ fontSize: 15, color: "#444", lineHeight: 1.9 }}
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
           </div>
         </div>
 

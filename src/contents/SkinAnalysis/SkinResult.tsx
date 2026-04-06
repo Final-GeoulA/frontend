@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./style/SkinResult.css";
 
 const resultData = [
@@ -11,6 +11,8 @@ const resultData = [
 
 const SkinResult: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const imgUrl = (location.state as { imgUrl?: string })?.imgUrl;
 
   // 가장 높은 비율 데이터 찾기
   const topResult = resultData.reduce((prev, current) =>
@@ -23,7 +25,7 @@ const SkinResult: React.FC = () => {
         <h1 className="result-title">피부 분석 결과</h1>
 
         <img
-          src="/image/SkinRank/skin5.jpg"
+          src={imgUrl || "/image/SkinRank/skin5.jpg"}
           alt="결과 이미지"
           className="result-image"
         />
