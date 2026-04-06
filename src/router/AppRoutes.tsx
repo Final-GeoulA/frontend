@@ -44,6 +44,8 @@ import RequireAuth from "../components/RequireAuth";
 // 결제
 import Payment from "../contents/Payment/Payment";
 import PaymentSuccess from "../contents/Payment/PaymentSuccess";
+import ProductPayment from "../contents/Payment/ProductPayment";
+import ProductPaymentSuccess from "../contents/Payment/ProductPaymentSuccess";
 
 const AppRoutes: React.FC = () => {
   const routeList = [
@@ -61,7 +63,7 @@ const AppRoutes: React.FC = () => {
 
     //제품추천
     { path: "/recommend", element: <Recommend /> },
-    { path: "/recommenddetail", element: <Recommenddetail /> },
+    { path: "/recommenddetail/:prodid", element: <Recommenddetail /> },
 
     // 커뮤니티
     {
@@ -82,9 +84,13 @@ const AppRoutes: React.FC = () => {
     // 피부 랭킹
     { path: "/SkinRank", element: <SkinRank /> },
 
-    // 결제
+    // 결제 (프리미엄)
     { path: "/payment", element: <Payment /> },
     { path: "/payment/success", element: <PaymentSuccess /> },
+
+    // 결제 (제품 구매)
+    { path: "/product-payment", element: <ProductPayment /> },
+    { path: "/product-payment/success", element: <ProductPaymentSuccess /> },
 
     // 로그인과 회원가입
     { path: "/login", element: <Login /> },
