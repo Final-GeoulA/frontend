@@ -70,7 +70,7 @@ const BoardForm = () => {
     }
     try {
       const res = await axios.post(
-        `http://192.168.0.68:9001/text_emotion/Board_emotion`,
+        `${process.env.REACT_APP_DJANGO_END_URL}/text_emotion/Board_emotion`,
         {
           content: content,
         }
