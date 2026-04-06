@@ -4,7 +4,7 @@ import { loadTossPayments } from "@tosspayments/tosspayments-sdk";
 import { useAuth } from "../../components/AuthProvider";
 import styles from "./ProductPayment.module.css";
 
-const CLIENT_KEY = "test_ck_KNbdOvk5rkmejPBPlX4z3n07xlzm";
+const CLIENT_KEY = "test_ck_Gv6LjeKD8a69GovzeBz03wYxAdXy";
 const TEAL = "#3BBFB2";
 
 interface Product {
