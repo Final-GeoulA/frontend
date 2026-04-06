@@ -1,23 +1,61 @@
 import React, { RefObject, useState } from 'react'
+import axios from 'axios';
+
 const TEAL = "#5BC8BF";
 
-const Upload: React.FC<any> = ({ props }: { props: RefObject<HTMLInputElement | null> }) => {
-	const [uploaded, setUploaded] = useState<string | null>(null);
-	const [dragging, setDragging] = useState(false);
+interface UploadProps {
+	props: RefObject<HTMLInputElement | null>;
+	onUploadDone?: (imgUrl: string) => void;
+}
 
-	const handleFile = (file: any) => {
+const Upload: React.FC<UploadProps> = ({ props, onUploadDone }) => {
+	const [uploaded, setUploaded] = useState<string | null>(null);
+	const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+	const [dragging, setDragging] = useState(false);
+	const [uploading, setUploading] = useState(false);
+
+	const handleFile = (file: File) => {
 		if (!file) return;
 		const url = URL.createObjectURL(file);
 		setUploaded(url);
+		setUploadedFile(file);
 	};
 
-	const handleDrop = (e: any) => {
+	const handleDrop = (e: React.DragEvent) => {
 		e.preventDefault();
 		setDragging(false);
 		const file = e.dataTransfer.files[0];
-		handleFile(file);
+		if (file) handleFile(file);
 	};
 
+	const handleAnalyze = async () => {
+		if (!uploadedFile) {
+			alert('사진을 먼저 선택해주세요.');
+			return;
+		}
+		setUploading(true);
+		try {
+			const formData = new FormData();
+			formData.append('file', uploadedFile);
+
+			const response = await axios.post(
+				`${process.env.REACT_APP_BACK_END_URL}/api/skinImg/upload`,
+				formData,
+				{ withCredentials: true }
+			);
+
+			if (!response.data.success) {
+				alert(response.data.message || '업로드에 실패했습니다.');
+				return;
+			}
+
+			onUploadDone?.(response.data.imgUrl);
+		} catch (e) {
+			alert('업로드에 실패했습니다.');
+		} finally {
+			setUploading(false);
+		}
+	};
 
 	return (
 		<div>
@@ -38,10 +76,8 @@ const Upload: React.FC<any> = ({ props }: { props: RefObject<HTMLInputElement | 
 				정확한 분석을 위해 아래 사항을 확인해주세요.
 			</p>
 
-			{/* 주의 아이콘 3개 */}
 			<img src='/image/skinanalysis/image.png' style={{ maxWidth: 400, display: 'block', margin: '0 auto', gap: 48, marginBottom: 48 }} />
 
-			{/* 드래그 업로드 영역 (업로드 시 미리보기) */}
 			{uploaded ? (
 				<div style={{ textAlign: "center", marginBottom: 36 }}>
 					<img
@@ -51,7 +87,7 @@ const Upload: React.FC<any> = ({ props }: { props: RefObject<HTMLInputElement | 
 					/>
 					<p
 						style={{ marginTop: 12, fontSize: 13, color: TEAL, cursor: "pointer", fontWeight: 600 }}
-						onClick={() => setUploaded(null)}
+						onClick={() => { setUploaded(null); setUploadedFile(null); }}
 					>
 						다시 선택하기
 					</p>
@@ -82,9 +118,30 @@ const Upload: React.FC<any> = ({ props }: { props: RefObject<HTMLInputElement | 
 						type="file"
 						accept="image/*"
 						style={{ display: "none" }}
-						onChange={e => handleFile(e.target.files?.[0])}
+						onChange={e => { if (e.target.files?.[0]) handleFile(e.target.files[0]); }}
 					/>
 				</div>
+			)}
+
+			{uploaded && (
+				<button
+					onClick={handleAnalyze}
+					disabled={uploading}
+					style={{
+						width: '100%',
+						padding: '14px',
+						fontSize: 16,
+						fontWeight: 700,
+						background: uploading ? '#aaa' : TEAL,
+						color: '#fff',
+						border: 'none',
+						borderRadius: 30,
+						cursor: uploading ? 'not-allowed' : 'pointer',
+						marginBottom: 16
+					}}
+				>
+					{uploading ? '저장 중...' : '피부 분석하기'}
+				</button>
 			)}
 		</div>
 	)

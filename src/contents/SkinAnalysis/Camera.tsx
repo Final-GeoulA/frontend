@@ -4,7 +4,11 @@ import axios from 'axios';
 
 const TEAL = "#5BC8BF";
 
-const Camera: React.FC = () => {
+interface CameraProps {
+	onUploadDone?: (imgUrl: string) => void;
+}
+
+const Camera: React.FC<CameraProps> = ({ onUploadDone }) => {
 	const webcamRef = useRef<Webcam>(null);
 	const [captured, setCaptured] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -33,12 +37,19 @@ const Camera: React.FC = () => {
 			const formData = new FormData();
 			formData.append('file', file);
 
-			await axios.post(
-				`${process.env.REACT_APP_BACK_END_URL}/api/skin-img/upload`,
+			const response = await axios.post(
+				`${process.env.REACT_APP_BACK_END_URL}/api/skinImg/upload`,
 				formData,
 				{ withCredentials: true }
 			);
+
+			if (!response.data.success) {
+				alert(response.data.message || '업로드에 실패했습니다.');
+				return;
+			}
+
 			setUploadDone(true);
+			onUploadDone?.(response.data.imgUrl);
 		} catch (e) {
 			alert('업로드에 실패했습니다.');
 		} finally {

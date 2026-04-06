@@ -18,8 +18,8 @@ const SkinAnalysis: React.FC = () => {
     setCameraOn(true);
   };
 
-  const goResultPage = () => {
-    navigate("/skinresult");
+  const goResultPage = (imgUrl: string) => {
+    navigate("/skinresult", { state: { imgUrl } });
   };
 
   return (
@@ -28,7 +28,7 @@ const SkinAnalysis: React.FC = () => {
         <div className="skin-analysis-container">
           <div className="skin-analysis-card">
             <div>
-              {cameraOn ? <Camera /> : <Upload props={fileRef} />}
+              {cameraOn ? <Camera onUploadDone={goResultPage} /> : <Upload props={fileRef} onUploadDone={goResultPage} />}
 
               <div className="skin-analysis-button-row">
                 <button
@@ -46,12 +46,6 @@ const SkinAnalysis: React.FC = () => {
                 </button>
               </div>
 
-              <button
-                className="skin-analysis-submit-btn"
-                onClick={goResultPage}
-              >
-                피부 분석하기
-              </button>
             </div>
           </div>
         </div>
