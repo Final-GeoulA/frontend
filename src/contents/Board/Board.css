@@ -239,3 +239,40 @@ color:white;
 padding:10px 20px;
 border-radius:6px;
 }
+.file-upload-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.file-upload-label {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #3bbfb2;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.file-upload-label:hover {
+  background: #2ea89b;
+}
+
+.file-name {
+  font-size: 14px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.file-remove-btn {
+  background: none;
+  border: none;
+  color: #e05c5c;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+}

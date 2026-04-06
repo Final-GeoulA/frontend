@@ -19,7 +19,7 @@ const Payment: React.FC = () => {
     }
 
     const tossPayments = await loadTossPayments(CLIENT_KEY);
-    const payment = tossPayments.payment({ customerKey: String(member.user_id) });
+    const payment = tossPayments.payment({ customerKey: `user-${member.user_id}` });
 
     await payment.requestPayment({
       method: "CARD",

@@ -15,11 +15,13 @@ const ProductPaymentSuccess: React.FC = () => {
 			const paymentKey = searchParams.get("paymentKey");
 			const orderId = searchParams.get("orderId");
 			const amount = Number(searchParams.get("amount"));
+			const prodid = Number(searchParams.get("prodid"));
+			const qty = Number(searchParams.get("qty"));
 
 			try {
 				const res = await axios.post(
 					`${process.env.REACT_APP_BACK_END_URL}/payment/confirm`,
-					{ paymentKey, orderId, amount },
+					{ paymentKey, orderId, amount, prodid, qty },
 					{ withCredentials: true }
 				);
 
