@@ -1,8 +1,9 @@
 import axios from "axios";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import Webcam from "react-webcam";
 import { useAuth } from "../../components/AuthProvider";
+import { useAdminAuth } from "../../components/AdminAuthProvider";
 
 const TEAL = "#5BC8BF";
 const TEAL_LIGHT = "#e8f8f7";
@@ -23,7 +24,14 @@ const AdminLogin: React.FC = () => {
     const [countdown, setCountdown] = useState<number | null>(null); //카운트 다운 저장할 useState
     const [captured, setCaptured] = useState<boolean>(false); //캡쳐
     const [result, setResult] = useState<FaceCompareResult | null>(null); //axios로 받은 결과를 저장할 useState
-
+    const { isAdmin } = useAdminAuth();
+    
+    useEffect(() => {
+            if (isAdmin) {
+                navigate("/");
+            }
+        });
+    
     const startCountdown = () => {
         if (countdown !== null) return;
         let counter = 5;
@@ -61,7 +69,7 @@ const AdminLogin: React.FC = () => {
             //서버로 전송할 때 post방식으로 바이너리 파일인 이미지 한장을 보내겠다
             formData.append('image', blob, 'capture.jpg');
             const response = await axios.post<FaceCompareResult>(
-                `${process.env.REACT_DJANGO_URL}/api/recogface/compare_face`,
+                `${process.env.REACT_APP_DJANGO_URL}/api/recogface/compare_face`,
                 formData
             );
             setResult(response.data);
@@ -85,8 +93,8 @@ const AdminLogin: React.FC = () => {
                     const loginresult = await login(currentEmail, currentPassword);
                     if (loginresult === 'success') {
                         // 0.8초 대기 후 실행
-                            alert(`${currentEmail} 관리자님, 로그인되었습니다`);
-                            navigate('/', { replace: true });
+                            alert(`얼굴 인증이 완료되었습니다.`);
+                            navigate('/admin/login', { replace: true });
 
                     } else {
                         alert('로그인 실패');

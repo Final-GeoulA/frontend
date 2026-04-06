@@ -48,6 +48,8 @@ import ChangePassword from "../contents/Mypage/ChangePassword";
 // 결제
 import Payment from "../contents/Payment/Payment";
 import PaymentSuccess from "../contents/Payment/PaymentSuccess";
+import JWTLogin from "../contents/Login/JWTLogin";
+import AdminDashboard from "../contents/Admin/AdminDashboard";
 import { elements } from "chart.js";
 
 const AppRoutes: React.FC = () => {
@@ -70,23 +72,16 @@ const AppRoutes: React.FC = () => {
     { path: "/recommenddetail/:prodid", element: <Recommenddetail /> },
 
     // 커뮤니티
-    {
-      path: "/board",
-      element: (
-        <RequireAuth>
-          <Board />
-        </RequireAuth>
-      ),
-    },
-    { path: "/boarddetail/:num", element: <Boarddetail /> },
-    { path: "/board/form", element: <BoardForm /> },
+    {path: "/board",element: (<RequireAuth><Board /></RequireAuth>),},
+    { path: "/boarddetail/:num", element: <RequireAuth><Boarddetail /></RequireAuth> },
+    { path: "/board/form", element: <RequireAuth><BoardForm /></RequireAuth> },
 
     // 진료 관리
-    { path: "/MedicalRecord", element: <MedicalRecord/>},
-    { path: "/MedicalRecordUpload", element: <MedicalRecordUpload/>},
+    { path: "/MedicalRecord", element: <RequireAuth><MedicalRecord/></RequireAuth>},
+    { path: "/MedicalRecordUpload", element: <RequireAuth><MedicalRecordUpload/></RequireAuth>},
 
     // 피부 랭킹
-    { path: "/SkinRank", element: <SkinRank /> },
+    { path: "/SkinRank", element: <RequireAuth><SkinRank /></RequireAuth> },
 
     // 결제
     { path: "/payment", element: <Payment /> },
@@ -97,8 +92,12 @@ const AppRoutes: React.FC = () => {
     { path: "/signup", element: <SignUp /> },
     { path: "/login/pwl", element: <Passwordless /> },
     { path: "/signup/pwl", element: <PasswordlessReg /> },
-    { path: "/admin/login", element: <AdminLogin /> },
+    { path: "/admin/facelogin", element: <AdminLogin /> },
+    { path: "/admin/login", element: <JWTLogin />},
     { path: "/find", element: <FindID /> },
+
+    // 관리자
+    { path: "/admin/dashboard", element: <AdminDashboard /> }
 
   ];
 
