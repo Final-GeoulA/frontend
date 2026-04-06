@@ -7,7 +7,7 @@
   font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
 }
 
-/* ?? ?ъ씠?쒕컮 ?? */
+/* ── 사이드바 ── */
 .sidebar {
   float: left;
   width: 141px;
@@ -70,7 +70,7 @@
   opacity: 1;
 }
 
-/* ?? ?ㅻ뜑 ?? */
+/* ── 헤더 ── */
 .header {
   display: flex;
   align-items: flex-start;
@@ -95,7 +95,7 @@
   display: block;
 }
 
-/* ?? 寃???뺣젹 ?? */
+/* ── 검색/정렬 ── */
 .searchArea {
   display: flex;
   gap: 10px;
@@ -160,7 +160,7 @@
   margin: 0 0 28px;
 }
 
-/* ?? ?쒗뭹 洹몃━???? */
+/* ── 제품 그리드 ── */
 .productGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -251,7 +251,7 @@
   margin: 4px 0 40px;
 }
 
-/* ?? ?섏씠吏?ㅼ씠???? */
+/* ── 페이지네이션 ── */
 .pagination {
   display: flex;
   justify-content: center;

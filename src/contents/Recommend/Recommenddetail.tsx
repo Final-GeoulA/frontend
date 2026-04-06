@@ -34,12 +34,12 @@ interface Comment {
 }
 
 interface CommentPage {
-	totalItems: number;
-	totalPages: number;
-	startPage: number;
-	endPage: number;
-	currentPage: number;
-	data: Comment[];
+  totalItems: number;
+  totalPages: number;
+  startPage: number;
+  endPage: number;
+  currentPage: number;
+  data: Comment[];
 }
 
 const Recommenddetail: React.FC = () => {

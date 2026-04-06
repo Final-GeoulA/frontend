@@ -1,51 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./style/SkinRank.css";
 
 interface SkinItem {
   id: number;
   image: string;
+  name: string;
+  win: number;
+  lose: number;
 }
-
-const initialData: SkinItem[] = [
-  { id: 1, image: "/image/SkinRank/skin1.jpeg" },
-  { id: 2, image: "/image/SkinRank/skin2.jpeg" },
-  { id: 3, image: "/image/SkinRank/skin3.jpeg" },
-  { id: 4, image: "/image/SkinRank/skin4.jpeg" },
-  { id: 5, image: "/image/SkinRank/skin1.jpeg" },
-  { id: 6, image: "/image/SkinRank/skin2.jpeg" },
-  { id: 7, image: "/image/SkinRank/skin3.jpeg" },
-  { id: 8, image: "/image/SkinRank/skin4.jpeg" },
-  { id: 9, image: "/image/SkinRank/skin1.jpeg" },
-  { id: 10, image: "/image/SkinRank/skin2.jpeg" },
-  { id: 11, image: "/image/SkinRank/skin3.jpeg" },
-  { id: 12, image: "/image/SkinRank/skin4.jpeg" },
-  { id: 13, image: "/image/SkinRank/skin1.jpeg" },
-  { id: 14, image: "/image/SkinRank/skin2.jpeg" },
-  { id: 15, image: "/image/SkinRank/skin3.jpeg" },
-  { id: 16, image: "/image/SkinRank/skin4.jpeg" },
-  { id: 17, image: "/image/SkinRank/skin1.jpeg" },
-  { id: 18, image: "/image/SkinRank/skin2.jpeg" },
-  { id: 19, image: "/image/SkinRank/skin3.jpeg" },
-  { id: 20, image: "/image/SkinRank/skin4.jpeg" },
-  { id: 21, image: "/image/SkinRank/skin1.jpeg" },
-  { id: 22, image: "/image/SkinRank/skin2.jpeg" },
-  { id: 23, image: "/image/SkinRank/skin3.jpeg" },
-  { id: 24, image: "/image/SkinRank/skin4.jpeg" },
-  { id: 25, image: "/image/SkinRank/skin1.jpeg" },
-  { id: 26, image: "/image/SkinRank/skin2.jpeg" },
-  { id: 27, image: "/image/SkinRank/skin3.jpeg" },
-  { id: 28, image: "/image/SkinRank/skin4.jpeg" },
-  { id: 29, image: "/image/SkinRank/skin1.jpeg" },
-  { id: 30, image: "/image/SkinRank/skin2.jpeg" },
-  { id: 31, image: "/image/SkinRank/skin3.jpeg" },
-  { id: 32, image: "/image/SkinRank/skin4.jpeg" }
-];
 
 const shuffle = (array: SkinItem[]) => {
   return [...array].sort(() => Math.random() - 0.5);
 };
 
 const SkinRank: React.FC = () => {
+  const [initialData, setInitialData] = useState<SkinItem[]>([]);
   const [roundSize, setRoundSize] = useState<number | null>(null);
   const [currentList, setCurrentList] = useState<SkinItem[]>([]);
   const [nextRound, setNextRound] = useState<SkinItem[]>([]);
@@ -53,13 +22,61 @@ const SkinRank: React.FC = () => {
   const [ranking, setRanking] = useState<SkinItem[]>([]);
   const [showRanking, setShowRanking] = useState(false);
 
-  // 시작
+  // 서버 데이터 가져오기
+  useEffect(() => {
+    fetch("http://192.168.0.56/geoulA/api/skinImg/list", {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("서버 응답:", data);
+        console.log("리스트 데이터:", data.list);
+
+        if (data.success && data.list) {
+          const mapped = data.list.map((item: any, index: number) => ({
+            id: item.userSkinImgId,
+            image: item.img,
+            name: item.nickname,
+            win: 0,
+            lose: 0,
+          }));
+
+          setInitialData(mapped);
+        } else {
+          console.log("데이터 없음 또는 로그인 필요");
+        }
+      })
+      .catch((err) => console.error("fetch 에러:", err));
+  }, []);
+
+  const getWinRate = (item: SkinItem) => {
+    const total = item.win + item.lose;
+    if (total === 0) return 0;
+    return Number(((item.win / total) * 100).toFixed(2));
+  };
+
   const startGame = (size: number) => {
-    const shuffled = shuffle(initialData);
-    const selected = shuffled.slice(0, size);
+    const shuffled = shuffle(
+      initialData.map((item) => ({
+        ...item,
+        win: 0,
+        lose: 0,
+      }))
+    );
+
+    const selected = shuffled.slice(0, Math.min(size, shuffled.length));
 
     setCurrentList(selected);
-    setRoundSize(size);
+    setRoundSize(selected.length);
+    setNextRound([]);
+    setCurrentIndex(0);
+    setRanking([]);
+    setShowRanking(false);
+  };
+
+  const resetGame = () => {
+    setRoundSize(null);
+    setCurrentList([]);
     setNextRound([]);
     setCurrentIndex(0);
     setRanking([]);
@@ -67,10 +84,11 @@ const SkinRank: React.FC = () => {
   };
 
   const handleSelect = (winner: SkinItem, loser: SkinItem) => {
-    const updatedNext = [...nextRound, winner];
+    const winnerUpdated = { ...winner, win: winner.win + 1 };
+    const loserUpdated = { ...loser, lose: loser.lose + 1 };
 
-    // 탈락자 기록
-    setRanking((prev) => [loser, ...prev]);
+    const updatedNext = [...nextRound, winnerUpdated];
+    setRanking((prev) => [loserUpdated, ...prev]);
 
     if (currentIndex + 2 < currentList.length) {
       setNextRound(updatedNext);
@@ -82,89 +100,140 @@ const SkinRank: React.FC = () => {
     }
   };
 
-  // 👉 시작 화면
+  //시작 화면 (디자인 유지 + 로딩 표시 추가)
   if (!roundSize) {
     return (
-      <div className="worldcup-container">
-        <h2>피부 월드컵</h2>
-        <p>라운드를 선택하세요</p>
+      <div className="worldcup-page">
+        <div className="worldcup-container">
+          <div className="hero-badge">Skin Tournament</div>
 
-        <div className="round-select">
-          <button onClick={() => startGame(32)}>32강</button>
-          <button onClick={() => startGame(16)}>16강</button>
-          <button onClick={() => startGame(8)}>8강</button>
+          <p className="skin-worldcup">피부 월드컵</p>
+
+          <p className="hero-title-text">더 좋아 보이는 피부에 투표하세요</p>
+
+          <p className="hero-subtext">
+            유저들의 피부 사진을 비교하며 더 건강하고 좋아 보이는 피부를
+            선택하는 토너먼트입니다.
+          </p>
+
+          {initialData.length === 0 && <p>이미지 불러오는 중...</p>}
+
+          <div className="hero-card">
+            <div className="hero-text-box">
+              <div className="hero-mini-tag">Real User Skin Vote</div>
+              <p className="rank-info">한 번의 선택으로 만드는 피부 랭킹</p>
+              <p>
+                두 피부 중 더 좋아 보이는 쪽을 선택해 주세요. <br />
+                선택 결과를 바탕으로 최종 피부 랭킹이 완성됩니다.
+              </p>
+            </div>
+
+            <div className="worldcup-image">
+              <img src="/image/SkinRank/vote.png" alt="피부 월드컵 이미지" />
+            </div>
+          </div>
+
+          <div className="round-buttons">
+            <button onClick={() => startGame(32)}>32강</button>
+            <button onClick={() => startGame(16)}>16강</button>
+            <button onClick={() => startGame(8)}>8강</button>
+          </div>
         </div>
       </div>
     );
   }
 
-  // 👉 랭킹 화면
+  // 랭킹 화면
   if (showRanking) {
     const finalRanking = [currentList[0], ...ranking];
 
     return (
-      <div className="worldcup-container">
-        <h2>최종 랭킹</h2>
+      <div className="worldcup-page">
+        <div className="worldcup-container">
+          <div className="hero-badge">Final Ranking</div>
+          <h2>최종 랭킹</h2>
 
-        <div className="ranking-list">
-          {finalRanking.map((item, index) => (
-            <div key={item.id} className="ranking-item">
-              <span className="rank">{index + 1}위</span>
-              <img src={item.image} alt="rank" />
-            </div>
-          ))}
+          <div className="ranking-list">
+            {finalRanking.map((item, index) => (
+              <div key={item.id} className="ranking-item">
+                <div className="rank">{index + 1}</div>
+
+                <img src={item.image} alt={item.name} className="rank-img" />
+
+                <div className="info">
+                  <span className="name">{item.name}</span>
+                  <span className="percent">{getWinRate(item)}%</span>
+
+                  <div className="bar">
+                    <div
+                      className="fill"
+                      style={{ width: `${getWinRate(item)}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button onClick={resetGame}>처음으로</button>
         </div>
-
-        <button className="restart-btn" onClick={() => setRoundSize(null)}>
-          처음으로
-        </button>
       </div>
     );
   }
 
-  // 👉 우승 화면
+  // 우승 화면
   if (currentList.length === 1) {
     return (
-      <div className="worldcup-container">
-        <h2>최종 우승</h2>
+      <div className="worldcup-page">
+        <div className="worldcup-container">
+          <div className="hero-badge">Winner</div>
+          <h2>최종 우승</h2>
 
-<div className="winner-box">
-  <img src={currentList[0].image} className="winner-img" />
+          <div className="winner-box">
+            <img
+              src={currentList[0].image}
+              alt={currentList[0].name}
+              className="winner-img"
+            />
 
-  <div className="winner-actions">
-    <button className="rank-btn" onClick={() => setShowRanking(true)}>
-      랭킹 보기
-    </button>
+            <div className="winner-name">{currentList[0].name}</div>
 
-    <button className="restart-btn" onClick={() => setRoundSize(null)}>
-      다시 하기
-    </button>
-  </div>
-</div>
+            <div className="winner-actions">
+              <button onClick={() => setShowRanking(true)}>
+                랭킹 보기
+              </button>
+              <button onClick={resetGame}>다시 하기</button>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
+  // 진행 화면
   const left = currentList[currentIndex];
   const right = currentList[currentIndex + 1];
-  const currentRound = currentList.length;
 
   return (
-    <div className="worldcup-container">
-      <h2>{currentRound}강</h2>
-      <p>
-        {currentIndex / 2 + 1} / {currentRound / 2} 경기
-      </p>
+    <div className="worldcup-page">
+      <div className="worldcup-container">
+        <div className="hero-badge">Round of {currentList.length}</div>
+        <h2>{currentList.length}강</h2>
 
-      <div className="battle">
-        <div className="card" onClick={() => handleSelect(left, right)}>
-          <img src={left.image} alt="left" />
-        </div>
+        <div className="battle">
+          <div className="card" onClick={() => handleSelect(left, right)}>
 
-        <div className="vs">VS</div>
+            <img src={left.image} alt={left.name} />
+            <div className="card-name">{left.name}</div>
+          </div>
 
-        <div className="card" onClick={() => handleSelect(right, left)}>
-          <img src={right.image} alt="right" />
+          <div className="vs">VS</div>
+
+          <div className="card" onClick={() => handleSelect(right, left)}>
+
+            <img src={right.image} alt={right.name} />
+            <div className="card-name">{right.name}</div>
+          </div>
         </div>
       </div>
     </div>

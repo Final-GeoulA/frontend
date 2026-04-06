@@ -1,273 +1,335 @@
-// npm install chart.js react-chartjs-2
-// 
-
-
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from "react";
 import {
-    BarElement, CategoryScale, Chart as ChartJS, ArcElement, Tooltip, Legend, Title, ChartOptions,
-    LineElement, LinearScale, PointElement, registerables,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import './style/skinreport.css'; // ★ CSS 파일 임포트 추가!
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Tooltip,
+  Legend,
+  ChartOptions,
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "./style/skinreport.css";
 import { ko } from "date-fns/locale";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
-interface ChartData {
-    labels: string[];
-    datasets: { label: string; data: number[]; borderColor: string | string[]; borderWidth: number; tension: number;}[];
-}
-
-const formatDate = (date: Date | null) => {
-    if (!date) return '';
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}.${month}.${day}`;
+type SkinItem = {
+  label: string;
+  value: number;
 };
 
-// 강제 onClick 주입을 제거하고 react-datepicker가 주는 기본 onClick만 받도록 수정
+type DailySkinReport = {
+  date: string;
+  items: SkinItem[];
+};
+
+const skinReports: DailySkinReport[] = [
+  {
+    date: "2026.03.10",
+    items: [
+      { label: "여드름", value: 40 },
+      { label: "염증성", value: 30 },
+      { label: "아토피", value: 20 },
+      { label: "건선", value: 10 },
+    ],
+  },
+  {
+    date: "2026.03.17",
+    items: [
+      { label: "여드름", value: 35 },
+      { label: "염증성", value: 28 },
+      { label: "아토피", value: 22 },
+      { label: "건선", value: 15 },
+    ],
+  },
+  {
+    date: "2026.03.24",
+    items: [
+      { label: "여드름", value: 30 },
+      { label: "염증성", value: 25 },
+      { label: "아토피", value: 25 },
+      { label: "건선", value: 20 },
+    ],
+  },
+];
+
+const formatDate = (date: Date | null) => {
+  if (!date) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}.${month}.${day}`;
+};
+
 const CalendarIconInput = React.forwardRef<HTMLDivElement, any>(
-    ({ onClick }, ref) => (
-        <div
-            onClick={onClick}
-            ref={ref}
-            style={{
-                width: '28px', height: '28px', border: '1px dashed #57c7b6',
-                borderRadius: '4px', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', cursor: 'pointer', fontSize: '12px',
-                color: '#57c7b6', backgroundColor: '#fff'
-            }}
-        >
-            img
-        </div>
-    )
+  ({ onClick }, ref) => (
+    <div onClick={onClick} ref={ref} className="calendar-icon-input">
+      date
+    </div>
+  )
 );
-CalendarIconInput.displayName = 'CalendarIconInput';
+CalendarIconInput.displayName = "CalendarIconInput";
 
 const SkinReport: React.FC = () => {
-    // 확정된 실제 선택 날짜
-    const [startDate, setStartDate] = useState<Date | null>(new Date('2026-02-13'));
-    const [endDate, setEndDate] = useState<Date | null>(new Date('2026-02-18'));
-    const before = '/image/Mypage/before.png'
-    const after = '/image/Mypage/after.png'
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const currentReport = skinReports[currentIndex];
 
-    // 달력 팝업 안에서 움직일 임시 날짜
-    const [tempStartDate, setTempStartDate] = useState<Date | null>(null);
-    const [tempEndDate, setTempEndDate] = useState<Date | null>(null);
+  const [startDate, setStartDate] = useState<Date | null>(new Date("2026-02-13"));
+  const [endDate, setEndDate] = useState<Date | null>(new Date("2026-02-18"));
+  const [tempStartDate, setTempStartDate] = useState<Date | null>(null);
+  const [tempEndDate, setTempEndDate] = useState<Date | null>(null);
 
-    // ★ 팝업 닫기를 외부에서 제어하기 위한 ref 생성
-    const startDatePickerRef = useRef<DatePicker>(null);
-    const endDatePickerRef = useRef<DatePicker>(null);
+  const startDatePickerRef = useRef<DatePicker>(null);
+  const endDatePickerRef = useRef<DatePicker>(null);
 
-    const [lineData, setLineData] = useState<ChartData | null>(null);
-    const labels = ['2026.01.13.', '2026.01.16.', '2026.01.20.', '2026.01.29.', '2026.02.10', '2026.02.14'];
-    const data = [0, 1.7, 8, 2, 6.2, 4.3];
+  const before = "/image/Mypage/before.png";
+  const after = "/image/Mypage/after.png";
 
-    const optionsLine: ChartOptions<'line'> = {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: false,
-        layout: {
-            padding: { top: 40, right: 20, left: 10, bottom: 10 } // 드롭다운과 겹치지 않게 위쪽 여백 확보
+  const chartData = {
+    labels: currentReport.items.map((item) => item.label),
+    datasets: [
+      {
+        label: "피부 비율",
+        data: currentReport.items.map((item) => item.value),
+        backgroundColor: ["#50CDBA", "#7EDCD0", "#A8E8E0", "#D4F5F1"],
+        borderRadius: 8,
+        barThickness: 20,
+        categoryPercentage: 0.72,
+        barPercentage: 0.9,
+      },
+    ],
+  };
+
+  const chartOptions: ChartOptions<"bar"> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: "y",
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (context) => `${context.raw}%`,
         },
-        plugins: {
-            legend: { display: false },
-            title: { display: false }, // 제목은 박스 바깥에 있으므로 숨김
-            tooltip: {
-                enabled: true,
-                mode: 'index',
-                intersect: false,
-            }
+      },
+    },
+    scales: {
+      x: {
+        min: 0,
+        max: 100,
+        grid: { color: "#eef2f4" },
+        ticks: {
+          callback: (value) => `${value}%`,
+          color: "#888",
+          font: { size: 12 },
         },
-        scales: {
-            x: {
-                grid: { display: false }, // 세로 격자선 숨김
-                border: { display: true, color: '#b3b3cc' }, // X축 하단 선 색상
-                ticks: { color: '#888', font: { size: 12 } }
-            },
-            y: {
-                grid: { display: false }, // 가로 격자선 숨김
-                border: { display: true, color: '#b3b3cc' }, // Y축 좌측 선 색상
-                ticks: { color: '#888', stepSize: 2, font: { size: 12 } },
-                min: 0,
-                max: 8
-            }
+        border: { display: false },
+      },
+      y: {
+        grid: { display: false },
+        ticks: {
+          color: "#333",
+          font: { size: 14 },
         },
-        elements: {
-            point: {
-                radius: 0, // 평소에는 꺾이는 점 숨김 (레퍼런스 동일)
-                hoverRadius: 6, // 마우스 올렸을 때만 표시
-            }
-        }
-    };
+        border: { display: false },
+      },
+    },
+  };
 
-    useEffect(() => {
-        setLineData({
-            labels: labels,
-            datasets: [{
-                label: '건수',
-                data: data,
-                borderColor: '#50CDBA', 
-                borderWidth: 3, // 선 굵게
-                tension: 0, // 곡선 없이 직선으로 이어지게
-            }]
-        })
-    }, []);
+  const renderCustomHeader = (
+    {
+      date,
+      decreaseMonth,
+      increaseMonth,
+      prevMonthButtonDisabled,
+      nextMonthButtonDisabled,
+    }: any,
+    onCancel: () => void,
+    onSet: () => void
+  ) => (
+    <div className="datepicker-header">
+      <div className="datepicker-header-top">
+        <span onClick={onCancel} className="datepicker-cancel">
+          취소
+        </span>
+        <span onClick={onSet} className="datepicker-confirm">
+          날짜 확정
+        </span>
+      </div>
 
-    // 공통 커스텀 헤더 렌더링
-    const renderCustomHeader = (
-        { date, decreaseMonth, increaseMonth, prevMonthButtonDisabled, nextMonthButtonDisabled }: any,
-        onCancel: () => void,
-        onSet: () => void
-    ) => (
-        <div style={{ padding: '15px 15px 5px 15px', backgroundColor: 'white', borderRadius: '12px 12px 0 0' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                <span onClick={onCancel} style={{ color: '#4da6ff', cursor: 'pointer', fontSize: '15px' }}>취소</span>
-                <span onClick={onSet} style={{ color: '#007aff', cursor: 'pointer', fontSize: '15px', fontWeight: 'bold' }}>날짜 확정</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ color: '#007aff', fontSize: '16px', fontWeight: '500' }}>
-                    {`${date.getFullYear()}년 ${date.toLocaleString('ko-KR', { month: 'long' })}`}
-                </span>
-                <div>
-                    <button onClick={decreaseMonth} disabled={prevMonthButtonDisabled} style={{ border: 'none', background: 'none', color: '#007aff', fontSize: '18px', cursor: 'pointer', padding: '0 8px' }}>{'<'}</button>
-                    <button onClick={increaseMonth} disabled={nextMonthButtonDisabled} style={{ border: 'none', background: 'none', color: '#007aff', fontSize: '18px', cursor: 'pointer', padding: '0 8px' }}>{'>'}</button>
-                </div>
-            </div>
-        </div>
-    );
-
-    return (
+      <div className="datepicker-header-bottom">
+        <span className="datepicker-current-month">
+          {`${date.getFullYear()}년 ${date.toLocaleString("ko-KR", {
+            month: "long",
+          })}`}
+        </span>
         <div>
-            <h4 style={{ fontWeight: 'bold', color: '#1a1a3a', marginBottom: '20px' }}>피부 변화 리포트</h4>
-            <div style={{
-                position: 'relative', // 드롭다운을 이 박스 기준으로 띄우기 위함
-                width: '100%', // 화면을 넓게 쓰도록 수정 (원하시면 줄여도 됩니다)
-                height: '400px',
-                backgroundColor: '#ffffff',
-                borderRadius: '16px',
-                padding: '20px',
-                boxShadow: '0 8px 30px rgba(20, 20, 50, 0.08)', // 부드럽고 넓은 그림자
-                marginBottom: '40px'
-            }}>
-                
-                {/* 우측 상단 드롭다운 (Absolute Positioning) */}
-                <div style={{ position: 'absolute', top: '25px', right: '30px', zIndex: 10 }}>
-                    <div className="btn-group">
-                        <button type="button" className="btn dropdown-toggle"
-                            data-bs-toggle="dropdown" aria-expanded="false"
-                            style={{ 
-                                backgroundColor: '#f4f4f5', 
-                                border: 'none',
-                                color: '#333',
-                                padding: '8px 20px',
-                                borderRadius: '8px',
-                                fontWeight: 'bold',
-                                fontSize: '14px'
-                            }}>
-                            전체
-                        </button>
-                        <ul className="dropdown-menu dropdown-menu-end" style={{ border: '1px solid #eee', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', borderRadius: '8px' }}>
-                            <li><a className="dropdown-item" href="#">전체</a></li>
-                            <li><a className="dropdown-item" href="#" style={{ color: '#aaa' }}>여드름</a></li>
-                            <li><a className="dropdown-item" href="#" style={{ color: '#aaa' }}>염증성</a></li>
-                            <li><a className="dropdown-item" href="#" style={{ color: '#aaa' }}>건선</a></li>
-                            <li><a className="dropdown-item" href="#" style={{ color: '#aaa' }}>아토피</a></li>
-                        </ul>
-                    </div>
-                </div>
-
-                {/* 차트 컴포넌트 */}
-                <Line data={lineData || { datasets: [] }} options={optionsLine} />
-            </div>
-                            
-            <h2 style={{ fontWeight: 'bold', color: '#1a1a3a', marginBottom: '20px' }}>피부 상태 변화</h2>
-            <div style={{ width: '100%' }}>
-                <div style={{ display: 'flex', border: '1px solid #ced4da', borderRadius: '8px', overflow: 'hidden', marginBottom: '30px', height: '50px' }}>
-                    
-                    {/* Start Date 영역 */}
-                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 15px' }}>
-                        <span style={{ color: startDate ? '#333' : '#adb5bd', fontSize: '15px' }}>
-                            {startDate ? formatDate(startDate) : 'Start date'}
-                        </span>
-                        <div style={{ width: '28px', height: '28px' }}>
-                            <DatePicker
-                                ref={startDatePickerRef}
-                                selected={tempStartDate}
-                                onChange={(date: Date | null) => setTempStartDate(date)}
-                                onCalendarOpen={() => setTempStartDate(startDate)} // 달력이 열릴 때 확정 날짜로 셋팅
-                                shouldCloseOnSelect={false} // 날짜 클릭해도 안 닫힘
-                                calendarClassName="custom-datepicker"
-                                formatWeekDay={(nameOfDay) => nameOfDay.substring(0, 1)}
-                                renderCustomHeader={(props) => renderCustomHeader(props, 
-                                    () => startDatePickerRef.current?.setOpen(false), // Cancel 시 닫기만 함
-                                    () => { setStartDate(tempStartDate); startDatePickerRef.current?.setOpen(false); } // Set 시 확정 후 닫기
-                                )}
-                                locale={ko}
-                                dateFormat="yyyy년 MM월 dd일"
-                                customInput={<CalendarIconInput />}
-                                popperPlacement="bottom-end"
-                            />
-                        </div>
-                    </div>
-
-                    <div style={{ backgroundColor: '#f0f4f5', display: 'flex', alignItems: 'center', padding: '0 20px', color: '#6c757d' }}>➔</div>
-
-                    {/* End Date 영역 */}
-                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 15px' }}>
-                        <span style={{ color: endDate ? '#333' : '#adb5bd', fontSize: '15px' }}>
-                            {endDate ? formatDate(endDate) : 'End date'}
-                        </span>
-                        <div style={{ width: '28px', height: '28px' }}>
-                            <DatePicker
-                                ref={endDatePickerRef}
-                                selected={tempEndDate}
-                                onChange={(date: Date | null) => setTempEndDate(date)}
-                                onCalendarOpen={() => setTempEndDate(endDate)}
-                                shouldCloseOnSelect={false}
-                                minDate={startDate || undefined}
-                                calendarClassName="custom-datepicker"
-                                formatWeekDay={(nameOfDay) => nameOfDay.substring(0, 1)}
-                                renderCustomHeader={(props) => renderCustomHeader(props, 
-                                    () => endDatePickerRef.current?.setOpen(false),
-                                    () => { setEndDate(tempEndDate); endDatePickerRef.current?.setOpen(false); }
-                                )}
-                                locale={ko}
-                                dateFormat="yyyy년 MM월 dd일"
-                                customInput={<CalendarIconInput />}
-                                popperPlacement="bottom-end"
-                            />
-                        </div>
-                    </div>
-
-                </div>
-
-                {/* 이미지 비교 영역 */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <div style={{ flex: 1, border: '1px solid #ced4da', borderRadius: '10px', padding: '20px', textAlign: 'center' }}>
-                        <h3 style={{ marginBottom: '20px', fontWeight: 'bold' }}>{formatDate(startDate)}</h3>
-                        <div style={{ backgroundColor: '#f4f4f4', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px' }}>
-                            <span style={{ color: '#aaa' }}>
-                                <img src={before} width='100%' height='300px' alt={`${formatDate(endDate)} 사진`} style={{ objectFit: 'cover' }} />
-                            </span>
-                        </div>
-                    </div>
-                    <div style={{ fontSize: '40px', color: '#57c7b6', margin: '0 20px', fontWeight: 'bold' }}>〉</div>
-                    <div style={{ flex: 1, border: '1px solid #ced4da', borderRadius: '10px', padding: '20px', textAlign: 'center' }}>
-                        <h3 style={{ marginBottom: '20px', fontWeight: 'bold' }}>{formatDate(endDate)}</h3>
-                        <div style={{ backgroundColor: '#f4f4f4', height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px' }}>
-                            <span style={{ color: '#aaa' }}>
-                                <img src={after} width='100%' height='300px' alt={`${formatDate(endDate)} 사진`} style={{ objectFit: 'cover' }} />
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          <button
+            onClick={decreaseMonth}
+            disabled={prevMonthButtonDisabled}
+            className="datepicker-month-btn"
+          >
+            {"<"}
+          </button>
+          <button
+            onClick={increaseMonth}
+            disabled={nextMonthButtonDisabled}
+            className="datepicker-month-btn"
+          >
+            {">"}
+          </button>
         </div>
-    )
-}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="skin-report-page">
+      <h4 className="skin-report-page-title">피부 변화 리포트</h4>
+
+      <div className="skin-report">
+        <div className="skin-report-card">
+            <div className="skin-report-header">
+            <div className="skin-report-date-nav">
+                <button
+                className="date-nav-btn"
+                onClick={() => setCurrentIndex((prev) => prev - 1)}
+                disabled={currentIndex === 0}
+                >
+                {"<"}
+                </button>
+
+                <span className="skin-report-date">{currentReport.date}</span>
+
+                <button
+                className="date-nav-btn"
+                onClick={() => setCurrentIndex((prev) => prev + 1)}
+                disabled={currentIndex === skinReports.length - 1}
+                >
+                {">"}
+                </button>
+            </div>
+
+            <div className="skin-report-summary">
+                현재 분석 결과, <span className="skin-report-summary-highlight">여드름</span> 가능성이 가장 높게 나타났어요.
+            </div>
+            </div>
+
+          <div className="skin-report-chart-wrap">
+            <Bar data={chartData} options={chartOptions} />
+          </div>
+
+          <div className="skin-report-legend">
+            {currentReport.items.map((item) => (
+              <div key={item.label} className="legend-row">
+                <span className="legend-label">{item.label}</span>
+                <span className="legend-value">{item.value}%</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <h4 className="skin-report-page-title">피부 상태 변화</h4>
+
+      <div className="skin-state-section">
+        <div className="date-range-bar">
+          <div className="date-range-box">
+            <span className={`date-range-text ${startDate ? "has-value" : ""}`}>
+              {startDate ? formatDate(startDate) : "Start date"}
+            </span>
+            <div className="date-picker-icon-wrap">
+              <DatePicker
+                ref={startDatePickerRef}
+                selected={tempStartDate}
+                onChange={(date: Date | null) => setTempStartDate(date)}
+                onCalendarOpen={() => setTempStartDate(startDate)}
+                shouldCloseOnSelect={false}
+                calendarClassName="custom-datepicker"
+                formatWeekDay={(nameOfDay) => nameOfDay.substring(0, 1)}
+                renderCustomHeader={(props) =>
+                  renderCustomHeader(
+                    props,
+                    () => startDatePickerRef.current?.setOpen(false),
+                    () => {
+                      setStartDate(tempStartDate);
+                      startDatePickerRef.current?.setOpen(false);
+                    }
+                  )
+                }
+                locale={ko}
+                dateFormat="yyyy년 MM월 dd일"
+                customInput={<CalendarIconInput />}
+                popperPlacement="bottom-end"
+              />
+            </div>
+          </div>
+
+          <div className="date-range-arrow">➔</div>
+
+          <div className="date-range-box">
+            <span className={`date-range-text ${endDate ? "has-value" : ""}`}>
+              {endDate ? formatDate(endDate) : "End date"}
+            </span>
+            <div className="date-picker-icon-wrap">
+              <DatePicker
+                ref={endDatePickerRef}
+                selected={tempEndDate}
+                onChange={(date: Date | null) => setTempEndDate(date)}
+                onCalendarOpen={() => setTempEndDate(endDate)}
+                shouldCloseOnSelect={false}
+                minDate={startDate || undefined}
+                calendarClassName="custom-datepicker"
+                formatWeekDay={(nameOfDay) => nameOfDay.substring(0, 1)}
+                renderCustomHeader={(props) =>
+                  renderCustomHeader(
+                    props,
+                    () => endDatePickerRef.current?.setOpen(false),
+                    () => {
+                      setEndDate(tempEndDate);
+                      endDatePickerRef.current?.setOpen(false);
+                    }
+                  )
+                }
+                locale={ko}
+                dateFormat="yyyy년 MM월 dd일"
+                customInput={<CalendarIconInput />}
+                popperPlacement="bottom-end"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="skin-compare-wrap">
+          <div className="skin-compare-card">
+            <h3 className="skin-compare-date">{formatDate(startDate)}</h3>
+            <div className="skin-compare-image-box">
+              <img
+                src={before}
+                alt={`${formatDate(startDate)} 사진`}
+                className="skin-compare-image"
+              />
+            </div>
+          </div>
+
+          <div className="skin-compare-arrow">〉</div>
+
+          <div className="skin-compare-card">
+            <h3 className="skin-compare-date">{formatDate(endDate)}</h3>
+            <div className="skin-compare-image-box">
+              <img
+                src={after}
+                alt={`${formatDate(endDate)} 사진`}
+                className="skin-compare-image"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default SkinReport;

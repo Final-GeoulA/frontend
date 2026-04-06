@@ -62,7 +62,9 @@ const Login: React.FC = () => {
 					<div style={{ marginBottom: 28 }}>
 						<div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
 							<label style={{ fontSize: 14, fontWeight: 600, color: "#333" }}>비밀번호</label>
+							<Link to={"/find"} style={{textDecoration:'none'}}>
 							<span style={{ fontSize: 14, color: TEAL, cursor: "pointer", fontWeight: 600 }}>Forgot？</span>
+							</Link>
 						</div>
 						<div style={{ position: "relative" }}>
 							<input
@@ -104,7 +106,7 @@ const Login: React.FC = () => {
 							width: "48%", padding: "15px", background: TEAL,
 							color: "#fff", border: "none", borderRadius: 10,
 							fontSize: 16, fontWeight: 700, cursor: "pointer", letterSpacing: "0.5px",
-							marginBottom: 20
+							marginBottom: 20, textDecoration:'none'
 						}}>
 							패스워드리스 로그인
 						</Link>

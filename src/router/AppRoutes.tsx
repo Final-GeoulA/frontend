@@ -13,6 +13,10 @@ import AdminLogin from "../contents/Login/AdminLogin";
 import MainPage from "../contents/MainPage/MainPage";
 import ServiceQuestion from "../contents/MainPage/ServiceQuestion";
 
+// 피부 진단
+import SkinAnalysis from "../contents/SkinAnalysis/SkinAnalysis";
+import SkinResult from '../contents/SkinAnalysis/SkinResult';
+
 // 커뮤니티
 import Board from "../contents/Board/Board";
 import BoardForm from "../contents/Board/BoardForm";
@@ -27,7 +31,6 @@ import HospitalSearch from "../contents/HospitalSearch/HospitalSearch";
 
 // 마이페이지
 import Mypage from "../contents/Mypage/MyPage";
-import SkinAnalysis from "../contents/SkinAnalysis/SkinAnalysis";
 import SkinReport from "../contents/Mypage/SkinReport";
 import Chat from "../contents/MainPage/Chat";
 import PasswordlessReg from "../contents/Login/PasswordlessReg";
@@ -40,20 +43,25 @@ import MedicalRecordUpload from "../contents/MedicalRecord/MedicalRecordUpload";
 // 피부 랭킹
 import SkinRank from "../contents/SkinRank/SkinRank";
 import RequireAuth from "../components/RequireAuth";
+import ChangePassword from "../contents/Mypage/ChangePassword";
 
 // 결제
 import Payment from "../contents/Payment/Payment";
 import PaymentSuccess from "../contents/Payment/PaymentSuccess";
 import ProductPayment from "../contents/Payment/ProductPayment";
 import ProductPaymentSuccess from "../contents/Payment/ProductPaymentSuccess";
+import JWTLogin from "../contents/Login/JWTLogin";
+import AdminDashboard from "../contents/Admin/AdminDashboard";
+import { elements } from "chart.js";
 
 const AppRoutes: React.FC = () => {
   const routeList = [
     // 홈 화면
     { path: "/", element: <MainPage /> },
 
-    // 촬영 or 사진 업로드
+    // 피부 진단
     { path: "/skinanalysis", element: <SkinAnalysis /> },
+    { path: "/skinresult", element: <SkinResult /> },
 
     // 서비스 문의
     { path: "/ServiceQuestion", element: <ServiceQuestion /> },
@@ -66,23 +74,16 @@ const AppRoutes: React.FC = () => {
     { path: "/recommenddetail/:prodid", element: <Recommenddetail /> },
 
     // 커뮤니티
-    {
-      path: "/board",
-      element: (
-        <RequireAuth>
-          <Board />
-        </RequireAuth>
-      ),
-    },
-    { path: "/boarddetail/:num", element: <Boarddetail /> },
-    { path: "/board/form", element: <BoardForm /> },
+    {path: "/board",element: (<RequireAuth><Board /></RequireAuth>),},
+    { path: "/boarddetail/:num", element: <RequireAuth><Boarddetail /></RequireAuth> },
+    { path: "/board/form", element: <RequireAuth><BoardForm /></RequireAuth> },
 
     // 진료 관리
-    { path: "/MedicalRecord", element: <MedicalRecord/>},
-    { path: "/MedicalRecordUpload", element: <MedicalRecordUpload/>},
+    { path: "/MedicalRecord", element: <RequireAuth><MedicalRecord/></RequireAuth>},
+    { path: "/MedicalRecordUpload", element: <RequireAuth><MedicalRecordUpload/></RequireAuth>},
 
     // 피부 랭킹
-    { path: "/SkinRank", element: <SkinRank /> },
+    { path: "/SkinRank", element: <RequireAuth><SkinRank /></RequireAuth> },
 
     // 결제 (프리미엄)
     { path: "/payment", element: <Payment /> },
@@ -97,10 +98,13 @@ const AppRoutes: React.FC = () => {
     { path: "/signup", element: <SignUp /> },
     { path: "/login/pwl", element: <Passwordless /> },
     { path: "/signup/pwl", element: <PasswordlessReg /> },
-    { path: "/admin/login", element: <AdminLogin /> },
+    { path: "/admin/facelogin", element: <AdminLogin /> },
+    { path: "/admin/login", element: <JWTLogin />},
+    { path: "/find", element: <FindID /> },
 
-    // 불명
-    { path: "/Find", element: <FindID /> },
+    // 관리자
+    { path: "/admin/dashboard", element: <AdminDashboard /> }
+
   ];
 
   return (
@@ -119,6 +123,7 @@ const AppRoutes: React.FC = () => {
         <Route path="savedhospitals" element={<HospitalSearch />} />
         <Route path="recommend" element={<Recommend likedOnly />} />
         <Route path="board" element={<Board />} />
+        <Route path="changepassword" element={<ChangePassword />} />
       </Route>
     </Routes>
   );
