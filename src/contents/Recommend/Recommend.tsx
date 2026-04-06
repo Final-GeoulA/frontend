@@ -347,6 +347,8 @@ const Gallery: React.FC<{ likedOnly?: boolean }> = ({ likedOnly }) => {
 				</ul>
 			</div>}
 
+			{!likedOnly && (
+			<>
 			{/* ── 헤더 ── */}
 			<div style={{
 				display: 'flex',
@@ -359,9 +361,9 @@ const Gallery: React.FC<{ likedOnly?: boolean }> = ({ likedOnly }) => {
 				{/* 좌: 타이틀 */}
 				<div>
 					<h4 style={{ fontWeight: 800, margin: 0, fontSize: 22, letterSpacing: '-0.5px', color: '#111' }}>
-						{likedOnly ? '좋아요한 제품' : '제품 추천'}
+						제품 추천
 					</h4>
-					<small style={{ color: TEAL, fontWeight: 600, fontSize: 13 }}>{likedOnly ? 'My Favorites' : 'Products'}</small>
+					<small style={{ color: TEAL, fontWeight: 600, fontSize: 13 }}>Products</small>
 				</div>
 
 				{/* 우: 검색 + 정렬 */}
@@ -409,6 +411,8 @@ const Gallery: React.FC<{ likedOnly?: boolean }> = ({ likedOnly }) => {
       </div>
 
       <hr className={styles.divider} />
+			</>
+			)}
 
 			{/* ── 제품 그리드 ── */}
 			<div style={{
@@ -484,10 +488,11 @@ const Gallery: React.FC<{ likedOnly?: boolean }> = ({ likedOnly }) => {
         ))}
       </div>
 
-      {/* 정렬 안내 */}
+      {!likedOnly && (
       <p className={styles.sortNote}>
         사용자 좋아요 수가 많은 순으로 정렬된 결과입니다.
       </p>
+      )}
 
 			{/* ── 페이지네이션 ── */}
 			<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6 }}>

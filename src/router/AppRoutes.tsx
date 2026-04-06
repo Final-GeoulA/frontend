@@ -117,7 +117,7 @@ const AppRoutes: React.FC = () => {
 
         <Route path="skinreport" element={<SkinReport />} />
         <Route path="savedhospitals" element={<HospitalSearch />} />
-        <Route path="recommend" element={<Recommend />} />
+        <Route path="recommend" element={<Recommend likedOnly />} />
         <Route path="board" element={<Board />} />
       </Route>
     </Routes>
