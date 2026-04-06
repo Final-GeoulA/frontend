@@ -42,6 +42,7 @@ const Login: React.FC = () => {
 				}}>
 					<h1 style={{ fontSize: 28, fontWeight: 700, color: "#111", marginBottom: 32, letterSpacing: "-0.5px" }}>로그인</h1>
 
+				<form onSubmit={handleLogin}>
 					{/* Email */}
 					<div style={{ marginBottom: 20 }}>
 						<label style={{ fontSize: 14, fontWeight: 600, color: "#333", display: "block", marginBottom: 8 }}>이메일</label>
@@ -57,6 +58,7 @@ const Login: React.FC = () => {
 							}}
 						/>
 					</div>
+					
 
 					{/* Password */}
 					<div style={{ marginBottom: 28 }}>
@@ -94,7 +96,7 @@ const Login: React.FC = () => {
 
 					{/* Button */}
 					<div style={{display:'flex', justifyContent:'space-between'}}>
-						<button onClick={handleLogin} style={{
+						<button type="submit" style={{
 							width: "48%", padding: "15px", background: TEAL,
 							color: "#fff", border: "none", borderRadius: 10,
 							fontSize: 16, fontWeight: 700, cursor: "pointer", letterSpacing: "0.5px",
@@ -111,6 +113,7 @@ const Login: React.FC = () => {
 							패스워드리스 로그인
 						</Link>
 					</div>
+				</form>
 					<p style={{ textAlign: "center", fontSize: 14, color: "#888", margin: 0 }}>
 						아직 계정이 없으신가요?{" "}
 						<span style={{ color: TEAL, fontWeight: 700, cursor: "pointer" }}>회원가입</span>
