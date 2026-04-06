@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import { Navbar } from 'react-bootstrap'
-import style from './board.module.css'
-import { Link, useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
+import styles from './Recommenddetail.module.css'
 import axios from 'axios'
+import { useAuth } from '../../components/AuthProvider'
+import { IoHeartOutline, IoHeart } from "react-icons/io5"
 
-const TEAL = "#3BBFB2"
-const TEAL_LIGHT = "#E8F7F6"
+const TEAL = "#3BBFB2";
+const TEAL_LIGHT = "#E8F7F6";
+
+const HeartIcon = IoHeart as React.ElementType;
+const EmptyHeart = IoHeartOutline as React.ElementType;
 
 interface Product {
-	product_id: 15,
+	product_id: number,
 	name: string,
 	brand: string,
 	category: string,
@@ -16,16 +20,17 @@ interface Product {
 	cost: string,
 	hit: number,
 	elike: number,
-	image: string
+	image: string,
+	hearted: number
 }
 
 interface Comment {
-	user_id: number,
-	user_name: string,
-	content: string,
-	elike: number,
-	reip: string,
-	bcdate: string
+	user_id: number;
+	user_name: string;
+	content: string;
+	elike: number;
+	reip: string;
+	bcdate: string;
 }
 
 interface CommentPage {
@@ -39,10 +44,14 @@ interface CommentPage {
 
 const Recommenddetail: React.FC = () => {
 	const { prodid } = useParams<string>();
+	const { member } = useAuth();
+	const navigate = useNavigate();
 	const [expanded, setExpanded] = useState(false)
+	const [quantity, setQuantity] = useState(1)
 	const [comment, setComment] = useState("")
-	const [product, setProduct] = useState<Product | null>(null)		//상품정보 저장(고정)
-	const [comments, setComments] = useState<CommentPage>({			//댓글정보 저장(여러 페이지라 유동)
+	const [product, setProduct] = useState<Product | null>(null)
+	const [similarList, setSimilarList] = useState<Product[]>([])
+	const [comments, setComments] = useState<CommentPage>({
 		totalItems: 0,
 		totalPages: 0,
 		startPage: 1,
@@ -58,223 +67,366 @@ const Recommenddetail: React.FC = () => {
 		}
 		return arr
 	}
+
 	const getPruduct = async (prodid: string | undefined) => {
 		try {
-			const res = await axios.get(`${process.env.REACT_APP_IP_KTG}/geoulA/board/product/detail?prodid=${prodid}`);
+			let url = `${process.env.REACT_APP_BACK_END_URL}/board/product/detail?prodid=${prodid}`;
+			if (member) url += `&userid=${member.user_id}`;
+			const res = await axios.get(url);
 			setProduct(res.data);
 		} catch (e) {
 		}
 	}
+
+	const toggleHeart = async (e: React.MouseEvent) => {
+		e.preventDefault();
+		e.stopPropagation();
+		if (!member) { alert("로그인이 필요합니다."); return; }
+		if (!product) return;
+		const endpoint = product.hearted === 1 ? 'unheart' : 'heart';
+		try {
+			await axios.get(
+				`${process.env.REACT_APP_BACK_END_URL}/board/product/${endpoint}?prodid=${product.product_id}&userid=${member.user_id}`
+			);
+			await getPruduct(prodid);
+		} catch (err) {
+			console.error("하트 처리 실패", err);
+		}
+	};
+
 	const getComments = async (commpage: number) => {
 		try {
-			const res = await axios.get(`${process.env.REACT_APP_IP_KTG}/geoulA/board/product/commlist?prodid=${prodid}&cPage=${commpage.toString()}`);
+			const res = await axios.get(`${process.env.REACT_APP_BACK_END_URL}/board/product/commlist?prodid=${prodid}&cPage=${commpage.toString()}`);
 			setComments(res.data);
 		} catch (e) {
 		}
 	}
 
-	useEffect(() => { getPruduct(prodid); getComments(comments.currentPage); }, [comments.currentPage]);
+	const getSimilar = async (category: string, prodid: string) => {
+		try {
+			const res = await axios.get(
+				`${process.env.REACT_APP_BACK_END_URL}/board/product/similar?category=${encodeURIComponent(category)}&prodid=${prodid}`
+			);
+			setSimilarList(res.data);
+		} catch (e) {}
+	};
+
+	const submitComment = async () => {
+		if (!member) { alert("로그인이 필요합니다."); return; }
+		if (!comment.trim()) { alert("내용을 입력해주세요."); return; }
+		try {
+			await axios.post(
+				`${process.env.REACT_APP_BACK_END_URL}/board/product/commadd`,
+				{ product_id: Number(prodid), user_id: member.user_id, user_name: member.nickname, content: comment },
+				{ withCredentials: true }
+			);
+			setComment("");
+			getComments(1);
+		} catch (e) {
+			console.error("댓글 등록 실패", e);
+		}
+	};
+
+	useEffect(() => { getPruduct(prodid); getComments(1); }, [prodid, member]);
+	useEffect(() => { if (product?.category && prodid) getSimilar(product.category, prodid); }, [product?.category, prodid]);
 
 	return (
-		<div style={{
-			minHeight: "100vh",
-			background: "#F8F9FA",
-			fontFamily: "'Pretendard', 'Apple SD Gothic Neo', sans-serif"
-		}}>
-			<Navbar />
+		<div style={{ maxWidth: 1200, margin: "0 auto", padding: "48px 24px 64px" }}>
+			<div style={{ display: "flex", gap: 28, alignItems: "flex-start" }}>
+				{/* ── 좌측 본문 ── */}
+				<div style={{ flex: 1, minWidth: 0 }}>
 
-			<div style={{ maxWidth: 900, margin: "0 auto", padding: "48px 24px 64px" }}>
-
-				{/* ── 헤더 ── */}
-				<div style={{ marginBottom: 28 }}>
-					<h1 style={{ fontSize: 26, fontWeight: 800, color: "#111", margin: 0 }}>제품 추천</h1>
-					<p style={{ fontSize: 13, fontWeight: 600, color: TEAL, margin: "4px 0 0" }}>Products</p>
-				</div>
-
-				{/* ── 상품 카드 ── */}
-				<div style={{
-					background: "#fff",
-					borderRadius: 18,
-					border: "1.5px solid #E8EEEE",
-					padding: "28px 32px",
-					marginBottom: 32,
-					display: "flex",
-					gap: 28,
-					alignItems: "flex-start"
-				}}>
-					{/* 이미지 */}
+					{/* ── 상품 카드 ── */}
 					<div style={{
-						width: 220, flexShrink: 0,
-						borderRadius: 12, overflow: "hidden",
-						background: "#F0FAFA",
-						display: "flex", alignItems: "center", justifyContent: "center",
-						padding: "16px 12px"
+						background: "#fff",
+						borderRadius: 18,
+						border: "1.5px solid #E8EEEE",
+						padding: "28px 32px",
+						marginBottom: 32,
+						display: "flex",
+						gap: 28,
+						alignItems: "flex-start"
 					}}>
-						<img
-							src={product?.image}
-							alt=""
-							style={{ width: "100%", height: "auto", display: "block" }}
-						/>
-					</div>
-
-					{/* 상품 정보 */}
-					<div style={{ flex: 1, minWidth: 0 }}>
-						<h2 style={{
-							fontSize: 20, fontWeight: 800, color: "#111",
-							margin: "0 0 8px", lineHeight: 1.4
-						}}>
-							{product?.name}
-						</h2>
-
-						<p style={{ fontSize: 13, color: "#666", margin: "0 0 16px", fontWeight: 500 }}>
-							제조사: {product?.brand}
-						</p>
-
-						<button onClick={() => setExpanded(!expanded)}
-							style={{
-								background: TEAL, color: "#fff",
-								border: "none", borderRadius: 20,
-								padding: "7px 18px", fontSize: 13, fontWeight: 600,
-								cursor: "pointer", marginBottom: 18
-							}}>
-							{expanded ? "성분숨기기" : "전성분보기"}
-						</button>
-
-						{/* 전성분 박스 */}
+						{/* 이미지 */}
 						<div style={{
-							overflow: "hidden",
-							maxHeight: expanded ? "none" : "77px",
-							transition: "max-height 0.3s ease",
-							background: "#F6FAFA",
-							border: "1px solid #D8EDED",
-							borderRadius: 10,
-							padding: "14px 16px",
-							fontSize: 12.5,
-							color: "#555",
-							lineHeight: 1.8
+							width: 220, flexShrink: 0,
+							borderRadius: 12, overflow: "hidden",
+							background: "#F0FAFA",
+							display: "flex", alignItems: "center", justifyContent: "center",
+							padding: "16px 12px",
+							position: "relative"
 						}}>
-							{product?.ingredient}
+							<img
+								src={product?.image}
+								alt=""
+								style={{ width: "100%", height: "auto", display: "block" }}
+							/>
+							<button
+								onClick={toggleHeart}
+								style={{
+									position: 'absolute', bottom: 10, right: 10,
+									background: 'rgba(255,255,255,0.85)',
+									border: 'none', borderRadius: '50%',
+									width: 32, height: 32,
+									display: 'flex', alignItems: 'center', justifyContent: 'center',
+									cursor: 'pointer', backdropFilter: 'blur(4px)',
+									transition: 'transform 0.2s',
+								}}
+								onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.15)'}
+								onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+							>
+								{product?.hearted === 1
+									? <HeartIcon style={{ color: '#FF4D6A', fontSize: 18 }} />
+									: <EmptyHeart style={{ color: '#bbb', fontSize: 18 }} />
+								}
+							</button>
 						</div>
-					</div>
-				</div>
 
-				{/* ── 사용자 후기 ── */}
-				<div style={{ marginBottom: 24 }}>
-					<div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-						<span style={{ fontSize: 17, fontWeight: 700, color: "#111" }}>사용자 후기</span>
-						<span style={{ fontSize: 13, color: "#888", fontWeight: 500 }}>후기 {comments.totalItems}개</span>
-					</div>
-
-					<div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-						{comments.data?.map(c => (
-							<div key={c.user_id} style={{
-								background: "#fff",
-								borderRadius: 14,
-								border: "1.5px solid #EEF2F2",
-								padding: "18px 22px"
+						{/* 상품 정보 */}
+						<div style={{ flex: 1, minWidth: 0 }}>
+							<span style={{
+								display: "inline-block",
+								background: TEAL_LIGHT, color: TEAL,
+								fontSize: 11, fontWeight: 700,
+								padding: "3px 10px", borderRadius: 20,
+								marginBottom: 10
 							}}>
-								<div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-									<img width="30" height="30" src="https://img.icons8.com/ios-glyphs/30/test-account.png" alt="test-account"/>
-									<span>{c.user_name}</span>
-									<span style={{ fontSize: 12, color: "#bbb" }}>{c.bcdate}</span>
-								</div>
-								<p style={{ margin: 0, fontSize: 14, color: "#444", paddingLeft: 46 }}>{c.content}</p>
+								{product?.category}
+							</span>
+
+							<h2 style={{
+								fontSize: 20, fontWeight: 800, color: "#111",
+								margin: "0 0 6px", lineHeight: 1.4
+							}}>
+								{product?.name}
+							</h2>
+
+							<p style={{ fontSize: 13, color: "#666", margin: "0 0 10px", fontWeight: 500 }}>
+								제조사: {product?.brand}
+							</p>
+
+							<p style={{ fontSize: 22, fontWeight: 800, color: "#111", margin: "0 0 14px" }}>
+								{product?.cost ? `${Number(product.cost.replace(/,/g, "")).toLocaleString()}원` : '가격 미정'}
+							</p>
+
+							<div style={{ display: "flex", gap: 16, marginBottom: 18 }}>
+								<span style={{ fontSize: 12, color: "#888" }}>
+									👁 조회 {product?.hit?.toLocaleString() ?? 0}
+								</span>
+								<span style={{ fontSize: 12, color: "#888" }}>
+									♥ 좋아요 {product?.elike?.toLocaleString() ?? 0}
+								</span>
 							</div>
-						))}
-					</div>
-				</div>
 
-				{/* ── 댓글 입력 ── */}
-				<div style={{
-					background: "#fff",
-					borderRadius: 14,
-					border: "1.5px solid #EEF2F2",
-					padding: "20px 24px",
-					marginBottom: 32
-				}}>
-					<div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
-						<div style={{
-							width: 32, height: 32, borderRadius: "50%",
-							background: TEAL_LIGHT, display: "flex",
-							alignItems: "center", justifyContent: "center"
-						}}>
-							<svg width="16" height="16" fill="none" stroke={TEAL} strokeWidth="2" viewBox="0 0 24 24">
-								<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
-							</svg>
+							{/* 수량 선택 + 구매 */}
+							<div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 18 }}>
+								<div style={{
+									display: "flex", alignItems: "center",
+									border: "1.5px solid #E2E8E8", borderRadius: 10, overflow: "hidden"
+								}}>
+									<button onClick={() => setQuantity(q => Math.max(1, q - 1))}
+										style={{
+											width: 34, height: 36, border: "none", background: "#FAFBFB",
+											fontSize: 16, cursor: "pointer", color: "#555"
+										}}>−</button>
+									<span style={{
+										width: 40, textAlign: "center", fontSize: 14, fontWeight: 600,
+										borderLeft: "1px solid #E2E8E8", borderRight: "1px solid #E2E8E8",
+										lineHeight: "36px"
+									}}>{quantity}</span>
+									<button onClick={() => setQuantity(q => q + 1)}
+										style={{
+											width: 34, height: 36, border: "none", background: "#FAFBFB",
+											fontSize: 16, cursor: "pointer", color: "#555"
+										}}>+</button>
+								</div>
+								<span style={{ fontSize: 13, color: "#666", fontWeight: 500 }}>
+									합계: <b style={{ color: "#111", fontSize: 15 }}>
+										{product?.cost ? `${(Number(product.cost.replace(/,/g, "")) * quantity).toLocaleString()}원` : '-'}
+									</b>
+								</span>
+							</div>
+
+							<div style={{ display: "flex", gap: 8, marginBottom: 18 }}>
+								<button
+									onClick={() => {
+										if (!member) { alert("로그인이 필요합니다."); return; }
+										navigate(`/product-payment`, { state: { product, quantity } });
+									}}
+									style={{
+										flex: 1, background: TEAL, color: "#fff",
+										border: "none", borderRadius: 10,
+										padding: "12px 0", fontSize: 15, fontWeight: 700,
+										cursor: "pointer", transition: "background 0.15s"
+									}}
+									onMouseEnter={e => e.currentTarget.style.background = "#2FA89C"}
+									onMouseLeave={e => e.currentTarget.style.background = TEAL}
+								>
+									구매하기
+								</button>
+							</div>
+
+							<button
+								onClick={() => setExpanded(!expanded)}
+								className={styles.ingredientBtn}
+							>
+								{expanded ? "성분 숨기기" : "전성분 보기"}
+							</button>
+
+							<div
+								className={styles.ingredientBox}
+								style={{ maxHeight: expanded ? "none" : "77px" }}
+							>
+								{product?.ingredient}
+							</div>
 						</div>
-						<span style={{ fontWeight: 700, fontSize: 15, color: "#333" }}>이 제품을 사용해보셨나요?</span>
 					</div>
 
-					<div style={{ display: "flex", gap: 10 }}>
+					{/* ── 사용자 후기 ── */}
+					<div className={styles.reviewsSection}>
+						<div className={styles.reviewsHeader}>
+							<span className={styles.reviewsTitle}>사용자 후기</span>
+							<span className={styles.reviewsCount}>
+								후기 {comments.totalItems}개
+							</span>
+						</div>
+
+						<div className={styles.reviewsList}>
+							{comments.data?.map((c) => (
+								<div key={c.user_id} className={styles.reviewCard}>
+									<div className={styles.reviewCardHeader}>
+										<img
+											width="30"
+											height="30"
+											src="https://img.icons8.com/ios-glyphs/30/test-account.png"
+											alt="test-account"
+										/>
+										<span>{c.user_name}</span>
+										<span className={styles.reviewDate}>{c.bcdate}</span>
+									</div>
+									<p className={styles.reviewContent}>{c.content}</p>
+								</div>
+							))}
+						</div>
+					</div>
+
+					{/* 댓글 입력 */}
+					<div className={styles.commentInputRow}>
 						<input
 							value={comment}
-							onChange={e => setComment(e.target.value)}
+							onChange={(e) => setComment(e.target.value)}
+							onKeyDown={(e) => e.key === "Enter" && submitComment()}
 							placeholder="해당 제품의 사용 후기를 남겨보세요."
-							style={{
-								flex: 1, padding: "12px 16px", fontSize: 14,
-								border: "1.5px solid #E2EBEB", borderRadius: 10,
-								outline: "none", color: "#333", background: "#FAFCFC"
-							}}
+							className={styles.commentInput}
 						/>
-						<button style={{
-							background: TEAL, color: "#fff", border: "none",
-							borderRadius: 10, padding: "0 22px",
-							fontSize: 14, fontWeight: 600, cursor: "pointer",
-							whiteSpace: "nowrap"
-						}}>
+						<button onClick={submitComment} className={styles.commentSubmitBtn}>
 							등록하기
 						</button>
 					</div>
+
+					{/* ── 페이지네이션 ── */}
+					<div className={styles.pagination}>
+						<button
+							onClick={() => getComments(Math.max(comments.currentPage - 1, 1))}
+							className={styles.pagBtn}
+						>
+							‹
+						</button>
+
+						{pages().map((p, i) =>
+							typeof p === "number" ? (
+								<button
+									key={i}
+									onClick={() => getComments(p)}
+									className={`${styles.pagBtn}${
+										p === comments.currentPage ? ` ${styles.active}` : ""
+									}`}
+								>
+									{p}
+								</button>
+							) : (
+								<span key={i} className={styles.pagDots}>
+									…
+								</span>
+							)
+						)}
+
+						<button
+							onClick={() =>
+								getComments(
+									Math.min(comments.currentPage + 1, comments.totalPages)
+								)
+							}
+							className={styles.pagBtn}
+						>
+							›
+						</button>
+					</div>
+
+				</div>{/* 좌측 본문 끝 */}
+
+				{/* ── 우측 유사 제품 사이드바 ── */}
+				<div style={{
+					width: 240, flexShrink: 0,
+					position: "sticky", top: 80,
+					display: "flex", flexDirection: "column", gap: 14
+				}}>
+					<div style={{
+						background: "#fff", borderRadius: 14,
+						border: "1.5px solid #E8EEEE", padding: "18px 16px"
+					}}>
+						<h3 style={{ fontSize: 15, fontWeight: 700, color: "#111", margin: "0 0 14px" }}>
+							비슷한 제품
+						</h3>
+						{similarList.length === 0 && (
+							<p style={{ fontSize: 13, color: "#aaa", textAlign: "center", margin: "20px 0" }}>
+								유사 제품이 없습니다
+							</p>
+						)}
+						<div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+							{similarList.map(item => (
+								<div
+									key={item.product_id}
+									onClick={() => navigate(`/recommenddetail/${item.product_id}`)}
+									style={{
+										display: "flex", gap: 10, alignItems: "center",
+										cursor: "pointer", padding: 8, borderRadius: 10,
+										transition: "background 0.15s",
+									}}
+									onMouseEnter={e => e.currentTarget.style.background = "#F0FAFA"}
+									onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+								>
+									<div style={{
+										width: 56, height: 56, flexShrink: 0,
+										borderRadius: 10, overflow: "hidden",
+										background: "#F6F8F8",
+										display: "flex", alignItems: "center", justifyContent: "center"
+									}}>
+										<img src={item.image} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+									</div>
+									<div style={{ flex: 1, minWidth: 0 }}>
+										<p style={{
+											fontSize: 13, fontWeight: 600, color: "#222",
+											margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap"
+										}}>
+											{item.name}
+										</p>
+										<p style={{ fontSize: 11, color: "#888", margin: "2px 0 0" }}>
+											{item.brand}
+										</p>
+										<p style={{ fontSize: 11, color: TEAL, margin: "2px 0 0", fontWeight: 600 }}>
+											♥ {item.elike}
+										</p>
+									</div>
+								</div>
+							))}
+						</div>
+					</div>
 				</div>
 
-				{/* ── 페이지네이션 ── */}
-				<div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 6 }}>
-					{/* 이전 */}
-					<button
-						onClick={() => getComments(Math.max(comments.currentPage-1, 1))}
-						style={pageBtn(false)}
-					>‹</button>
-
-					{pages().map((p, i) =>
-						typeof p === "number" ? (
-							<button
-								key={i}
-								onClick={() => getComments(p)}
-								style={pageBtn(p === comments.currentPage)}
-							>{p}</button>
-						) : (
-							<span key={i} style={{ fontSize: 14, color: "#aaa", padding: "0 4px" }}>…</span>
-						)
-					)}
-
-					{/* 다음 */}
-					<button
-						onClick={() => getComments(Math.min(comments.currentPage+1, comments.totalPages))}
-						style={pageBtn(false)}
-					>›</button>
-				</div>
-
-				{/* 목록/삭제 */}
-				<div style={{ textAlign: "center", marginTop: 24 }}>
-					<Link to="/community/boardlist" className={style.button} style={{ margin: 5, fontSize: 12 }}>목록</Link>
-					<button className={style.button} style={{ margin: 5, fontSize: 12 }}>삭제</button>
-				</div>
-
-			</div>
+			</div>{/* flex 컨테이너 끝 */}
 		</div>
 	)
 }
 
-function pageBtn(active: boolean): React.CSSProperties {
-	return {
-		width: 34, height: 34, borderRadius: 8,
-		border: active ? `1.5px solid ${TEAL}` : "1.5px solid #E2E8E8",
-		background: active ? TEAL : "#fff",
-		color: active ? "#fff" : "#555",
-		fontWeight: active ? 700 : 500,
-		fontSize: 14, cursor: "pointer",
-		display: "flex", alignItems: "center", justifyContent: "center"
-	}
-}
-
-export default Recommenddetail
+export default Recommenddetail;

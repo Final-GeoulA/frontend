@@ -2,11 +2,17 @@
 설치한 모듈
 yarn add react-icons
 */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { IoHeartOutline, IoHeart } from "react-icons/io5";
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from "../../components/AuthProvider";
+import styles from './Recommend.module.css';
+
+const SearchIcon = CiSearch as React.ElementType;
+const HeartIcon = IoHeart as React.ElementType;
+const EmptyHeart = IoHeartOutline as React.ElementType;
 
 const TEAL = "#3BBFB2";
 
@@ -20,23 +26,24 @@ interface Product {
 	hit: number;
 	elike: number;
 	image: string;
+	hearted: number;
 }
 
 interface Page {
-	totalItems: number;
-	totalPages: number;
-	startPage: number;
-	endPage: number;
-	currentPage: number;
-	data: Product[];
+  totalItems: number;
+  totalPages: number;
+  startPage: number;
+  endPage: number;
+  currentPage: number;
+  data: Product[];
 }
 
-const Gallery: React.FC = () => {
+const Gallery: React.FC<{ likedOnly?: boolean }> = ({ likedOnly }) => {
+	const userinfo = useAuth()
 	const [category, setCategory] = useState<string>('스킨/토너');
 	const [selectedSearchOpt, setSelectedSearchOpt] = useState<string>('상품명');	//검색 타입
 	const [search, setSearch] = useState<string>('');						//검색 키워드
 	const [hovered, setHovered] = useState<number | null>(null);
-	const [likedIds, setLikedIds] = useState<Set<number>>(new Set());
 	const [Content, setContent] = useState<Page>({
 		totalItems: 0,
 		totalPages: 1,
@@ -46,45 +53,67 @@ const Gallery: React.FC = () => {
 		data: []
 	});
 
-	const getPage = async (category:string,page: number) => {
+	const getPage = async (cat: string, page: number, search: string) => {
 		try {
-			const res = await axios.get(`${process.env.REACT_APP_IP_KTG}/geoulA/board/product/list?category=${category}&cPage=${page}${search === '' ? '' : `&type=${selectedSearchOpt}&keyword=${search}`}`);
+			let url = `${process.env.REACT_APP_BACK_END_URL}/board/product/list?cPage=${page}`;
+			if (likedOnly && userinfo.member) {
+				url += `&liked=true&id=${userinfo.member.user_id}`;
+			} else {
+				url += `&category=${cat}`;
+				if (userinfo.member) url += `&id=${userinfo.member.user_id}`;
+			}
+			if (search !== '') url += `&type=${selectedSearchOpt}&keyword=${search}`;
+			const res = await axios.get(url);
 			setContent(res.data);
-			console.log(res.data)
 		} catch (e) {
-			// 서버 미연결 시 더미 데이터
 		}
 	};
 
-	useEffect(() => { getPage(category, 1); }, []);
+	useEffect(() => { getPage(category, 1, ''); }, [userinfo.member]);
 
-	const toggleHeart = (id: number, e: React.MouseEvent) => {
+	const toggleHeart = async (id: number, hearted: number, e: React.MouseEvent) => {
 		e.preventDefault();
 		e.stopPropagation();
-		setLikedIds(prev => {
-			const next = new Set(prev);
-			next.has(id) ? next.delete(id) : next.add(id);
-			return next;
-		});
+		if (!userinfo.member) {
+			alert("로그인이 필요합니다.");
+			return;
+		}
+		const endpoint = hearted === 1 ? 'unheart' : 'heart';
+		try {
+			await axios.get(
+				`${process.env.REACT_APP_BACK_END_URL}/board/product/${endpoint}?prodid=${id}&userid=${userinfo.member.user_id}`
+			);
+			await getPage(category, Content.currentPage, search);
+		} catch (err) {
+			console.error("하트 처리 실패", err);
+		}
 	};
 
-	const sortOptions = [
-		{ id: 'name', label: '상품명' },
-		{ id: 'brand', label: '브랜드' },
-		{ id: 'ingre', label: '성분' },
-	];
+  const sortOptions = [
+    { id: "name", label: "상품명" },
+    { id: "brand", label: "브랜드" },
+    { id: "ingre", label: "성분" },
+  ];
 
-	// 페이지네이션 범위
-	const totalPages = Content.totalPages;
-	const pageNums: (number | string)[] = [];
-	const start = Content.startPage || 1;
-	const end = Math.min(Content.endPage || 5, totalPages);
-	for (let i = start; i <= end; i++) pageNums.push(i);
-	if (end < totalPages) { pageNums.push('...'); pageNums.push(totalPages); }
+  const menuItems = [
+    { id: 1, label: "스킨/토너", value: "스킨/토너" },
+    { id: 2, label: "에센스/세럼/앰플", value: "에센스/세럼/앰플" },
+    { id: 3, label: "크림", value: "크림" },
+    { id: 4, label: "로션", value: "로션" },
+    { id: 5, label: "미스트/오일", value: "미스트/오일" },
+    { id: 6, label: "스킨케어세트", value: "스킨케어세트" },
+  ];
 
-	const SearchIcon = CiSearch as any;
-	const HeartIcon = IoHeart as any;
-	const EmptyHeart = IoHeartOutline as any;
+  // 페이지네이션 범위
+  const totalPages = Content.totalPages;
+  const pageNums: (number | string)[] = [];
+  const start = Content.startPage || 1;
+  const end = Math.min(Content.endPage || 5, totalPages);
+  for (let i = start; i <= end; i++) pageNums.push(i);
+  if (end < totalPages) {
+    pageNums.push("...");
+    pageNums.push(totalPages);
+  }
 
 	return (
 		<div style={{
@@ -93,26 +122,26 @@ const Gallery: React.FC = () => {
 			padding: '40px 24px 64px',
 			fontFamily: "'Pretendard', 'Apple SD Gothic Neo', sans-serif",
 		}}>
-			<div style={{ float: "left", width: "141px", marginRight: "49px" }}>
-				{/* 타이틀 */}
-				<p
-					style={{
-						marginBottom: "32px",
-						fontSize: "28px",
-						lineHeight: "1.3",
-						letterSpacing: "-1.3px",
-						fontWeight: "700",
-						color: "#111",
-						wordBreak: "keep-all",
-					}}
-				>
-					스킨케어
-				</p>
+		{!likedOnly && <div style={{ float: "left", width: "141px", marginRight: "49px" }}>
+			{/* 타이틀 */}
+			<p
+				style={{
+					marginBottom: "32px",
+					fontSize: "28px",
+					lineHeight: "1.3",
+					letterSpacing: "-1.3px",
+					fontWeight: "700",
+					color: "#111",
+					wordBreak: "keep-all",
+				}}
+			>
+				스킨케어
+			</p>
 
 				{/* 메뉴 리스트 */}
 				<ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
 					<li key={1} style={{ borderBottom: "1px solid #efefef" }}>
-						<button onMouseEnter={() => setHovered(1)} onMouseLeave={() => setHovered(null)} onClick={() => {setCategory('스킨/토너'); getPage('스킨/토너', 1)}}
+						<button onMouseEnter={() => setHovered(1)} onMouseLeave={() => setHovered(null)} onClick={() => { setCategory('스킨/토너'); setSearch(''); getPage('스킨/토너', 1, '') }}
 							style={{
 								background: "none",
 								border: "none",
@@ -146,7 +175,7 @@ const Gallery: React.FC = () => {
 						</button>
 					</li>
 					<li key={2} style={{ borderBottom: "1px solid #efefef" }}>
-						<button onMouseEnter={() => setHovered(2)} onMouseLeave={() => setHovered(null)} onClick={() => {setCategory('에센스/세럼/앰플'); getPage('에센스/세럼/앰플', 1)}}
+						<button onMouseEnter={() => setHovered(2)} onMouseLeave={() => setHovered(null)} onClick={() => { setCategory('에센스/세럼/앰플'); getPage('에센스/세럼/앰플', 1, '') }}
 							style={{
 								background: "none",
 								border: "none",
@@ -180,7 +209,7 @@ const Gallery: React.FC = () => {
 						</button>
 					</li>
 					<li key={3} style={{ borderBottom: "1px solid #efefef" }}>
-						<button onMouseEnter={() => setHovered(3)} onMouseLeave={() => setHovered(null)} onClick={() => {setCategory('크림'); getPage('크림', 1)}}
+						<button onMouseEnter={() => setHovered(3)} onMouseLeave={() => setHovered(null)} onClick={() => { setCategory('크림'); getPage('크림', 1, '') }}
 							style={{
 								background: "none",
 								border: "none",
@@ -214,7 +243,7 @@ const Gallery: React.FC = () => {
 						</button>
 					</li>
 					<li key={4} style={{ borderBottom: "1px solid #efefef" }}>
-						<button onMouseEnter={() => setHovered(4)} onMouseLeave={() => setHovered(null)} onClick={() => {setCategory('로션'); getPage('로션', 1)}}
+						<button onMouseEnter={() => setHovered(4)} onMouseLeave={() => setHovered(null)} onClick={() => { setCategory('로션'); getPage('로션', 1, '') }}
 							style={{
 								background: "none",
 								border: "none",
@@ -248,7 +277,7 @@ const Gallery: React.FC = () => {
 						</button>
 					</li>
 					<li key={5} style={{ borderBottom: "1px solid #efefef" }}>
-						<button onMouseEnter={() => setHovered(5)} onMouseLeave={() => setHovered(null)} onClick={() => {setCategory('미스트/오일'); getPage('미스트/오일', 1)}}
+						<button onMouseEnter={() => setHovered(5)} onMouseLeave={() => setHovered(null)} onClick={() => { setCategory('미스트/오일'); getPage('미스트/오일', 1, '') }}
 							style={{
 								background: "none",
 								border: "none",
@@ -282,7 +311,7 @@ const Gallery: React.FC = () => {
 						</button>
 					</li>
 					<li key={6} style={{ borderBottom: "1px solid #efefef" }}>
-						<button onMouseEnter={() => setHovered(6)} onMouseLeave={() => setHovered(null)} onClick={() => {setCategory('스킨케어세트'); getPage('스킨케어세트', 1)}}
+						<button onMouseEnter={() => setHovered(6)} onMouseLeave={() => setHovered(null)} onClick={() => { setCategory('스킨케어세트'); getPage('스킨케어세트', 1, '') }}
 							style={{
 								background: "none",
 								border: "none",
@@ -316,7 +345,7 @@ const Gallery: React.FC = () => {
 						</button>
 					</li>
 				</ul>
-			</div>
+			</div>}
 
 			{/* ── 헤더 ── */}
 			<div style={{
@@ -330,9 +359,9 @@ const Gallery: React.FC = () => {
 				{/* 좌: 타이틀 */}
 				<div>
 					<h4 style={{ fontWeight: 800, margin: 0, fontSize: 22, letterSpacing: '-0.5px', color: '#111' }}>
-						제품 추천
+						{likedOnly ? '좋아요한 제품' : '제품 추천'}
 					</h4>
-					<small style={{ color: TEAL, fontWeight: 600, fontSize: 13 }}>Products</small>
+					<small style={{ color: TEAL, fontWeight: 600, fontSize: 13 }}>{likedOnly ? 'My Favorites' : 'Products'}</small>
 				</div>
 
 				{/* 우: 검색 + 정렬 */}
@@ -342,6 +371,7 @@ const Gallery: React.FC = () => {
 						<input
 							value={search}
 							onChange={e => setSearch(e.target.value)}
+							onKeyDown={e => { if (e.key === 'Enter') getPage(category, 1, search); }}
 							placeholder="Search"
 							style={{
 								padding: '9px 14px 9px 14px',
@@ -354,45 +384,31 @@ const Gallery: React.FC = () => {
 								width: 200,
 							}}
 						/>
-						<SearchIcon onClick={() => getPage(category, Content.currentPage)} style={{
-							cursor: 'pointer',
-							position: 'absolute', right: 12, top: '50%',
-							transform: 'translateY(-50%)', fontSize: 18, color: '#aaa'
-						}} />
-					</div>
-
-					{/* 정렬 드롭다운 */}
-					<div style={{ position: 'relative' }}>
-						<select
-							value={selectedSearchOpt}
-							onChange={e => setSelectedSearchOpt(e.target.value)}
-							style={{
-								padding: '9px 36px 9px 14px',
-								borderRadius: 12,
-								border: '1.5px solid #E8EAEA',
-								background: '#FAFBFB',
-								fontSize: 14,
-								color: '#333',
-								outline: 'none',
-								appearance: 'none',
+							<SearchIcon onClick={() => getPage(category, 1, search)} style={{
 								cursor: 'pointer',
-								minWidth: 150,
-							}}
-						>
-							{sortOptions.map(o => (
-								<option key={o.id} value={o.label}>{o.label}</option>
-							))}
-						</select>
-						<span style={{
-							position: 'absolute', right: 12, top: '50%',
-							transform: 'translateY(-50%)', pointerEvents: 'none',
-							color: '#aaa', fontSize: 11
-						}}>▼</span>
+								position: 'absolute', right: 12, top: '50%',
+								transform: 'translateY(-50%)', fontSize: 18, color: '#aaa'
+							}} />
 					</div>
-				</div>
-			</div>
 
-			<hr style={{ borderTop: '1.5px solid #F0F0F0', margin: '0 0 28px' }} />
+          <div className={styles.selectWrapper}>
+            <select
+              value={selectedSearchOpt}
+              onChange={(e) => setSelectedSearchOpt(e.target.value)}
+              className={styles.sortSelect}
+            >
+              {sortOptions.map((o) => (
+                <option key={o.id} value={o.label}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
+            <span className={styles.selectArrow}>▼</span>
+          </div>
+        </div>
+      </div>
+
+      <hr className={styles.divider} />
 
 			{/* ── 제품 그리드 ── */}
 			<div style={{
@@ -438,7 +454,7 @@ const Gallery: React.FC = () => {
 								/>
 								{/* 하트 버튼 */}
 								<button
-									onClick={e => toggleHeart(item.product_id, e)}
+									onClick={e => toggleHeart(item.product_id, item.hearted, e)}
 									style={{
 										position: 'absolute', bottom: 10, right: 10,
 										background: 'rgba(255,255,255,0.85)',
@@ -451,38 +467,27 @@ const Gallery: React.FC = () => {
 									onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.15)'}
 									onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
 								>
-									{likedIds.has(item.product_id)
+									{item.hearted === 1
 										? <HeartIcon style={{ color: '#FF4D6A', fontSize: 18 }} />
 										: <EmptyHeart style={{ color: '#bbb', fontSize: 18 }} />
 									}
 								</button>
 							</div>
 
-							{/* 텍스트 */}
-							<div style={{ padding: '12px 14px 16px' }}>
-								<p style={{ margin: '0 0 4px', fontSize: 12, color: '#999', fontWeight: 500 }}>
-									{item.brand}
-								</p>
-								<p style={{
-									margin: 0, fontSize: 13, fontWeight: 600, color: '#222',
-									lineHeight: 1.5,
-									display: '-webkit-box',
-									WebkitLineClamp: 2,
-									WebkitBoxOrient: 'vertical',
-									overflow: 'hidden',
-								}}>
-									{item.name}
-								</p>
-							</div>
-						</div>
-					</Link>
-				))}
-			</div>
+              {/* 텍스트 */}
+              <div className={styles.productInfo}>
+                <p className={styles.productBrand}>{item.brand}</p>
+                <p className={styles.productName}>{item.name}</p>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
 
-			{/* 정렬 안내 */}
-			<p style={{ fontSize: 11, color: '#aaa', margin: '4px 0 40px' }}>
-				사용자 좋아요 수가 많은 순으로 정렬된 결과입니다.
-			</p>
+      {/* 정렬 안내 */}
+      <p className={styles.sortNote}>
+        사용자 좋아요 수가 많은 순으로 정렬된 결과입니다.
+      </p>
 
 			{/* ── 페이지네이션 ── */}
 			<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6 }}>
@@ -491,7 +496,7 @@ const Gallery: React.FC = () => {
 					label="‹"
 					disabled={Content.currentPage === 1}
 					active={false}
-					onClick={() => { getPage(category, Content.currentPage - 1); }}
+					onClick={() => { getPage(category, Content.currentPage - 1, ''); }}
 				/>
 
 				{pageNums.map((p, i) =>
@@ -500,7 +505,7 @@ const Gallery: React.FC = () => {
 							key={i}
 							label={String(p)}
 							active={p === Content.currentPage}
-							onClick={() => { getPage(category, p); }}
+							onClick={() => { getPage(category, p, ''); }}
 						/>
 					) : (
 						<span key={i} style={{ fontSize: 14, color: '#bbb', padding: '0 2px' }}>…</span>
@@ -512,7 +517,7 @@ const Gallery: React.FC = () => {
 					label="›"
 					disabled={Content.currentPage === totalPages}
 					active={false}
-					onClick={() => { getPage(category, Content.currentPage + 1); }}
+					onClick={() => { getPage(category, Content.currentPage + 1, ''); }}
 				/>
 			</div>
 		</div>
@@ -520,24 +525,19 @@ const Gallery: React.FC = () => {
 };
 
 /* ── 페이지 버튼 ── */
-const PagBtn: React.FC<{ label: string; active: boolean; disabled?: boolean; onClick: () => void; }> = ({ label, active, disabled, onClick }) => (
-	<button
-		disabled={disabled}
-		onClick={onClick}
-		style={{
-			width: 38, height: 38,
-			borderRadius: 10,
-			border: active ? `1.5px solid ${TEAL}` : '1.5px solid #E2E8E8',
-			background: active ? TEAL : '#fff',
-			color: active ? '#fff' : disabled ? '#ccc' : '#555',
-			fontWeight: active ? 700 : 500,
-			fontSize: 14, cursor: disabled ? 'default' : 'pointer',
-			display: 'flex', alignItems: 'center', justifyContent: 'center',
-			transition: 'all 0.15s',
-		}}
-	>
-		{label}
-	</button>
+const PagBtn: React.FC<{
+  label: string;
+  active: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+}> = ({ label, active, disabled, onClick }) => (
+  <button
+    disabled={disabled}
+    onClick={onClick}
+    className={`${styles.pagBtn}${active ? ` ${styles.active}` : ""}`}
+  >
+    {label}
+  </button>
 );
 
 export default Gallery;
