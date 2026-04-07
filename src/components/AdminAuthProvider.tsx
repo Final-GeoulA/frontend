@@ -19,6 +19,13 @@ interface TokenPayload {
     iat: number;
 }
 
+interface TokenPayload {
+    role: string;
+    sub: string;
+    exp: number;
+    iat: number;
+}
+
 const AdminContext = createContext<AdminAuthContextProps | null>(null);
 
 export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({
