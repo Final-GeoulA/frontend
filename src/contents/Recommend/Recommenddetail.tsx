@@ -34,12 +34,12 @@ interface Comment {
 }
 
 interface CommentPage {
-  totalItems: number;
-  totalPages: number;
-  startPage: number;
-  endPage: number;
-  currentPage: number;
-  data: Comment[];
+	totalItems: number;
+	totalPages: number;
+	startPage: number;
+	endPage: number;
+	currentPage: number;
+	data: Comment[];
 }
 
 const Recommenddetail: React.FC = () => {
@@ -108,7 +108,7 @@ const Recommenddetail: React.FC = () => {
 				`${process.env.REACT_APP_BACK_END_URL}/board/product/similar?category=${encodeURIComponent(category)}&prodid=${prodid}`
 			);
 			setSimilarList(res.data);
-		} catch (e) {}
+		} catch (e) { }
 	};
 
 	const submitComment = async () => {
@@ -338,9 +338,8 @@ const Recommenddetail: React.FC = () => {
 								<button
 									key={i}
 									onClick={() => getComments(p)}
-									className={`${styles.pagBtn}${
-										p === comments.currentPage ? ` ${styles.active}` : ""
-									}`}
+									className={`${styles.pagBtn}${p === comments.currentPage ? ` ${styles.active}` : ""
+										}`}
 								>
 									{p}
 								</button>
