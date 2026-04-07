@@ -33,7 +33,7 @@ const Chat: React.FC = () => {
 
     try {
       const res = await axios.post(
-        "http://192.168.0.54:9002/api/chat/ask/",
+        "http://192.168.0.54:9001/api/chat/ask/",
         { question: input }
       );
 
