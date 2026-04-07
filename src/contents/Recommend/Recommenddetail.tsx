@@ -108,7 +108,7 @@ const Recommenddetail: React.FC = () => {
 				`${process.env.REACT_APP_BACK_END_URL}/board/product/similar?category=${encodeURIComponent(category)}&prodid=${prodid}`
 			);
 			setSimilarList(res.data);
-		} catch (e) { }
+		} catch (e) {}
 	};
 
 	const submitComment = async () => {
