@@ -29,7 +29,7 @@ const Navbar: React.FC = () => {
           <li>  <Link to="/recommend">제품 추천</Link>  </li>
           <li>  <Link to="/HospitalSearch">병원 약국 찾기</Link>  </li>
           <li>  <Link to="/MedicalRecord">진료 기록</Link>   </li>
-          <li>  <Link to="/SkinRank">피부 랭킹</Link>  </li>
+          <li>  <Link to="/SkinRank">밸런스 게임</Link>  </li>
           <li>  <Link to="/board">커뮤니티</Link>  </li>
 
         </ul>
