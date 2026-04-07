@@ -23,36 +23,42 @@ const SkinRank: React.FC = () => {
   const [ranking, setRanking] = useState<SkinItem[]>([]);
   const [showRanking, setShowRanking] = useState(false);
 
-  // 랭킹 먼저 가져오기
+  // 랭킹 가져오기
   useEffect(() => {
     fetch(`${process.env.REACT_APP_BACK_END_URL}/api/vote/rank`)
       .then((res) => res.json())
       .then((data) => {
+        console.log("rank data:", data);
+
         const map: any = {};
         data.forEach((item: any) => {
           map[item.userId] = item;
         });
+
         setRankMap(map);
       })
       .catch((err) => console.error("rank fetch 에러:", err));
   }, []);
 
-  // 이미지 + 누적 투표 반영
+  //이미지 + 랭킹 결합 
   useEffect(() => {
-    if (Object.keys(rankMap).length === 0) return;
-
     fetch(`${process.env.REACT_APP_BACK_END_URL}/api/skinImg/list`, {
       credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
+        console.log("skinImg data:", data);
+
         if (data.success && data.list) {
           const mapped = data.list.map((item: any) => {
             const rank = rankMap[item.userSkinImgId];
 
             return {
               id: item.userSkinImgId,
-              image: item.img,
+              // 이미지 경로 안전 처리
+              image: item.img.startsWith("http")
+                ? item.img
+                : `${process.env.REACT_APP_BACK_END_URL}${item.img}`,
               name: item.nickname,
               win: rank ? rank.winCount : 0,
               lose: rank ? rank.loseCount : 0,
@@ -73,7 +79,6 @@ const SkinRank: React.FC = () => {
 
   const startGame = (size: number) => {
     const shuffled = shuffle(initialData);
-
     const selected = shuffled.slice(0, Math.min(size, shuffled.length));
 
     setCurrentList(selected);
@@ -103,7 +108,6 @@ const SkinRank: React.FC = () => {
       body: `winnerId=${winner.id}&loserId=${loser.id}`,
     });
 
-    // 기존 로직 유지
     const winnerUpdated = { ...winner, win: winner.win + 1 };
     const loserUpdated = { ...loser, lose: loser.lose + 1 };
 
@@ -166,9 +170,7 @@ const SkinRank: React.FC = () => {
   // 랭킹 화면
   if (showRanking) {
     const finalRanking = [...initialData].sort((a, b) => {
-      const aRate = getWinRate(a);
-      const bRate = getWinRate(b);
-      return bRate - aRate;
+      return getWinRate(b) - getWinRate(a);
     });
 
     return (
@@ -186,7 +188,7 @@ const SkinRank: React.FC = () => {
 
                 <div className="info">
                   <span className="name">{item.name}</span>
-                  <span className="percent">{getWinRate(item).toFixed(2)}%</span>
+                  <span className="percent">{getWinRate(item)}%</span>
 
                   <div className="bar">
                     <div
