@@ -68,6 +68,19 @@ const Camera: React.FC<CameraProps> = ({ onUploadDone }) => {
 				return;
 			}
 
+			const scores = djangoRes.data.scores ?? {};
+			await axios.post(
+				`${process.env.REACT_APP_BACK_END_URL}/api/skinAnalysis/save`,
+				{
+					userSkinImgId: springRes.data.userSkinImgId,
+					diseaseAtopy:  Math.round((scores['아토피']  ?? 0) * 10),
+					diseaseDry:    Math.round((scores['건선']    ?? 0) * 10),
+					diseasePimple: Math.round((scores['여드름']  ?? 0) * 10),
+					diseaseInflam: Math.round((scores['염증성']  ?? 0) * 10),
+				},
+				{ withCredentials: true }
+			);
+
 			setUploadDone(true);
 			onUploadDone?.(springRes.data.imgUrl, djangoRes.data);
 		} catch (e) {
