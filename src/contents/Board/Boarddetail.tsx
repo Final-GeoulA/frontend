@@ -3,11 +3,12 @@ import axios from 'axios'
 import style from './board.module.css'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../components/AuthProvider'
+import {useAdminAuth} from '../../components/AdminAuthProvider'
 
 interface BoardSkinVO {
   board_skin_id: number;
   title: string;
-  writer: string;
+  nickname: string;
   content: string;
   imgn: string;
   hit?: number;
@@ -29,7 +30,7 @@ const Boarddetail: React.FC = () => {
   const { num } = useParams<{ num: string }>();
   const navigate = useNavigate();
   const { member } = useAuth();
-
+  const {isAdmin} = useAdminAuth();
   const [post, setPost] = useState<BoardSkinVO | null>(null);
   const [comments, setComments] = useState<BoardSkinCommVO[]>([]);
   const [commentText, setCommentText] = useState("");
@@ -129,7 +130,7 @@ const Boarddetail: React.FC = () => {
             </h1>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div>
-                <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#333" }}>{post.writer}</p>
+                <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#333" }}>{post.nickname}</p>
                 <p style={{ margin: 0, fontSize: 13, color: "#aaa" }}>{post.bdate} · 조회 {post.hit}</p>
               </div>
               <button
@@ -170,7 +171,7 @@ const Boarddetail: React.FC = () => {
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
               <span style={{ fontWeight: 600, fontSize: 15, color: "#222" }}>{c.unickname}</span>
               <span style={{ fontSize: 13, color: "#aaa" }}>{c.bcdate}</span>
-              {member?.nickname === c.unickname && (
+              {(member?.nickname === c.unickname || isAdmin === true) && (
                 <button
                   onClick={() => handleDeleteComment(c)}
                   style={{ marginLeft: "auto", background: "none", border: "none", color: "#aaa", cursor: "pointer", fontSize: 12 }}
@@ -216,7 +217,7 @@ const Boarddetail: React.FC = () => {
           <div style={{ textAlign: "center", marginTop: 16 }}>
             <Link to="/board" className={style.button} style={{ margin: 5, fontSize: 12 }}>목록</Link>
     
-            {member?.nickname === post.writer && (
+            {(member?.nickname === post.nickname || isAdmin === true) && (
               <>
               <Link to="/board/form" state={{data:post}} className={style.button} style={{ margin: 5, fontSize: 12 }}>수정</Link>
               <button className={style.button} onClick={handleDeletePost} style={{ margin: 5, fontSize: 12,border:"none" }}>삭제</button>

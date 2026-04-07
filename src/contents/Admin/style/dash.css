@@ -1,0 +1,31 @@
+.page-btn {
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  color: #6b7280;
+  transition: all 0.2s ease;
+}
+
+/* 활성화된 버튼 스타일 (isActive가 true일 때 덮어쓰기) */
+.page-btn.active {
+  font-weight: 700;
+  border: none;
+  background-color: #5bc8bf; /* TEAL 컬러 */
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(91, 200, 191, 0.3);
+}
+
+/* (선택 사항) 마우스를 올렸을 때 살짝 변하는 호버 효과 */
+.page-btn:not(.active):hover {
+  background-color: #f9fafb;
+  color: #374151;
+}

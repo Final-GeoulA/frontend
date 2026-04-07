@@ -77,11 +77,33 @@
   color: #1f2937;
 }
 
-.skin-report-chart-wrap {
-  width: 100%;
-  height: 230px;
+.skin-report-body {
+  display: flex;
+  align-items: center;
+  gap: 20px;
   margin-bottom: 14px;
-  padding: 0 4px; 
+}
+
+.skin-report-image-wrap {
+  flex-shrink: 0;
+  width: 140px;
+  height: 140px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1.5px solid #e0f5f2;
+}
+
+.skin-report-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.skin-report-chart-wrap {
+  flex: 1;
+  height: 140px;
+  margin-bottom: 0;
+  padding: 0 4px;
 }
 
 .skin-report-legend {
