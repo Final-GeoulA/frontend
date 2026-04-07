@@ -87,7 +87,7 @@ const BoardForm = () => {
       const formData = new FormData();
       formData.append("title", title);
       formData.append("content", content);
-      formData.append("writer", member?.nickname ?? "익명");
+      formData.append("nickname", member?.nickname ?? "익명");
       formData.append("textemotion", emotionLabel);
       if (file) {
         formData.append("mfile", file);

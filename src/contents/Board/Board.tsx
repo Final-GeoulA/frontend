@@ -6,7 +6,7 @@ import { Link, useLocation } from "react-router-dom";
 interface Post {
   board_skin_id: number;
   title: string;
-  writer: string;
+  nickname: string;
   bdate: string;
   hit: number;
   textemotion:String;
@@ -96,7 +96,7 @@ const Board = () => {
                   {post.title}
                 </Link>
               </td>
-              <td>{post.writer}</td>
+              <td>{post.nickname}</td>
               <td>{post.bdate}</td>
               <td>{post.hit}</td>
               <td>{post.textemotion}</td>
