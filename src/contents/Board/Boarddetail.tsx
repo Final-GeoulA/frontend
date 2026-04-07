@@ -8,7 +8,7 @@ import {useAdminAuth} from '../../components/AdminAuthProvider'
 interface BoardSkinVO {
   board_skin_id: number;
   title: string;
-  writer: string;
+  nickname: string;
   content: string;
   imgn: string;
   hit?: number;
@@ -130,7 +130,7 @@ const Boarddetail: React.FC = () => {
             </h1>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div>
-                <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#333" }}>{post.writer}</p>
+                <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#333" }}>{post.nickname}</p>
                 <p style={{ margin: 0, fontSize: 13, color: "#aaa" }}>{post.bdate} · 조회 {post.hit}</p>
               </div>
               <button
@@ -217,7 +217,7 @@ const Boarddetail: React.FC = () => {
           <div style={{ textAlign: "center", marginTop: 16 }}>
             <Link to="/board" className={style.button} style={{ margin: 5, fontSize: 12 }}>목록</Link>
     
-            {(member?.nickname === post.writer || isAdmin === true) && (
+            {(member?.nickname === post.nickname || isAdmin === true) && (
               <>
               <Link to="/board/form" state={{data:post}} className={style.button} style={{ margin: 5, fontSize: 12 }}>수정</Link>
               <button className={style.button} onClick={handleDeletePost} style={{ margin: 5, fontSize: 12,border:"none" }}>삭제</button>
