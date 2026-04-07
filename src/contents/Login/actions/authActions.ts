@@ -11,7 +11,8 @@ export const login = async (username: string, password: string) => {
             }, { withCredentials:true});
         console.log("TOKEN: " + res.data.access_token);
         const { token } = res.data.access_token;
-
+        const role = res.data.role;
+        localStorage.setItem('role',role);
         localStorage.setItem('username',username);
         localStorage.setItem('token',res.data.access_token);
     } catch (error) {

@@ -1,6 +1,10 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import DashDocs from "./DashDocs";
+import DashHome from "./DashHome";
+import DashMember from "./DashMember";
+import { useAdminAuth } from '../../components/AdminAuthProvider';
 
 const TEAL = "#5BC8BF";
 const BG_COLOR = "#f4f7f8";
@@ -16,47 +20,26 @@ interface UserInfo {
 }
 
 const AdminDashboard: React.FC = () => {
-  const [userList, setUserList] = useState<UserInfo[]>([]);
-  const [page, setPage] = useState(1);
-  const [size] = useState(5);
-  const [totalPages, setTotalPages] = useState(0);
+  const [activeMenu, setActiveMenu] = useState(1);
+  const navigate = useNavigate();
+  const { isAdmin, adminRole, adminName } = useAdminAuth();
 
   useEffect(() => {
-    fetchUserList(page);
-  }, [page]);
+    if (!isAdmin) {
+      navigate("/");
+    }
+  }, []);
 
-  const fetchUserList = (page: number) => {
-    axios.post(`${process.env.REACT_APP_BACK_ADMIN_URL}/api/user/info`, {
-      params: {
-        page: page,
-        size
-      },
-    }).then(response => {
-      console.log(response.data.content);
-      setUserList(response.data.content);
-      setTotalPages(response.data.total_pages)
-    })
-      .catch(error => {
-        console.error('오류', error)
-      })
-  }
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
+  const contentMap: Record<number, React.ReactNode> = {
+    1: <DashHome />,
+    2: <DashMember />,
+    3: <DashDocs />,
+    // 4: <SystemSettings />,
   };
-  // 임시 더미 데이터 (나중에 81번 포트 JWT로 받아올 데이터들)
-  const stats = [
-    { label: "총 회원 수", value: "1,284", increase: "+12%" },
-    { label: "신규 가입 (오늘)", value: "42", increase: "+5%" },
-    { label: "신규 게시글", value: "315", increase: "+18%" },
-    { label: "신고 접수", value: "3", increase: "-2%", isDanger: true },
-  ];
 
-  // const recentUsers = [
-  //     { id: 1, email: "user01@test.com", name: "김철수", status: "활성", date: "2026-04-03" },
-  //     { id: 2, email: "hello_world@test.com", name: "이영희", status: "대기", date: "2026-04-03" },
-  //     { id: 3, email: "hacker99@test.com", name: "박지성", status: "정지", date: "2026-04-02" },
-  //     { id: 4, email: "admin_tester@test.com", name: "홍길동", status: "활성", date: "2026-04-01" },
-  // ];
+  useEffect(() => {
+    console.log('dd:', activeMenu);
+  }, [activeMenu]);
 
   return (
     <div style={{ display: "flex", minHeight: "100vh", backgroundColor: BG_COLOR, fontFamily: "'Pretendard', sans-serif" }}>
@@ -68,111 +51,20 @@ const AdminDashboard: React.FC = () => {
       }}>
         <div style={{ padding: "0 24px", marginBottom: 40 }}>
           <h2 style={{ fontSize: 22, fontWeight: 800, color: TEAL, margin: 0, letterSpacing: "-0.5px" }}>
-            GeoulA Admin
+            GeoulA 관리자 페이지
           </h2>
         </div>
 
         <nav style={{ flex: 1, padding: "0 16px", display: "flex", flexDirection: "column", gap: 8 }}>
-          <SidebarItem icon={<HomeIcon />} label="대시보드" active />
-          <SidebarItem icon={<UsersIcon />} label="회원 관리" />
-          <SidebarItem icon={<DocumentIcon />} label="게시물 관리" />
-          <SidebarItem icon={<SettingsIcon />} label="시스템 설정" />
+          <ul onClick={e => setActiveMenu(1)}><SidebarItem icon={<HomeIcon />} label="대시보드" active={activeMenu === 1} /></ul>
+          <ul onClick={e => setActiveMenu(2)}><SidebarItem icon={<UsersIcon />} label="회원 관리" active={activeMenu === 2} /></ul>
+          <ul onClick={e => setActiveMenu(3)}><SidebarItem icon={<DocumentIcon />} label="게시물 관리" active={activeMenu === 3} /></ul>
+          {/* <Link><SidebarItem icon={<DocumentIcon />} label="게시물 관리" /></Link>
+          <Link><SidebarItem icon={<SettingsIcon />} label="시스템 설정" /></Link> */}
         </nav>
-
-        <div style={{ padding: "0 16px" }}>
-          <button style={{
-            width: "100%", padding: "12px", background: "#fef2f2", color: "#dc2626",
-            border: "none", borderRadius: 8, fontSize: 14, fontWeight: 600,
-            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8
-          }}>
-            <LogoutIcon /> 로그아웃
-          </button>
-        </div>
       </aside>
-
-      {/* 2. 메인 콘텐츠 영역 */}
       <main style={{ flex: 1, display: "flex", flexDirection: "column" }}>
-
-        {/* 상단 헤더 */}
-        <header style={{
-          height: 72, backgroundColor: "#fff", borderBottom: "1px solid #e5e7eb",
-          display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 32px"
-        }}>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: TEXT_DARK, margin: 0 }}>대시보드 개요</h1>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div style={{
-              padding: "6px 12px", backgroundColor: "#e8f8f7", color: TEAL,
-              borderRadius: 20, fontSize: 13, fontWeight: 700
-            }}>
-              👑 최고 관리자
-            </div>
-            <div style={{ width: 40, height: 40, borderRadius: "50%", backgroundColor: "#e5e7eb", cursor: "pointer" }} />
-          </div>
-        </header>
-
-        {/* 대시보드 본문 */}
-        <div style={{ padding: 32, overflowY: "auto" }}>
-
-          {/* 상태 카드 (KPI) */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24, marginBottom: 32 }}>
-            {stats.map((stat, idx) => (
-              <div key={idx} style={{
-                backgroundColor: "#fff", padding: 24, borderRadius: 16,
-                boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)"
-              }}>
-                <p style={{ fontSize: 14, color: TEXT_GRAY, margin: "0 0 8px 0", fontWeight: 500 }}>{stat.label}</p>
-                <div style={{ display: "flex", alignItems: "flex-end", gap: 12 }}>
-                  <h3 style={{ fontSize: 28, fontWeight: 700, color: TEXT_DARK, margin: 0 }}>{stat.value}</h3>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: stat.isDanger ? "#dc2626" : TEAL, marginBottom: 4 }}>
-                    {stat.increase}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* 최근 가입 유저 테이블 */}
-          <div style={{
-            backgroundColor: "#fff", borderRadius: 16, padding: "24px",
-            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05)"
-          }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: TEXT_DARK, margin: 0 }}>최근 가입 유저</h3>
-              <span style={{ fontSize: 13, color: TEAL, fontWeight: 600, cursor: "pointer" }}>전체 보기 &rarr;</span>
-            </div>
-
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ borderBottom: "2px solid #f3f4f6", textAlign: "left" }}>
-                  <th style={{ padding: "12px 8px", fontSize: 13, color: TEXT_GRAY, fontWeight: 600 }}>ID</th>
-                  <th style={{ padding: "12px 8px", fontSize: 13, color: TEXT_GRAY, fontWeight: 600 }}>이메일</th>
-                  <th style={{ padding: "12px 8px", fontSize: 13, color: TEXT_GRAY, fontWeight: 600 }}>이름</th>
-                  <th style={{ padding: "12px 8px", fontSize: 13, color: TEXT_GRAY, fontWeight: 600 }}>성별</th>
-                  <th style={{ padding: "12px 8px", fontSize: 13, color: TEXT_GRAY, fontWeight: 600 }}>가입일</th>
-                </tr>
-              </thead>
-              <tbody>
-                {userList.map(user => (
-                  <tr key={user.user_id} style={{ borderBottom: "1px solid #f3f4f6" }}>
-                    <td style={{ padding: "16px 8px", fontSize: 14, color: TEXT_DARK, fontWeight: 500 }}>#{user.user_id}</td>
-                    <td style={{ padding: "16px 8px", fontSize: 14, color: TEXT_GRAY }}>{user.email}</td>
-                    <td style={{ padding: "16px 8px", fontSize: 14, color: TEXT_DARK }}>{user.nickname}</td>
-                    <td style={{ padding: "16px 8px" }}>
-                      <span style={{
-                        padding: "4px 10px", borderRadius: 20, fontSize: 12, fontWeight: 600,
-                        backgroundColor: user.gender === "남자" ? "#dcfce7" : user.gender === "여자" ? "#fee2e2" : "#f3f4f6"
-                      }}>
-                        {user.gender}
-                      </span>
-                    </td>
-                    <td style={{ padding: "16px 8px", fontSize: 14, color: TEXT_GRAY }}>{user.udate}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        {contentMap[activeMenu]}
       </main>
     </div>
   );
