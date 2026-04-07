@@ -131,13 +131,12 @@ const SkinRank: React.FC = () => {
         <div className="worldcup-container">
           <div className="hero-badge">Skin Tournament</div>
 
-          <p className="skin-worldcup">피부 월드컵</p>
+          <p className="skin-worldcup">사용자 피부 밸런스 게임</p>
 
           <p className="hero-title-text">더 좋아 보이는 피부에 투표하세요</p>
 
           <p className="hero-subtext">
-            유저들의 피부 사진을 비교하며 더 건강하고 좋아 보이는 피부를
-            선택하는 토너먼트입니다.
+            유저들의 피부 사진을 비교하여 선택하는 토너먼트입니다.
           </p>
 
           {initialData.length === 0 && <p>이미지 불러오는 중...</p>}
