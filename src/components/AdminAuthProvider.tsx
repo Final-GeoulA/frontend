@@ -3,11 +3,20 @@ import { jwtDecode } from "jwt-decode";
 
 interface AdminAuthContextProps {
     isAdmin: boolean;
+    facePass: boolean;
     adminToken: string | null;
     adminName: string | null;
     adminRole: string | null;
     adminLogin: (username: string, token: string) => void;
     adminLogout: () => void;
+    faceValdiate: () => void;
+}
+
+interface TokenPayload {
+    role: string;
+    sub: string;
+    exp: number;
+    iat: number;
 }
 
 interface TokenPayload {
@@ -26,6 +35,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const [adminName, setAdminName] = useState<string | null>(null);
     const [adminRole, setAdminRole] = useState<string | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [facePass, setFacePass] = useState(false);
 
     useEffect(() => {
         const savedToken = localStorage.getItem("token");
@@ -56,6 +66,10 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setIsAdmin(true);
     };
 
+    const faceValdiate = () => {
+        setFacePass(true);
+    };
+
     const adminLogout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("username");
@@ -63,10 +77,11 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setAdminName(null);
         setAdminRole(null);
         setIsAdmin(false);
+        setFacePass(false);
     };
 
     return (
-        <AdminContext.Provider value={{ isAdmin, adminToken, adminName, adminRole, adminLogin, adminLogout }}>
+        <AdminContext.Provider value={{ isAdmin, adminToken, adminName, adminRole, facePass, faceValdiate, adminLogin, adminLogout }}>
             {children}
         </AdminContext.Provider>
     );

@@ -2,7 +2,6 @@ import axios from "axios";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import Webcam from "react-webcam";
-import { useAuth } from "../../components/AuthProvider";
 import { useAdminAuth } from "../../components/AdminAuthProvider";
 
 const TEAL = "#5BC8BF";
@@ -24,13 +23,13 @@ const AdminLogin: React.FC = () => {
     const [countdown, setCountdown] = useState<number | null>(null); //카운트 다운 저장할 useState
     const [captured, setCaptured] = useState<boolean>(false); //캡쳐
     const [result, setResult] = useState<FaceCompareResult | null>(null); //axios로 받은 결과를 저장할 useState
-    const { isAdmin } = useAdminAuth();
+    const { isAdmin, faceValdiate } = useAdminAuth();
     
     useEffect(() => {
             if (isAdmin) {
                 navigate("/");
             }
-        });
+        },[]);
     
     const startCountdown = () => {
         if (countdown !== null) return;
@@ -69,7 +68,7 @@ const AdminLogin: React.FC = () => {
             //서버로 전송할 때 post방식으로 바이너리 파일인 이미지 한장을 보내겠다
             formData.append('image', blob, 'capture.jpg');
             const response = await axios.post<FaceCompareResult>(
-                `${process.env.REACT_APP_DJANGO_URL}/api/recogface/compare_face`,
+                `${process.env.REACT_APP_DJANGO_END_URL}/api/recogface/compare_face`,
                 formData
             );
             setResult(response.data);
@@ -80,22 +79,18 @@ const AdminLogin: React.FC = () => {
     }
 
     // 로그인 동작
-    const { login, checkLogin } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
         const loginAsAdmin = async () => {
             if (result !== null && result.result === 'ok') {
-                const currentEmail = result.admin_name;
-                const currentPassword = 'admin';
                 setResult(null);
                 try {
-                    const loginresult = await login(currentEmail, currentPassword);
-                    if (loginresult === 'success') {
+                    if (result.result === 'ok') {
                         // 0.8초 대기 후 실행
                             alert(`얼굴 인증이 완료되었습니다.`);
+                            faceValdiate();
                             navigate('/admin/login', { replace: true });
-
                     } else {
                         alert('로그인 실패');
                     }
@@ -105,7 +100,7 @@ const AdminLogin: React.FC = () => {
             }
         };
         loginAsAdmin();
-    }, [result, login, navigate]);
+    }, [result, navigate]);
 
     return (
         <div style={{ minHeight: "100vh", background: "#f7f7f7", fontFamily: "'Pretendard', 'Apple SD Gothic Neo', sans-serif" }}>
