@@ -56,7 +56,7 @@ const Board = () => {
   return (
     <div className="community-container">
       <div className="community-header">
-        <h2>커뮤니티</h2>
+        <h2 className="commynity-title">커뮤니티</h2>
 
         <div className="community-controls">
           <input
@@ -70,9 +70,9 @@ const Board = () => {
             value={searchType}
             onChange={(e) => setSearchType(e.target.value)}
           >
-            <option value="2">Sort by : 제목</option>
-            <option value="1">Sort by : 작성자</option>
-            <option value="3">Sort by : 내용</option>
+            <option value="2">제목</option>
+            <option value="1">작성자</option>
+            <option value="3">내용</option>
           </select>
         </div>
       </div>

@@ -4,7 +4,17 @@ import axios from 'axios';
 
 const TEAL = "#5BC8BF";
 
-const Camera: React.FC = () => {
+interface PredictionResult {
+	predicted_class: string;
+	confidence: number;
+	scores: Record<string, number>;
+}
+
+interface CameraProps {
+	onUploadDone?: (imgUrl: string, prediction: PredictionResult) => void;
+}
+
+const Camera: React.FC<CameraProps> = ({ onUploadDone }) => {
 	const webcamRef = useRef<Webcam>(null);
 	const [captured, setCaptured] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -30,15 +40,36 @@ const Camera: React.FC = () => {
 			const blob = await res.blob();
 			const file = new File([blob], 'selfie.jpg', { type: 'image/jpeg' });
 
-			const formData = new FormData();
-			formData.append('file', file);
+			// Spring 저장 + Django 분석 동시 요청
+			const springForm = new FormData();
+			springForm.append('file', file);
 
-			await axios.post(
-				`${process.env.REACT_APP_BACK_END_URL}/api/skin-img/upload`,
-				formData,
-				{ withCredentials: true }
-			);
+			const djangoForm = new FormData();
+			djangoForm.append('image', file);
+
+			const [springRes, djangoRes] = await Promise.all([
+				axios.post(
+					`${process.env.REACT_APP_BACK_END_URL}/api/skinImg/upload`,
+					springForm,
+					{ withCredentials: true }
+				),
+				axios.post(
+					`${process.env.REACT_APP_DJANGO_END_URL}/api/skin/predict/`,
+					djangoForm
+				),
+			]);
+
+			if (!springRes.data.success) {
+				alert(springRes.data.message || '이미지 저장에 실패했습니다.');
+				return;
+			}
+			if (!djangoRes.data.success) {
+				alert('피부 분석에 실패했습니다.');
+				return;
+			}
+
 			setUploadDone(true);
+			onUploadDone?.(springRes.data.imgUrl, djangoRes.data);
 		} catch (e) {
 			alert('업로드에 실패했습니다.');
 		} finally {

@@ -15,6 +15,7 @@ const shuffle = (array: SkinItem[]) => {
 
 const SkinRank: React.FC = () => {
   const [initialData, setInitialData] = useState<SkinItem[]>([]);
+  const [rankMap, setRankMap] = useState<any>({});
   const [roundSize, setRoundSize] = useState<number | null>(null);
   const [currentList, setCurrentList] = useState<SkinItem[]>([]);
   const [nextRound, setNextRound] = useState<SkinItem[]>([]);
@@ -22,32 +23,53 @@ const SkinRank: React.FC = () => {
   const [ranking, setRanking] = useState<SkinItem[]>([]);
   const [showRanking, setShowRanking] = useState(false);
 
-  // 서버 데이터 가져오기
+  // 랭킹 가져오기
   useEffect(() => {
-    fetch("http://192.168.0.56/geoulA/api/skinImg/list", {
+    fetch(`${process.env.REACT_APP_BACK_END_URL}/api/vote/rank`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("rank data:", data);
+
+        const map: any = {};
+        data.forEach((item: any) => {
+          map[item.userId] = item;
+        });
+
+        setRankMap(map);
+      })
+      .catch((err) => console.error("rank fetch 에러:", err));
+  }, []);
+
+  //이미지 + 랭킹 결합 
+  useEffect(() => {
+    fetch(`${process.env.REACT_APP_BACK_END_URL}/api/skinImg/list`, {
       credentials: "include",
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("서버 응답:", data);
-        console.log("리스트 데이터:", data.list);
+        console.log("skinImg data:", data);
 
         if (data.success && data.list) {
-          const mapped = data.list.map((item: any, index: number) => ({
-            id: item.userSkinImgId,
-            image: item.img,
-            name: item.nickname,
-            win: 0,
-            lose: 0,
-          }));
+          const mapped = data.list.map((item: any) => {
+            const rank = rankMap[item.userSkinImgId];
+
+            return {
+              id: item.userSkinImgId,
+              // 이미지 경로 안전 처리
+              image: item.img.startsWith("http")
+                ? item.img
+                : `${process.env.REACT_APP_BACK_END_URL}${item.img}`,
+              name: item.nickname,
+              win: rank ? rank.winCount : 0,
+              lose: rank ? rank.loseCount : 0,
+            };
+          });
 
           setInitialData(mapped);
-        } else {
-          console.log("데이터 없음 또는 로그인 필요");
         }
       })
       .catch((err) => console.error("fetch 에러:", err));
-  }, []);
+  }, [rankMap]);
 
   const getWinRate = (item: SkinItem) => {
     const total = item.win + item.lose;
@@ -56,14 +78,7 @@ const SkinRank: React.FC = () => {
   };
 
   const startGame = (size: number) => {
-    const shuffled = shuffle(
-      initialData.map((item) => ({
-        ...item,
-        win: 0,
-        lose: 0,
-      }))
-    );
-
+    const shuffled = shuffle(initialData);
     const selected = shuffled.slice(0, Math.min(size, shuffled.length));
 
     setCurrentList(selected);
@@ -84,6 +99,15 @@ const SkinRank: React.FC = () => {
   };
 
   const handleSelect = (winner: SkinItem, loser: SkinItem) => {
+    // 서버 저장
+    fetch(`${process.env.REACT_APP_BACK_END_URL}/api/vote/do`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: `winnerId=${winner.id}&loserId=${loser.id}`,
+    });
+
     const winnerUpdated = { ...winner, win: winner.win + 1 };
     const loserUpdated = { ...loser, lose: loser.lose + 1 };
 
@@ -100,7 +124,7 @@ const SkinRank: React.FC = () => {
     }
   };
 
-  //시작 화면 (디자인 유지 + 로딩 표시 추가)
+  // 시작 화면
   if (!roundSize) {
     return (
       <div className="worldcup-page">
@@ -145,7 +169,9 @@ const SkinRank: React.FC = () => {
 
   // 랭킹 화면
   if (showRanking) {
-    const finalRanking = [currentList[0], ...ranking];
+    const finalRanking = [...initialData].sort((a, b) => {
+      return getWinRate(b) - getWinRate(a);
+    });
 
     return (
       <div className="worldcup-page">
@@ -222,7 +248,6 @@ const SkinRank: React.FC = () => {
 
         <div className="battle">
           <div className="card" onClick={() => handleSelect(left, right)}>
-
             <img src={left.image} alt={left.name} />
             <div className="card-name">{left.name}</div>
           </div>
@@ -230,7 +255,6 @@ const SkinRank: React.FC = () => {
           <div className="vs">VS</div>
 
           <div className="card" onClick={() => handleSelect(right, left)}>
-
             <img src={right.image} alt={right.name} />
             <div className="card-name">{right.name}</div>
           </div>

@@ -1,21 +1,23 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./style/SkinResult.css";
-
-const resultData = [
-  { name: "여드름", percent: 40 },
-  { name: "염증성", percent: 30 },
-  { name: "아토피", percent: 20 },
-  { name: "건선", percent: 10 },
-];
 
 const SkinResult: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state as { imgUrl?: string; prediction?: any } | null;
+  const imgUrl = state?.imgUrl;
+  const prediction = state?.prediction;
 
-  // 가장 높은 비율 데이터 찾기
-  const topResult = resultData.reduce((prev, current) =>
-    current.percent > prev.percent ? current : prev
-  );
+  const resultData: { name: string; percent: number }[] = prediction?.scores
+    ? Object.entries(prediction.scores).map(([name, percent]) => ({
+        name,
+        percent: Number(percent),
+      })).sort((a, b) => b.percent - a.percent)
+    : [];
+
+  const topName = prediction?.predicted_class ?? "";
+  const topConfidence = prediction?.confidence ?? 0;
 
   return (
     <div className="result-page">
@@ -23,14 +25,14 @@ const SkinResult: React.FC = () => {
         <h1 className="result-title">피부 분석 결과</h1>
 
         <img
-          src="/image/SkinRank/skin5.jpg"
+          src={imgUrl || "/image/SkinRank/skin5.jpg"}
           alt="결과 이미지"
           className="result-image"
         />
 
         <p className="result-guide">
-          현재 분석 결과, <span className="highlight">{topResult.name}</span> 가능성이
-          가장 높게 나타났어요.  <br/>
+          현재 분석 결과, <span className="highlight">{topName}</span> 가능성이
+          가장 높게 나타났어요. ({topConfidence}%)<br/>
           누적된 피부 측정 기록을 통해 나의 피부 변화를 확인해보세요.
         </p>
 

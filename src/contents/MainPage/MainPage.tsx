@@ -64,21 +64,41 @@ const MainPage: React.FC = () => {
     <div className="skin-container">
       {/* 상단 이미지 추가 */}
       <section className="skin-top">
-        <div className="top-text">
-          <h1>내 피부 사진으로</h1>
-          <h1 className="highlight">피부 상태를 분석해보세요</h1>
-          <p>Analyze your skin from a simple face scan</p>
-          <Link to="/skinanalysis" className="scan-btn">
-            Scan My Skin
-          </Link>
-        </div>
+        <div className="skin-top-inner">
+          <div className="top-text">
+          <h1 className="title-main">내 피부 사진으로</h1>
+          <h1 className="title-sub">피부 상태를 분석해보세요</h1>
+            <p className="info-text">한 장의 사진으로 피부 상태를 빠르게 확인해보세요 <br/>
+            Analyze your skin from a simple face scan</p>
 
-        <div className="top-image">
-          <img src="/image/Main/skincare.png" alt="skincare" />
+              <div className="hero-features">
+                <span>✔ AI 피부 분석   </span>
+                <span>✔ 맞춤형 제품 추천   </span>
+                <span>✔ 병원/약국 찾기   </span>
+              </div>
+            <Link to="/skinanalysis" className="scan-btn">
+              AI 피부 분석 시작하기
+            </Link>
+          </div>
+
+          {/* <div className="top-image">
+            <img src="/image/Main/skincare.png" alt="skincare" />
+          </div> */}
+
+          <div className="top-image">
+            <div className="scan-frame">
+              <span className="frame-corner corner-tl"></span>
+              <span className="frame-corner corner-tr"></span>
+              <span className="frame-corner corner-bl"></span>
+              <span className="frame-corner corner-br"></span>
+
+              <img src="/image/Main/face_scan.gif" alt="face scan" className="scan-gif" />
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* 과정 설명 */}
+      {/* 과정(step) 설명 */}
       <section className="skin-steps">
         <div className="step">
           <span className="step-label">Step 1</span>

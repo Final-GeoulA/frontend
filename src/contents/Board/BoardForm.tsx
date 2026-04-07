@@ -7,6 +7,32 @@ import { CKEditor } from "@ckeditor/ckeditor5-react";
 import DecoupledEditor from "@ckeditor/ckeditor5-build-decoupled-document";
 import "@ckeditor/ckeditor5-build-decoupled-document/build/translations/ko.js";
 
+class UploadAdapter {
+  private loader: any;
+  constructor(loader: any) {
+    this.loader = loader;
+  }
+  upload() {
+    return this.loader.file.then((file: File) => {
+      const formData = new FormData();
+      formData.append("upload", file);
+      return axios
+        .post(
+          `${process.env.REACT_APP_BACK_END_URL}/board/skin/uploadImage`,
+          formData,
+          { withCredentials: true }
+        )
+        .then((res) => ({ default: res.data.url }));
+    });
+  }
+  abort() {}
+}
+
+function UploadAdapterPlugin(editor: any) {
+  editor.plugins.get("FileRepository").createUploadAdapter = (loader: any) =>
+    new UploadAdapter(loader);
+}
+
 const BoardForm = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -44,7 +70,7 @@ const BoardForm = () => {
     }
     try {
       const res = await axios.post(
-        `http://192.168.0.252:9001/text_emotion/Board_emotion`,
+        `${process.env.REACT_APP_DJANGO_END_URL}/text_emotion/Board_emotion`,
         {
           content: content,
         }
@@ -88,6 +114,7 @@ const BoardForm = () => {
   const editorConfig = {
       language: "ko",
       placeholder: "내용을 입력해주세요 (글꼴·색·표·이미지·정렬 등 풀옵션)",
+      extraPlugins: [UploadAdapterPlugin],
       toolbar: {
         shouldNotGroupWhenFull: true,
         items: [
@@ -150,12 +177,6 @@ const BoardForm = () => {
     <div className="write-container write-container--pro">
         <div className="write-pro-header">
           <h2>커뮤니티 글쓰기</h2>
-          <span className="write-pro-badges">
-            <span className="badge-pill">고급 편집기</span>
-            <span className="badge-pill">Document 모드</span>
-            <span className="badge-pill">표·이미지·동영상</span>
-            <span className="badge-pill">글꼴·색상</span>
-          </span>
         </div>
 
         <input

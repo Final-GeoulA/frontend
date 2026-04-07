@@ -220,16 +220,16 @@ const MedicalRecord: React.FC = () => {
             <p className="login-popup-text">로그인 후 이용 가능한 기능입니다.</p>
             <div className="login-popup-buttons">
               <button
-                className="login-popup-cancel"
-                onClick={() => setShowLoginPopup(false)}
-              >
-                닫기
-              </button>
-              <button
                 className="login-popup-confirm"
                 onClick={() => navigate('/login')}
               >
                 로그인하러 가기
+              </button>
+                            <button
+                className="login-popup-cancel"
+                onClick={() => setShowLoginPopup(false)}
+              >
+                닫기
               </button>
             </div>
           </div>

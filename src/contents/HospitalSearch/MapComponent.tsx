@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useAuth } from '../../components/AuthProvider';
 import "./style/MapComponent.css";
+import { useNavigate } from "react-router-dom";
 
 declare global {
   interface Window {
@@ -11,6 +13,11 @@ const BACKEND_URL = process.env.REACT_APP_BACK_END_URL;
 const MAP_KEY = process.env.REACT_APP_MAP_KEY;
 
 const MapComponent: React.FC = () => {
+
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
+  const [showLoginPopup, setShowLoginPopup] = useState(false);
+
   const mapRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
   const currentMarkerRef = useRef<any>(null);
@@ -499,23 +506,30 @@ const MapComponent: React.FC = () => {
                 }`}
                 onClick={() => moveToPlace(place, index)}
               >
-                <div className="place-header">
-                  <div className="place-name">
-                    {index + 1}. {place.place_name}
+                <div className="place-row">
+                  <div className="place-content">
+                    <div className="place-name">
+                      {index + 1}. {place.place_name}
+                    </div>
+                    <div className="place-address">{place.address_name}</div>
                   </div>
 
                   <div
                     className="bookmark"
                     onClick={(e) => {
                       e.stopPropagation();
+
+                      if (!isLoggedIn) {
+                        setShowLoginPopup(true);
+                        return;
+                      }
+
                       toggleBookmark(place);
                     }}
                   >
                     {bookmarks[place.id] ? "♥" : "♡"}
                   </div>
                 </div>
-
-                <div className="place-address">{place.address_name}</div>
               </div>
             ))}
           </div>
@@ -540,6 +554,28 @@ const MapComponent: React.FC = () => {
       >
         현재 위치
       </div>
+
+      {showLoginPopup && (
+        <div className="login-popup-overlay">
+          <div className="login-popup">
+            <p className="login-popup-text">로그인 후 이용 가능한 기능입니다.</p>
+            <div className="login-popup-buttons">
+              <button
+                className="login-popup-confirm"
+                onClick={() => navigate('/login')}
+              >
+                로그인하러 가기
+              </button>
+              <button
+                className="login-popup-cancel"
+                onClick={() => setShowLoginPopup(false)}
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

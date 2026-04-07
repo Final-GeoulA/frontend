@@ -34,6 +34,7 @@ import Mypage from "../contents/Mypage/MyPage";
 import SkinReport from "../contents/Mypage/SkinReport";
 import Chat from "../contents/MainPage/Chat";
 import PasswordlessReg from "../contents/Login/PasswordlessReg";
+import LoginLog from "../contents/Login/LoginLog";
 
 // 진료 관리
 import MedicalRecord from "../contents/MedicalRecord/MedicalRecord";
@@ -123,6 +124,7 @@ const AppRoutes: React.FC = () => {
         <Route path="savedhospitals" element={<HospitalSearch />} />
         <Route path="recommend" element={<Recommend likedOnly />} />
         <Route path="board" element={<Board />} />
+        <Route path="loginlog" element={<LoginLog/>}/>
         <Route path="changepassword" element={<ChangePassword />} />
       </Route>
     </Routes>
