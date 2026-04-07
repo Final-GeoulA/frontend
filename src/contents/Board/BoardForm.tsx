@@ -40,7 +40,6 @@ const BoardForm = () => {
   const [file, setFile] = useState<File | null>(null);
 
   //게시판 수정 로직
-
   const location = useLocation();
   const Edit = location.state && location.state.data;
   useEffect(() => {
@@ -68,11 +67,16 @@ const BoardForm = () => {
       alert("제목과 내용을 입력해주세요.");
       return;
     }
+    // /<\/?p\b[^>]*>/gi -> p태그 x
+    // /<[^>]*>/g -> 전체 태그 x
     try {
+      const cont = content
+      const cleanText = cont.replace(/<[^>]*>/g , ""); 
+      console.log(cleanText)
       const res = await axios.post(
         `${process.env.REACT_APP_DJANGO_END_URL}/text_emotion/Board_emotion`,
         {
-          content: content,
+          content: cleanText,
         }
       );
       console.log("감정 분석 결과", res.data);
@@ -95,6 +99,7 @@ const BoardForm = () => {
           formData,
           { withCredentials: true }
         );
+        navigate("/board");
       }
       else {
         await axios.post(
