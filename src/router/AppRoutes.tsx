@@ -123,7 +123,7 @@ const AppRoutes: React.FC = () => {
         <Route path="skinreport" element={<SkinReport />} />
         <Route path="savedhospitals" element={<HospitalSearch />} />
         <Route path="recommend" element={<Recommend likedOnly />} />
-        <Route path="board" element={<Board />} />
+        <Route path="board" element={<Board myPostsOnly />} />
         <Route path="loginlog" element={<LoginLog/>}/>
         <Route path="changepassword" element={<ChangePassword />} />
       </Route>
