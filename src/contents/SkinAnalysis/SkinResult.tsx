@@ -5,10 +5,10 @@ import "./style/SkinResult.css";
 const SkinResult: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const state = location.state as { imgUrl?: string; prediction?: any; emotion?: string } | null;
+  const state = location.state as { imgUrl?: string; prediction?: any; emotionjson?: any } | null;
   const imgUrl = state?.imgUrl;
   const prediction = state?.prediction;
-  const emotion = state?.emotion;
+  const emotionjson = state?.emotionjson;
   const dictEmotion = {
     'Happiness': '😊',
     'Sadness': '😢',
@@ -41,7 +41,7 @@ const SkinResult: React.FC = () => {
           className="result-image"
         />
         <div>
-          <span className="result-emotion" style={{ fontSize: "2.5rem" }}>{dictEmotion[emotion as keyof typeof dictEmotion]}</span>
+          <span className="result-emotion" style={{ whiteSpace: 'pre-line', fontSize: emotionjson.success ? "2.0rem" : "1.0rem" }}>{emotionjson.success ? `당신의 표정 : ${dictEmotion[emotionjson.emotion as keyof typeof dictEmotion]}` : '얼굴을 찾지 못했습니다\n이미지에 얼굴이 명확히 보이는지 확인해주세요 😢'}</span>
         </div>
         
         <div>

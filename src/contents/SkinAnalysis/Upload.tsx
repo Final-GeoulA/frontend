@@ -5,7 +5,7 @@ const TEAL = "#5BC8BF";
 
 interface UploadProps {
 	props: RefObject<HTMLInputElement | null>;
-	onUploadDone?: (imgUrl: string, prediction: any, emotion: string) => void;
+	onUploadDone?: (imgUrl: string, prediction: any, emotionjson: any) => void;
 }
 
 const Upload: React.FC<UploadProps> = ({ props, onUploadDone }) => {
@@ -68,22 +68,18 @@ const Upload: React.FC<UploadProps> = ({ props, onUploadDone }) => {
 				alert('피부 분석에 실패했습니다.');
 				return;
 			}
-			if (!djangoRes_emotion.data.success) {
-				alert('감정 분석에 실패했습니다.');
-				return;
-			}
 
 			await axios.post(									//	감정분석 저장용 axios 추가
 				`${process.env.REACT_APP_BACK_END_URL}/api/emotionAnalysis/save`,
 				{
 					imgId: springRes.data.userSkinImgId,		// springRes.data.userSkinImgId << 테이블 Primary Key 값
 					imgname: uploadedFile.name,
-					emotion: djangoRes_emotion.data.emotion,
+					emotion: djangoRes_emotion.data.success ? djangoRes_emotion.data.emotion : 'emotionERROR',
 				},
 				{ withCredentials: true }
 			);
 
-			onUploadDone?.(springRes.data.imgUrl, djangoRes.data, djangoRes_emotion.data.emotion);
+			onUploadDone?.(springRes.data.imgUrl, djangoRes.data, djangoRes_emotion.data);
 
 		} catch (e) {
 			alert('업로드에 실패했습니다.');
