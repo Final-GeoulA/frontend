@@ -12,7 +12,7 @@ const JWTLogin: React.FC = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [showPw, setShowPw] = useState(false);
-    const { isAdmin, adminName, adminLogin } = useAdminAuth();
+    const { isAdmin, adminName, facePass, adminLogin } = useAdminAuth();
     const { member, logout } = useAuth();
     const navigate = useNavigate();
 
@@ -20,7 +20,14 @@ const JWTLogin: React.FC = () => {
         if (isAdmin) {
             navigate("/");
         }
-    });
+    },[]);
+
+    useEffect(() => {
+        if (!facePass) {
+            alert("얼굴 인증이 완료되지 않았습니다.");
+            navigate("/admin/facelogin");
+        }
+    },[])
 
 
     // ---------- 관리자 로그인 (JWT) ----------

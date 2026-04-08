@@ -6,10 +6,11 @@ import { Link, useLocation } from "react-router-dom";
 interface Post {
   board_skin_id: number;
   title: string;
-  nickname: string;
+  writer: string;
   bdate: string;
   hit: number;
   textemotion:String;
+  role:string;
 }
 
 const Board = () => {
@@ -20,6 +21,7 @@ const Board = () => {
   const [endPage, setEndPage] = useState(1);
   const [searchType, setSearchType] = useState("2"); // 1:작성자, 2:제목, 3:내용
   const [searchValue, setSearchValue] = useState("");
+  
   const fetchList = (
     page: number,
     sType = searchType,
@@ -31,7 +33,13 @@ const Board = () => {
         withCredentials: true,
       })
       .then((res) => {
-        setPosts(res.data.data);
+        const allPosts: Post[] = res.data.data;
+        const sortedPosts = [...allPosts].sort((a, b) => {
+          if (a.role === "관리자" && b.role !== "관리자") return -1;
+          if (a.role !== "관리자" && b.role === "관리자") return 1;
+         return 0;
+       });
+        setPosts(sortedPosts);
         setCurrentPage(res.data.currentPage);
         setTotalPages(res.data.totalPages);
         setStartPage(res.data.startPage);
@@ -88,15 +96,22 @@ const Board = () => {
           </tr>
         </thead>
 
-        <tbody>
+        <tbody className="community-body">
           {posts.map((post) => (
-            <tr key={post.board_skin_id}>
+            <tr key={post.board_skin_id}
+                className={post.role === '관리자' ? "admin-row" : ""}>
               <td className="title">
-                <Link to={`/boarddetail/${post.board_skin_id}`}>
+                <Link to={`/boarddetail/${post.board_skin_id}`}style={{textDecoration : 'none'}}>
+                  {post.role === '관리자' && <span style={{
+                      padding: "4px 10px", borderRadius: 20, fontSize: 12, fontWeight: 600,
+                      backgroundColor: "#5BC8BF",
+                      marginRight : '5px', 
+                      color: "#ffffff"
+                    }}>공 지</span>}
                   {post.title}
                 </Link>
               </td>
-              <td>{post.nickname}</td>
+              <td>{post.writer}</td>
               <td>{post.bdate}</td>
               <td>{post.hit}</td>
               <td>{post.textemotion}</td>
