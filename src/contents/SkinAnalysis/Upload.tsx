@@ -69,12 +69,15 @@ const Upload: React.FC<UploadProps> = ({ props, onUploadDone }) => {
 				return;
 			}
 
-			await axios.post(									//	감정분석 저장용 axios 추가
-				`${process.env.REACT_APP_BACK_END_URL}/api/emotionAnalysis/save`,
+			const scores = djangoRes.data.scores ?? {};
+			await axios.post(
+				`${process.env.REACT_APP_BACK_END_URL}/api/skinAnalysis/save`,
 				{
-					imgId: springRes.data.userSkinImgId,		// springRes.data.userSkinImgId << 테이블 Primary Key 값
-					imgname: uploadedFile.name,
-					emotion: djangoRes_emotion.data.success ? djangoRes_emotion.data.emotion : 'emotionERROR',
+					userSkinImgId: springRes.data.userSkinImgId,
+					diseaseAtopy:  Math.round((scores['아토피']  ?? 0) * 10),
+					diseaseDry:    Math.round((scores['건선']    ?? 0) * 10),
+					diseasePimple: Math.round((scores['여드름']  ?? 0) * 10),
+					diseaseInflam: Math.round((scores['염증성']  ?? 0) * 10),
 				},
 				{ withCredentials: true }
 			);

@@ -88,15 +88,7 @@ const Camera: React.FC<CameraProps> = ({ onUploadDone }) => {
 				{ withCredentials: true }
 			);
 
-			await axios.post(									//	감정분석 저장용 axios 추가
-				`${process.env.REACT_APP_BACK_END_URL}/api/emotionAnalysis/save`,
-				{
-					imgId: springRes.data.userSkinImgId,		// springRes.data.userSkinImgId << 테이블 Primary Key 값
-					imgname: file.name,
-					emotion: djangoRes_emotion.data.success ? djangoRes_emotion.data.emotion : 'emotionERROR',
-				},
-				{ withCredentials: true }
-			);
+
 
 			setUploadDone(true);
 			onUploadDone?.(springRes.data.imgUrl, djangoRes.data, djangoRes_emotion.data);

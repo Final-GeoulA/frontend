@@ -13,7 +13,11 @@ interface Post {
   role:string;
 }
 
-const Board = () => {
+interface BoardProps {
+  myPostsOnly?: boolean;
+}
+
+const Board = ({ myPostsOnly = false }: BoardProps) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -21,7 +25,7 @@ const Board = () => {
   const [endPage, setEndPage] = useState(1);
   const [searchType, setSearchType] = useState("2"); // 1:작성자, 2:제목, 3:내용
   const [searchValue, setSearchValue] = useState("");
-  
+
   const fetchList = (
     page: number,
     sType = searchType,
@@ -29,7 +33,7 @@ const Board = () => {
   ) => {
     axios
       .get(`${process.env.REACT_APP_BACK_END_URL}/board/skin/list`, {
-        params: { cPage: page, searchType: sType, searchValue: sValue },
+        params: { cPage: page, searchType: sType, searchValue: sValue, ...(myPostsOnly && { mypage: "true" }) },
         withCredentials: true,
       })
       .then((res) => {
