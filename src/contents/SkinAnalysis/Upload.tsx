@@ -5,7 +5,7 @@ const TEAL = "#5BC8BF";
 
 interface UploadProps {
 	props: RefObject<HTMLInputElement | null>;
-	onUploadDone?: (imgUrl: string, prediction: any) => void;
+	onUploadDone?: (imgUrl: string, prediction: any, emotion: string) => void;
 }
 
 const Upload: React.FC<UploadProps> = ({ props, onUploadDone }) => {
@@ -41,7 +41,10 @@ const Upload: React.FC<UploadProps> = ({ props, onUploadDone }) => {
 			const djangoForm = new FormData();
 			djangoForm.append('image', uploadedFile);
 
-			const [springRes, djangoRes] = await Promise.all([
+			const djangoForm_emotion = new FormData();			//	감정분석용 폼 추가
+			djangoForm_emotion.append('image', uploadedFile);
+
+			const [springRes, djangoRes, djangoRes_emotion] = await Promise.all([	
 				axios.post(
 					`${process.env.REACT_APP_BACK_END_URL}/api/skinImg/upload`,
 					springForm,
@@ -50,6 +53,10 @@ const Upload: React.FC<UploadProps> = ({ props, onUploadDone }) => {
 				axios.post(
 					`${process.env.REACT_APP_DJANGO_END_URL}/api/skin/predict/`,
 					djangoForm
+				),
+				axios.post(										//	감정분석용 axios 추가
+					`${process.env.REACT_APP_DJANGO_END_URL}/api/imgemotion/predict/`,
+					djangoForm_emotion
 				),
 			]);
 
@@ -61,21 +68,23 @@ const Upload: React.FC<UploadProps> = ({ props, onUploadDone }) => {
 				alert('피부 분석에 실패했습니다.');
 				return;
 			}
+			if (!djangoRes_emotion.data.success) {
+				alert('감정 분석에 실패했습니다.');
+				return;
+			}
 
-			const scores = djangoRes.data.scores ?? {};
-			await axios.post(
-				`${process.env.REACT_APP_BACK_END_URL}/api/skinAnalysis/save`,
+			await axios.post(									//	감정분석 저장용 axios 추가
+				`${process.env.REACT_APP_BACK_END_URL}/api/emotionAnalysis/save`,
 				{
-					userSkinImgId: springRes.data.userSkinImgId,
-					diseaseAtopy:  Math.round((scores['아토피']  ?? 0) * 10),
-					diseaseDry:    Math.round((scores['건선']    ?? 0) * 10),
-					diseasePimple: Math.round((scores['여드름']  ?? 0) * 10),
-					diseaseInflam: Math.round((scores['염증성']  ?? 0) * 10),
+					imgId: springRes.data.userSkinImgId,		// springRes.data.userSkinImgId << 테이블 Primary Key 값
+					imgname: uploadedFile.name,
+					emotion: djangoRes_emotion.data.emotion,
 				},
 				{ withCredentials: true }
 			);
 
-			onUploadDone?.(springRes.data.imgUrl, djangoRes.data);
+			onUploadDone?.(springRes.data.imgUrl, djangoRes.data, djangoRes_emotion.data.emotion);
+
 		} catch (e) {
 			alert('업로드에 실패했습니다.');
 		} finally {

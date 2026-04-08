@@ -11,7 +11,7 @@ interface PredictionResult {
 }
 
 interface CameraProps {
-	onUploadDone?: (imgUrl: string, prediction: PredictionResult) => void;
+	onUploadDone?: (imgUrl: string, prediction: PredictionResult, emotion: string) => void;
 }
 
 const Camera: React.FC<CameraProps> = ({ onUploadDone }) => {
@@ -47,7 +47,10 @@ const Camera: React.FC<CameraProps> = ({ onUploadDone }) => {
 			const djangoForm = new FormData();
 			djangoForm.append('image', file);
 
-			const [springRes, djangoRes] = await Promise.all([
+			const djangoForm_emotion = new FormData();			//	감정분석용 폼 추가
+			djangoForm_emotion.append('image', file);
+
+			const [springRes, djangoRes, djangoRes_emotion] = await Promise.all([
 				axios.post(
 					`${process.env.REACT_APP_BACK_END_URL}/api/skinImg/upload`,
 					springForm,
@@ -57,6 +60,10 @@ const Camera: React.FC<CameraProps> = ({ onUploadDone }) => {
 					`${process.env.REACT_APP_DJANGO_END_URL}/api/skin/predict/`,
 					djangoForm
 				),
+				axios.post(										//	감정분석용 axios 추가
+					`${process.env.REACT_APP_DJANGO_END_URL}/api/imgemotion/predict/`,
+					djangoForm_emotion
+				),
 			]);
 
 			if (!springRes.data.success) {
@@ -65,6 +72,10 @@ const Camera: React.FC<CameraProps> = ({ onUploadDone }) => {
 			}
 			if (!djangoRes.data.success) {
 				alert('피부 분석에 실패했습니다.');
+				return;
+			}
+			if (!djangoRes_emotion.data.success) {
+				alert('감정 분석에 실패했습니다.');
 				return;
 			}
 
@@ -81,8 +92,18 @@ const Camera: React.FC<CameraProps> = ({ onUploadDone }) => {
 				{ withCredentials: true }
 			);
 
+			await axios.post(									//	감정분석 저장용 axios 추가
+				`${process.env.REACT_APP_BACK_END_URL}/api/emotionAnalysis/save`,
+				{
+					imgId: springRes.data.userSkinImgId,		// springRes.data.userSkinImgId << 테이블 Primary Key 값
+					imgname: file.name,
+					emotion: djangoRes_emotion.data.emotion,
+				},
+				{ withCredentials: true }
+			);
+
 			setUploadDone(true);
-			onUploadDone?.(springRes.data.imgUrl, djangoRes.data);
+			onUploadDone?.(springRes.data.imgUrl, djangoRes.data, djangoRes_emotion.data.emotion);
 		} catch (e) {
 			alert('업로드에 실패했습니다.');
 		} finally {

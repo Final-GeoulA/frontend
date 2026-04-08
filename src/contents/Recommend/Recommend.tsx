@@ -30,12 +30,12 @@ interface Product {
 }
 
 interface Page {
-  totalItems: number;
-  totalPages: number;
-  startPage: number;
-  endPage: number;
-  currentPage: number;
-  data: Product[];
+	totalItems: number;
+	totalPages: number;
+	startPage: number;
+	endPage: number;
+	currentPage: number;
+	data: Product[];
 }
 
 const Gallery: React.FC<{ likedOnly?: boolean }> = ({ likedOnly }) => {
@@ -89,31 +89,31 @@ const Gallery: React.FC<{ likedOnly?: boolean }> = ({ likedOnly }) => {
 		}
 	};
 
-  const sortOptions = [
-    { id: "name", label: "상품명" },
-    { id: "brand", label: "브랜드" },
-    { id: "ingre", label: "성분" },
-  ];
+	const sortOptions = [
+		{ id: "name", label: "상품명" },
+		{ id: "brand", label: "브랜드" },
+		{ id: "ingre", label: "성분" },
+	];
 
-  const menuItems = [
-    { id: 1, label: "스킨/토너", value: "스킨/토너" },
-    { id: 2, label: "에센스/세럼/앰플", value: "에센스/세럼/앰플" },
-    { id: 3, label: "크림", value: "크림" },
-    { id: 4, label: "로션", value: "로션" },
-    { id: 5, label: "미스트/오일", value: "미스트/오일" },
-    { id: 6, label: "스킨케어세트", value: "스킨케어세트" },
-  ];
+	const menuItems = [
+		{ id: 1, label: "스킨/토너", value: "스킨/토너" },
+		{ id: 2, label: "에센스/세럼/앰플", value: "에센스/세럼/앰플" },
+		{ id: 3, label: "크림", value: "크림" },
+		{ id: 4, label: "로션", value: "로션" },
+		{ id: 5, label: "미스트/오일", value: "미스트/오일" },
+		{ id: 6, label: "스킨케어세트", value: "스킨케어세트" },
+	];
 
-  // 페이지네이션 범위
-  const totalPages = Content.totalPages;
-  const pageNums: (number | string)[] = [];
-  const start = Content.startPage || 1;
-  const end = Math.min(Content.endPage || 5, totalPages);
-  for (let i = start; i <= end; i++) pageNums.push(i);
-  if (end < totalPages) {
-    pageNums.push("...");
-    pageNums.push(totalPages);
-  }
+	// 페이지네이션 범위
+	const totalPages = Content.totalPages;
+	const pageNums: (number | string)[] = [];
+	const start = Content.startPage || 1;
+	const end = Math.min(Content.endPage || 5, totalPages);
+	for (let i = start; i <= end; i++) pageNums.push(i);
+	if (end < totalPages) {
+		pageNums.push("...");
+		pageNums.push(totalPages);
+	}
 
 	return (
 		<div style={{
@@ -122,21 +122,21 @@ const Gallery: React.FC<{ likedOnly?: boolean }> = ({ likedOnly }) => {
 			padding: '40px 24px 64px',
 			fontFamily: "'Pretendard', 'Apple SD Gothic Neo', sans-serif",
 		}}>
-		{!likedOnly && <div style={{ float: "left", width: "141px", marginRight: "49px" }}>
-			{/* 타이틀 */}
-			<p
-				style={{
-					marginBottom: "32px",
-					fontSize: "28px",
-					lineHeight: "1.3",
-					letterSpacing: "-1.3px",
-					fontWeight: "700",
-					color: "#111",
-					wordBreak: "keep-all",
-				}}
-			>
-				스킨케어
-			</p>
+			{!likedOnly && <div style={{ float: "left", width: "141px", marginRight: "49px" }}>
+				{/* 타이틀 */}
+				<p
+					style={{
+						marginBottom: "32px",
+						fontSize: "28px",
+						lineHeight: "1.3",
+						letterSpacing: "-1.3px",
+						fontWeight: "700",
+						color: "#111",
+						wordBreak: "keep-all",
+					}}
+				>
+					스킨케어
+				</p>
 
 				{/* 메뉴 리스트 */}
 				<ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
@@ -348,70 +348,70 @@ const Gallery: React.FC<{ likedOnly?: boolean }> = ({ likedOnly }) => {
 			</div>}
 
 			{!likedOnly && (
-			<>
-			{/* ── 헤더 ── */}
-			<div style={{
-				display: 'flex',
-				alignItems: 'flex-start',
-				justifyContent: 'space-between',
-				flexWrap: 'wrap',
-				gap: 12,
-				marginBottom: 32,
-			}}>
-				{/* 좌: 타이틀 */}
-				<div>
-					<h4 style={{ fontWeight: 800, margin: 0, fontSize: 22, letterSpacing: '-0.5px', color: '#111' }}>
-						제품 추천
-					</h4>
-					<small style={{ color: TEAL, fontWeight: 600, fontSize: 13 }}>Products</small>
-				</div>
+				<>
+					{/* ── 헤더 ── */}
+					<div style={{
+						display: 'flex',
+						alignItems: 'flex-start',
+						justifyContent: 'space-between',
+						flexWrap: 'wrap',
+						gap: 12,
+						marginBottom: 32,
+					}}>
+						{/* 좌: 타이틀 */}
+						<div>
+							<h4 style={{ fontWeight: 800, margin: 0, fontSize: 22, letterSpacing: '-0.5px', color: '#111' }}>
+								제품 추천
+							</h4>
+							<small style={{ color: TEAL, fontWeight: 600, fontSize: 13 }}>Products</small>
+						</div>
 
-				{/* 우: 검색 + 정렬 */}
-				<div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-					{/* 검색 */}
-					<div style={{ position: 'relative' }}>
-						<input
-							value={search}
-							onChange={e => setSearch(e.target.value)}
-							onKeyDown={e => { if (e.key === 'Enter') getPage(category, 1, search); }}
-							placeholder="Search"
-							style={{
-								padding: '9px 14px 9px 14px',
-								borderRadius: 12,
-								border: '1.5px solid #E8EAEA',
-								background: '#FAFBFB',
-								fontSize: 14,
-								color: '#333',
-								outline: 'none',
-								width: 200,
-							}}
-						/>
-							<SearchIcon onClick={() => getPage(category, 1, search)} style={{
-								cursor: 'pointer',
-								position: 'absolute', right: 12, top: '50%',
-								transform: 'translateY(-50%)', fontSize: 18, color: '#aaa'
-							}} />
+						{/* 우: 검색 + 정렬 */}
+						<div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+							{/* 검색 */}
+							<div style={{ position: 'relative' }}>
+								<input
+									value={search}
+									onChange={e => setSearch(e.target.value)}
+									onKeyDown={e => { if (e.key === 'Enter') getPage(category, 1, search); }}
+									placeholder="Search"
+									style={{
+										padding: '9px 14px 9px 14px',
+										borderRadius: 12,
+										border: '1.5px solid #E8EAEA',
+										background: '#FAFBFB',
+										fontSize: 14,
+										color: '#333',
+										outline: 'none',
+										width: 200,
+									}}
+								/>
+								<SearchIcon onClick={() => getPage(category, 1, search)} style={{
+									cursor: 'pointer',
+									position: 'absolute', right: 12, top: '50%',
+									transform: 'translateY(-50%)', fontSize: 18, color: '#aaa'
+								}} />
+							</div>
+
+							<div className={styles.selectWrapper}>
+								<select
+									value={selectedSearchOpt}
+									onChange={(e) => setSelectedSearchOpt(e.target.value)}
+									className={styles.sortSelect}
+								>
+									{sortOptions.map((o) => (
+										<option key={o.id} value={o.label}>
+											{o.label}
+										</option>
+									))}
+								</select>
+								<span className={styles.selectArrow}>▼</span>
+							</div>
+						</div>
 					</div>
 
-          <div className={styles.selectWrapper}>
-            <select
-              value={selectedSearchOpt}
-              onChange={(e) => setSelectedSearchOpt(e.target.value)}
-              className={styles.sortSelect}
-            >
-              {sortOptions.map((o) => (
-                <option key={o.id} value={o.label}>
-                  {o.label}
-                </option>
-              ))}
-            </select>
-            <span className={styles.selectArrow}>▼</span>
-          </div>
-        </div>
-      </div>
-
-      <hr className={styles.divider} />
-			</>
+					<hr className={styles.divider} />
+				</>
 			)}
 
 			{/* ── 제품 그리드 ── */}
@@ -478,21 +478,21 @@ const Gallery: React.FC<{ likedOnly?: boolean }> = ({ likedOnly }) => {
 								</button>
 							</div>
 
-              {/* 텍스트 */}
-              <div className={styles.productInfo}>
-                <p className={styles.productBrand}>{item.brand}</p>
-                <p className={styles.productName}>{item.name}</p>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+							{/* 텍스트 */}
+							<div className={styles.productInfo}>
+								<p className={styles.productBrand}>{item.brand}</p>
+								<p className={styles.productName}>{item.name}</p>
+							</div>
+						</div>
+					</Link>
+				))}
+			</div>
 
-      {!likedOnly && (
-      <p className={styles.sortNote}>
-        사용자 좋아요 수가 많은 순으로 정렬된 결과입니다.
-      </p>
-      )}
+			{!likedOnly && (
+				<p className={styles.sortNote}>
+					사용자 좋아요 수가 많은 순으로 정렬된 결과입니다.
+				</p>
+			)}
 
 			{/* ── 페이지네이션 ── */}
 			<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6 }}>
@@ -531,18 +531,18 @@ const Gallery: React.FC<{ likedOnly?: boolean }> = ({ likedOnly }) => {
 
 /* ── 페이지 버튼 ── */
 const PagBtn: React.FC<{
-  label: string;
-  active: boolean;
-  disabled?: boolean;
-  onClick: () => void;
+	label: string;
+	active: boolean;
+	disabled?: boolean;
+	onClick: () => void;
 }> = ({ label, active, disabled, onClick }) => (
-  <button
-    disabled={disabled}
-    onClick={onClick}
-    className={`${styles.pagBtn}${active ? ` ${styles.active}` : ""}`}
-  >
-    {label}
-  </button>
+	<button
+		disabled={disabled}
+		onClick={onClick}
+		className={`${styles.pagBtn}${active ? ` ${styles.active}` : ""}`}
+	>
+		{label}
+	</button>
 );
 
 export default Gallery;

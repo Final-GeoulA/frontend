@@ -5,15 +5,26 @@ import "./style/SkinResult.css";
 const SkinResult: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const state = location.state as { imgUrl?: string; prediction?: any } | null;
+  const state = location.state as { imgUrl?: string; prediction?: any; emotion?: string } | null;
   const imgUrl = state?.imgUrl;
   const prediction = state?.prediction;
+  const emotion = state?.emotion;
+  const dictEmotion = {
+    'Happiness': '😊',
+    'Sadness': '😢',
+    'Anger': '😠',
+    'Fear': '😨',
+    'Surprise': '😲',
+    'Neutral': '😐',
+    'Contempt': '😨',
+    'Disgust': '🤢',
+  };
 
   const resultData: { name: string; percent: number }[] = prediction?.scores
     ? Object.entries(prediction.scores).map(([name, percent]) => ({
-        name,
-        percent: Number(percent),
-      })).sort((a, b) => b.percent - a.percent)
+      name,
+      percent: Number(percent),
+    })).sort((a, b) => b.percent - a.percent)
     : [];
 
   const topName = prediction?.predicted_class ?? "";
@@ -29,12 +40,17 @@ const SkinResult: React.FC = () => {
           alt="결과 이미지"
           className="result-image"
         />
-
-        <p className="result-guide">
-          현재 분석 결과, <span className="highlight">{topName}</span> 가능성이
-          가장 높게 나타났어요. ({topConfidence}%)<br/>
-          누적된 피부 측정 기록을 통해 나의 피부 변화를 확인해보세요.
-        </p>
+        <div>
+          <span className="result-emotion" style={{ fontSize: "2.5rem" }}>{dictEmotion[emotion as keyof typeof dictEmotion]}</span>
+        </div>
+        
+        <div>
+          <p className="result-guide">
+            현재 분석 결과, <span className="highlight">{topName}</span> 가능성이
+            가장 높게 나타났어요. ({topConfidence}%)<br />
+            누적된 피부 측정 기록을 통해 나의 피부 변화를 확인해보세요.
+          </p>
+        </div>
 
         <div className="result-list">
           {resultData.map((item) => (
