@@ -319,3 +319,26 @@ border-radius:6px;
   font-size: 14px;
   padding: 0;
 }
+
+/* 관리자 행 배경색 (연한 회색이나 하늘색 추천) */
+.admin-row {
+  background-color: #f8f9fa;
+  font-weight: 500;
+}
+
+/* 마우스 올렸을 때 효과 */
+.admin-row:hover {
+  background-color: #f1f3f5 !important;
+}
+
+/* 공지 배표 스타일 (선택사항) */
+.notice-badge {
+  color: #3bbfb2;
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+/* 기존 테이블 가독성을 위해 */
+.community-table tr {
+  transition: background-color 0.2s ease;
+}
