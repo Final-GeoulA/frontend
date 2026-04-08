@@ -6,6 +6,7 @@ import { useAuth } from "../../components/AuthProvider";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import DecoupledEditor from "@ckeditor/ckeditor5-build-decoupled-document";
 import "@ckeditor/ckeditor5-build-decoupled-document/build/translations/ko.js";
+import { useAdminAuth } from "../../components/AdminAuthProvider";
 
 class UploadAdapter {
   private loader: any;
@@ -38,6 +39,8 @@ const BoardForm = () => {
   const [content, setContent] = useState("");
   const [textemotion, setTextemotion] = useState("");
   const [file, setFile] = useState<File | null>(null);
+
+  const {isAdmin} = useAdminAuth();
 
   //게시판 수정 로직
   const location = useLocation();
@@ -85,10 +88,19 @@ const BoardForm = () => {
         result.positive > result.negative ? "긍정😁" : "부정😟";
 
       const formData = new FormData();
+      if(isAdmin){
       formData.append("title", title);
       formData.append("content", content);
-      formData.append("nickname", member?.nickname ?? "익명");
+      formData.append("writer", '관리자');
+      formData.append("role",'관리자');
+      formData.append("textemotion", '-');
+      }else{
+      formData.append("title", title);
+      formData.append("content", content);
+      formData.append("writer", member?.nickname ?? "익명");
+      formData.append("role",isAdmin ? '관리자':'이용자');
       formData.append("textemotion", emotionLabel);
+      }
       if (file) {
         formData.append("mfile", file);
       }
