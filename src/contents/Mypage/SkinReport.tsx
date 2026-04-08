@@ -78,8 +78,8 @@ const SkinReport: React.FC = () => {
           setSkinReports(mapped);
           setCurrentIndex(mapped.length > 0 ? mapped.length - 1 : 0);
 
-          // 피부 상태 변화 기본 날짜: 가장 오래된 vs 가장 최근
-          if (mapped.length >= 2) {
+          // 피부 상태 변화 기본 날짜: 가장 오래된 vs 가장 최근 (1개면 동일)
+          if (mapped.length >= 1) {
             setStartDate(new Date(mapped[0].date.replace(/\./g, "-")));
             setEndDate(new Date(mapped[mapped.length - 1].date.replace(/\./g, "-")));
           }
@@ -95,12 +95,12 @@ const SkinReport: React.FC = () => {
     (r) => new Date(r.date.replace(/\./g, "-"))
   );
 
-  // 날짜로 가장 가까운 report 찾기
-  const findImgByDate = (date: Date | null) => {
+  // 날짜로 가장 가까운 report 찾기 (useLast=true면 같은 날 마지막 사진)
+  const findImgByDate = (date: Date | null, useLast = false) => {
     if (!date || skinReports.length === 0) return "";
     const target = formatDate(date);
-    const found = skinReports.find((r) => r.date === target);
-    if (found) return found.img;
+    const matches = skinReports.filter((r) => r.date === target);
+    if (matches.length > 0) return useLast ? matches[matches.length - 1].img : matches[0].img;
     // 날짜가 정확히 없으면 가장 가까운 것 반환
     return skinReports.reduce((prev, curr) => {
       const prevDiff = Math.abs(new Date(prev.date.replace(/\./g, "-")).getTime() - date.getTime());
@@ -338,7 +338,7 @@ const SkinReport: React.FC = () => {
             <h3 className="skin-compare-date">{formatDate(startDate)}</h3>
             <div className="skin-compare-image-box">
               <img
-                src={findImgByDate(startDate) || "/image/Mypage/before.png"}
+                src={findImgByDate(startDate, true) || "/image/Mypage/before.png"}
                 alt={`${formatDate(startDate)} 사진`}
                 className="skin-compare-image"
               />
@@ -351,7 +351,7 @@ const SkinReport: React.FC = () => {
             <h3 className="skin-compare-date">{formatDate(endDate)}</h3>
             <div className="skin-compare-image-box">
               <img
-                src={findImgByDate(endDate) || "/image/Mypage/after.png"}
+                src={findImgByDate(endDate, true) || "/image/Mypage/after.png"}
                 alt={`${formatDate(endDate)} 사진`}
                 className="skin-compare-image"
               />
