@@ -11,7 +11,7 @@ interface PredictionResult {
 }
 
 interface CameraProps {
-	onUploadDone?: (imgUrl: string, prediction: PredictionResult, emotion: string) => void;
+	onUploadDone?: (imgUrl: string, prediction: PredictionResult, emotionjson: any) => void;
 }
 
 const Camera: React.FC<CameraProps> = ({ onUploadDone }) => {
@@ -74,10 +74,6 @@ const Camera: React.FC<CameraProps> = ({ onUploadDone }) => {
 				alert('피부 분석에 실패했습니다.');
 				return;
 			}
-			if (!djangoRes_emotion.data.success) {
-				alert('감정 분석에 실패했습니다.');
-				return;
-			}
 
 			const scores = djangoRes.data.scores ?? {};
 			await axios.post(
@@ -97,13 +93,13 @@ const Camera: React.FC<CameraProps> = ({ onUploadDone }) => {
 				{
 					imgId: springRes.data.userSkinImgId,		// springRes.data.userSkinImgId << 테이블 Primary Key 값
 					imgname: file.name,
-					emotion: djangoRes_emotion.data.emotion,
+					emotion: djangoRes_emotion.data.success ? djangoRes_emotion.data.emotion : 'emotionERROR',
 				},
 				{ withCredentials: true }
 			);
 
 			setUploadDone(true);
-			onUploadDone?.(springRes.data.imgUrl, djangoRes.data, djangoRes_emotion.data.emotion);
+			onUploadDone?.(springRes.data.imgUrl, djangoRes.data, djangoRes_emotion.data);
 		} catch (e) {
 			alert('업로드에 실패했습니다.');
 		} finally {
