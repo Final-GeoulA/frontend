@@ -61,8 +61,8 @@ const AppRoutes: React.FC = () => {
     { path: "/", element: <MainPage /> },
 
     // 피부 진단
-    { path: "/skinanalysis", element: <SkinAnalysis /> },
-    { path: "/skinresult", element: <SkinResult /> },
+    { path: "/skinanalysis", element: <RequireAuth><SkinAnalysis /></RequireAuth> },
+    { path: "/skinresult", element: <RequireAuth><SkinResult /></RequireAuth> },
 
     // 서비스 문의
     { path: "/ServiceQuestion", element: <ServiceQuestion /> },
@@ -71,7 +71,7 @@ const AppRoutes: React.FC = () => {
     { path: "/HospitalSearch", element: <HospitalSearch /> },
 
     //제품추천
-    { path: "/recommend", element: <Recommend /> },
+    { path: "/recommend", element: <RequireAuth><Recommend /></RequireAuth> },
     { path: "/recommenddetail/:prodid", element: <Recommenddetail /> },
 
     // 커뮤니티
@@ -87,12 +87,12 @@ const AppRoutes: React.FC = () => {
     { path: "/SkinRank", element: <RequireAuth><SkinRank /></RequireAuth> },
 
     // 결제 (프리미엄)
-    { path: "/payment", element: <Payment /> },
+    { path: "/payment", element: <RequireAuth><Payment /></RequireAuth> },
     { path: "/payment/success", element: <PaymentSuccess /> },
 
     // 결제 (제품 구매)
-    { path: "/product-payment", element: <ProductPayment /> },
-    { path: "/product-payment/success", element: <ProductPaymentSuccess /> },
+    { path: "/product-payment", element: <RequireAuth><ProductPayment /></RequireAuth> },
+    { path: "/product-payment/success", element: <RequireAuth><ProductPaymentSuccess /></RequireAuth> },
 
     // 로그인과 회원가입
     { path: "/login", element: <Login /> },
