@@ -17,7 +17,7 @@ const PasswordlessReg: React.FC = () => {
     const [plStep, setPlStep] = useState<"NONE" | "REGISTER" | "WAIT_APPROVE">("NONE");
     const registerIntervalRef = useRef<number | null>(null); // QR 등록 여부
     const approveIntervalRef = useRef<number | null>(null); // 모바일 승인
-    const url = 'http://172.26.208.1/geoulA'
+    const url = 'http://43.203.153.169/geoulA'
     const [userInfo, setUserInfo] = useState({
         email: '',
         password: ''

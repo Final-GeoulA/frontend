@@ -116,7 +116,10 @@ const Login: React.FC = () => {
 				</form>
 					<p style={{ textAlign: "center", fontSize: 14, color: "#888", margin: 0 }}>
 						아직 계정이 없으신가요?{" "}
-						<span style={{ color: TEAL, fontWeight: 700, cursor: "pointer" }}>회원가입</span>
+						<span><a href="/signup" style={{ color: TEAL, fontWeight: 700, cursor: "pointer" }}>회원가입</a></span>
+						/
+						<span><a href="/signup/pwl" style={{ color: TEAL, fontWeight: 700, cursor: "pointer" }}>PWL회원가입</a></span>
+						
 					</p>
 				</div>
 			</div>
