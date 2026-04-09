@@ -34,9 +34,9 @@ const JWTLogin: React.FC = () => {
     const handleAdminLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         // TODO: JWT 로그인 로직 구현
-        const res = login(username, password);
+        await login(username, password);
         const token = localStorage.getItem('token')!;
-        console.log(res);
+
         console.log("관리자 로그인 시도:", username, password);
         adminLogin(username, token);
         console.log(`로그인 됨: ${username}, ${token}`);

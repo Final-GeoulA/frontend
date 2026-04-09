@@ -82,21 +82,12 @@ const DashHome: React.FC = () => {
         <h1 style={{ fontSize: 20, fontWeight: 700, color: TEXT_DARK, margin: 0 }}>대시보드 개요</h1>
 
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          {
-            (adminRole === "SUPERADMIN") ?
-              <div style={{
-                padding: "6px 12px", backgroundColor: "#e8f8f7", color: TEAL,
-                borderRadius: 20, fontSize: 13, fontWeight: 700
-              }}>
-                👑 최고 관리자 {adminName} 님
-              </div> :
-              <div style={{
-                padding: "6px 12px", backgroundColor: "#e8f8f7", color: TEAL,
-                borderRadius: 20, fontSize: 13, fontWeight: 700
-              }}>
-                일반 관리자 {adminName} 님
-              </div>
-          }
+          <div style={{
+            padding: "6px 12px", backgroundColor: "#e8f8f7", color: TEAL,
+            borderRadius: 20, fontSize: 13, fontWeight: 700
+          }}>
+            {adminRole === "SUPERADMIN" ? "👑 " : ""}{adminName} 님
+          </div>
         </div>
       </header>
 

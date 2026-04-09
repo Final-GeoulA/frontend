@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { jwtDecode } from "jwt-decode";
 
@@ -31,39 +32,40 @@ const AdminContext = createContext<AdminAuthContextProps | null>(null);
 export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
-    const [adminToken, setAdminToken] = useState<string | null>(null);
-    const [adminName, setAdminName] = useState<string | null>(null);
-    const [adminRole, setAdminRole] = useState<string | null>(null);
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [facePass, setFacePass] = useState(false);
-
-    useEffect(() => {
-        const savedToken = localStorage.getItem("token");
-        const savedName = localStorage.getItem("username");
-
-        if (savedToken) {
+    const [adminToken, setAdminToken] = useState<string | null>(() => {
+        const token = localStorage.getItem("token");
+        if (token) axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        return token;
+    });
+    const [adminName, setAdminName] = useState<string | null>(() => localStorage.getItem("username"));
+    const [adminRole, setAdminRole] = useState<string | null>(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
             try {
-                const decoded = jwtDecode<TokenPayload>(savedToken);
-                const role = decoded.role;
-                console.log("전체 데이터: ", decoded);
-                console.log("권한: ", role);
-                localStorage.setItem("role", role);
-                setAdminRole(role);
-                setAdminToken(savedToken);
-                setAdminName(savedName);
-                setIsAdmin(true);
-            } catch (error) {
-                console.log("디코딩 오류: ", error);
-            }
+                const decoded = jwtDecode<TokenPayload>(token);
+                localStorage.setItem("role", decoded.role);
+                return decoded.role;
+            } catch { return null; }
         }
-    }, [])
+        return null;
+    });
+    const [isAdmin, setIsAdmin] = useState<boolean>(() => !!localStorage.getItem("token"));
+    const [facePass, setFacePass] = useState(false);
 
     const adminLogin = (username: string, token: string) => {
         localStorage.setItem("token", token);
         localStorage.setItem("username", username);
+        try {
+            const decoded = jwtDecode<TokenPayload>(token);
+            setAdminRole(decoded.role);
+            localStorage.setItem("role", decoded.role);
+        } catch (error) {
+            console.log("디코딩 오류: ", error);
+        }
         setAdminToken(token);
         setAdminName(username);
         setIsAdmin(true);
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     };
 
     const faceValdiate = () => {
@@ -78,6 +80,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setAdminRole(null);
         setIsAdmin(false);
         setFacePass(false);
+        delete axios.defaults.headers.common["Authorization"];
     };
 
     return (
