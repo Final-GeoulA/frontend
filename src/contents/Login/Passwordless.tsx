@@ -6,8 +6,12 @@ const TEAL = "#5BC8BF";
 
 const PasswordlessLogin: React.FC = () => {
   const navigate = useNavigate();
+  const { checkLogin } = useAuth();
   const [email, setEmail] = useState("");
   const [isWaiting, setIsWaiting] = useState(false); // 승인 대기 상태 여부
+  const [matchingNumber, setMatchingNumber] = useState<string | null>(null); // 번호 매칭용 숫자
+  const [countdown, setCountdown] = useState(60);
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // 컴포넌트 언마운트 시 폴링 멈춤 (메모리 누수 방지)
@@ -22,6 +26,24 @@ const PasswordlessLogin: React.FC = () => {
       clearInterval(pollingIntervalRef.current);
       pollingIntervalRef.current = null;
     }
+    if (countdownRef.current) {
+      clearInterval(countdownRef.current);
+      countdownRef.current = null;
+    }
+  };
+
+  const startCountdown = () => {
+    setCountdown(60);
+    countdownRef.current = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(countdownRef.current!);
+          countdownRef.current = null;
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   // 2초 간격으로 서버에 승인 여부를 묻는 폴링 함수
@@ -46,6 +68,7 @@ const PasswordlessLogin: React.FC = () => {
           stopPolling();
           setIsWaiting(false);
           alert("패스워드리스 로그인 성공! 환영합니다.");
+          await checkLogin();
           navigate("/", { replace: true }); // 메인 페이지로 이동
         } else if (res.data && res.data.auth === "W") {
           // 대기 중
@@ -98,9 +121,15 @@ const PasswordlessLogin: React.FC = () => {
         })
       }).then(r => r.json());
 
-      if (pushRes.result === true) {
+      console.log("getSpUrl 전체 응답:", pushRes);
+      console.log("getSpUrl data:", pushRes.data);
+      if (pushRes.result === true || pushRes.result === "OK") {
         // 3. 발송 성공 시 폴링 시작
         const sessionId = pushRes.sessionId;
+        // 번호 매칭 숫자 추출 (벤더 API 응답 필드명에 따라 조정)
+        const num = pushRes.data?.servicePassword ?? null;
+        setMatchingNumber(num !== null ? String(num) : null);
+        startCountdown();
         startPolling(email, sessionId);
       } else {
         alert("푸시 알림 발송에 실패했습니다.");
@@ -123,10 +152,6 @@ const PasswordlessLogin: React.FC = () => {
           <h1 style={{ fontSize: 26, fontWeight: 700, color: "#111", marginBottom: 12, letterSpacing: "-0.5px" }}>
             패스워드리스 로그인
           </h1>
-          <p style={{ fontSize: 15, color: "#666", marginBottom: 36, wordBreak: "keep-all" }}>
-            비밀번호 없이 스마트폰 앱의 알림을 통해 안전하게 로그인하세요.
-          </p>
-
           {!isWaiting ? (
             /* ----- 이메일 입력 및 인증 요청 화면 ----- */
             <form onSubmit={handlePushRequest}>
@@ -160,13 +185,25 @@ const PasswordlessLogin: React.FC = () => {
           ) : (
             /* ----- 스마트폰 승인 대기 화면 ----- */
             <div style={{ padding: "20px 0" }}>
-              <div style={{ marginBottom: 24 }}>
-                {/* 대기 상태를 나타내는 간단한 애니메이션 효과 대체용 아이콘 */}
-                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke={TEAL} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ animation: "spin 3s linear infinite" }}>
-                  <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" />
-                </svg>
-              </div>
               <h3 style={{ fontSize: 18, color: "#333", marginBottom: 12 }}>스마트폰을 확인해 주세요</h3>
+              {matchingNumber && (
+                <div style={{
+                  margin: "0 auto 20px",
+                  padding: "16px 32px",
+                  background: "#f0fafa",
+                  border: `2px solid ${TEAL}`,
+                  borderRadius: 12,
+                  display: "inline-block"
+                }}>
+                  <p style={{ fontSize: 13, color: "#666", marginBottom: 6 }}>앱에 표시된 번호와 일치하는지 확인하세요</p>
+                  <p style={{ fontSize: 40, fontWeight: 800, color: TEAL, margin: 0, letterSpacing: "4px" }}>
+                    {matchingNumber}
+                  </p>
+                  <p style={{ fontSize: 13, color: countdown <= 10 ? "#e53e3e" : "#999", marginTop: 10, marginBottom: 0 }}>
+                    {countdown}초 후 만료
+                  </p>
+                </div>
+              )}
               <p style={{ fontSize: 15, color: "#777", lineHeight: "1.5" }}>
                 <strong>{email}</strong> 계정으로 <br/>
                 인증 알림을 발송했습니다.<br/>
@@ -177,7 +214,8 @@ const PasswordlessLogin: React.FC = () => {
                 onClick={() => {
                   stopPolling();
                   setIsWaiting(false);
-                }} 
+                  setMatchingNumber(null);
+                }}
                 style={{
                   marginTop: 32, padding: "10px 20px", background: "#f1f1f1",
                   color: "#555", border: "none", borderRadius: 8,

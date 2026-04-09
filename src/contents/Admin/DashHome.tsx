@@ -65,7 +65,7 @@ const DashHome: React.FC = () => {
       console.error(error);
     }
   }, [])
-  // 임시 더미 데이터 (나중에 81번 포트 JWT로 받아올 데이터들)
+
   const stats = [
     { label: "총 회원 수", value: total },
     { label: "신규 가입 (오늘)", value: newMember },
@@ -82,12 +82,21 @@ const DashHome: React.FC = () => {
         <h1 style={{ fontSize: 20, fontWeight: 700, color: TEXT_DARK, margin: 0 }}>대시보드 개요</h1>
 
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <div style={{
-            padding: "6px 12px", backgroundColor: "#e8f8f7", color: TEAL,
-            borderRadius: 20, fontSize: 13, fontWeight: 700
-          }}>
-            {adminRole === "SUPERADMIN" ? "👑 " : ""}{adminName} 님
-          </div>
+          {
+            (adminRole === "SUPERADMIN") ?
+              <div style={{
+                padding: "6px 12px", backgroundColor: "#e8f8f7", color: TEAL,
+                borderRadius: 20, fontSize: 13, fontWeight: 700
+              }}>
+                👑 최고 관리자 {adminName} 님
+              </div> :
+              <div style={{
+                padding: "6px 12px", backgroundColor: "#e8f8f7", color: TEAL,
+                borderRadius: 20, fontSize: 13, fontWeight: 700
+              }}>
+                {adminName} 님
+              </div>
+          }
         </div>
       </header>
 

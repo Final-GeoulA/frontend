@@ -98,7 +98,7 @@ const AppRoutes: React.FC = () => {
     { path: "/login", element: <Login /> },
     { path: "/signup", element: <SignUp /> },
     { path: "/login/pwl", element: <Passwordless /> },
-    { path: "/signup/pwl", element: <PasswordlessReg /> },
+    { path: " ", element: <PasswordlessReg /> },
     { path: "/admin/facelogin", element: <AdminLogin /> },
     { path: "/admin/login", element: <JWTLogin />},
     { path: "/find", element: <FindID /> },
