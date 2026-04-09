@@ -25,12 +25,19 @@ const DashMember: React.FC = () => {
   const [size] = useState(5);
   const [totalPages, setTotalPages] = useState(0);
   const [searchValue, setSearchValue] = useState("");
+  const [total, setTotal] = useState(0);
   const { isAdmin, adminRole, adminName } = useAdminAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchAllUserList(searchValue, page);
   }, [page, searchValue]);
+
+  useEffect(() => {
+    axios.post(`${process.env.REACT_APP_BACK_ADMIN_URL}/api/user/member/total`)
+      .then(data => setTotal(data.data))
+      .catch(error => console.error(error));
+  }, []);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -68,21 +75,12 @@ const DashMember: React.FC = () => {
 
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
 
-          {
-            (adminRole === "SUPERADMIN") ?
-              <div style={{
-                padding: "6px 12px", backgroundColor: "#e8f8f7", color: TEAL,
-                borderRadius: 20, fontSize: 13, fontWeight: 700
-              }}>
-                👑 최고 관리자 {adminName} 님
-              </div> :
-              <div style={{
-                padding: "6px 12px", backgroundColor: "#e8f8f7", color: TEAL,
-                borderRadius: 20, fontSize: 13, fontWeight: 700
-              }}>
-                일반 관리자 {adminName} 님
-              </div>
-          }
+          <div style={{
+            padding: "6px 12px", backgroundColor: "#e8f8f7", color: TEAL,
+            borderRadius: 20, fontSize: 13, fontWeight: 700
+          }}>
+            {adminRole === "SUPERADMIN" ? "👑 " : ""}{adminName} 님
+          </div>
 
         </div>
       </header>
@@ -117,7 +115,7 @@ const DashMember: React.FC = () => {
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
             <h3 style={{ fontSize: 18, fontWeight: 700, color: TEXT_DARK, margin: 0 }}>전체 회원 목록</h3>
-            <span style={{ fontSize: 13, color: TEXT_GRAY, fontWeight: 500 }}>총 1,284명</span>
+            <span style={{ fontSize: 13, color: TEXT_GRAY, fontWeight: 500 }}>총 {total}명</span>
           </div>
 
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -160,17 +158,32 @@ const DashMember: React.FC = () => {
                   <td style={{ padding: "16px 8px", textAlign: "center" }}>
                     {/* 관리 액션 버튼들 */}
                     <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-                      <button style={{
-                        padding: "6px 12px", border: "1px solid #e5e7eb", backgroundColor: "#fff",
-                        borderRadius: 6, fontSize: 12, fontWeight: 600, color: TEXT_DARK, cursor: "pointer"
-                      }}>
+                      <button
+                        onClick={() => {
+                          if (adminRole !== "SUPERADMIN") { alert("권한이 없습니다."); return; }
+                          axios.put(`${process.env.REACT_APP_BACK_ADMIN_URL}/api/super/user/${user.user_id}/grade`)
+                            .then(() => fetchAllUserList(searchValue, page))
+                            .catch(() => alert("등급 변경에 실패했습니다."));
+                        }}
+                        style={{
+                          padding: "6px 12px", border: "1px solid #e5e7eb", backgroundColor: "#fff",
+                          borderRadius: 6, fontSize: 12, fontWeight: 600, color: TEXT_DARK, cursor: "pointer"
+                        }}>
                         수정
                       </button>
-                      <button style={{
-                        padding: "6px 12px", border: "1px solid #fecaca", backgroundColor: "#fef2f2",
-                        borderRadius: 6, fontSize: 12, fontWeight: 600, color: "#dc2626", cursor: "pointer"
-                      }}>
-                        정지
+                      <button
+                        onClick={() => {
+                          if (adminRole !== "SUPERADMIN") { alert("권한이 없습니다."); return; }
+                          if (!window.confirm("정말 삭제하시겠습니까?")) return;
+                          axios.delete(`${process.env.REACT_APP_BACK_ADMIN_URL}/api/super/user/${user.user_id}`)
+                            .then(() => fetchAllUserList(searchValue, page))
+                            .catch(() => alert("삭제에 실패했습니다."));
+                        }}
+                        style={{
+                          padding: "6px 12px", border: "1px solid #fecaca", backgroundColor: "#fef2f2",
+                          borderRadius: 6, fontSize: 12, fontWeight: 600, color: "#dc2626", cursor: "pointer"
+                        }}>
+                        삭제
                       </button>
                     </div>
                   </td>
