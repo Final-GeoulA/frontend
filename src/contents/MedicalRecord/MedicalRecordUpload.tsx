@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './style/MedicalRecordUpload.css';
 import axios from 'axios';
+import { useAuth } from '../../components/AuthProvider';
 
 const MedicalRecordUpload: React.FC = () => {
   const navigate = useNavigate();
+  const { isLoggedIn, member } = useAuth();
 
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>('');
@@ -157,6 +159,21 @@ const MedicalRecordUpload: React.FC = () => {
       alert('서버 오류');
     }
   };
+
+  if (isLoggedIn && member?.user_grade_id !== 2) {
+    return (
+      <div className="medical-upload-page">
+        <div className="medical-upload-card">
+          <div className="premium-only-box">
+            <p className="premium-only-title">프리미엄 회원 전용 기능</p>
+            <p className="premium-only-desc">
+              진료 기록 추가는 프리미엄 회원만 이용할 수 있습니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="medical-upload-page">
