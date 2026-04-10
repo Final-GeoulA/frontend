@@ -21,7 +21,7 @@ type CalendarCell = {
 
 const MedicalRecord: React.FC = () => {
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, member } = useAuth();
 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedCell, setSelectedCell] = useState<CalendarCell | null>(null);
@@ -126,6 +126,21 @@ const MedicalRecord: React.FC = () => {
   }, [firstDay, lastDate, year, month, groupedRecords]);
 
   const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
+
+  if (isLoggedIn && member?.user_grade_id !== 2) {
+    return (
+      <div className="medical-record-page">
+        <div className="medical-record-card">
+          <div className="premium-only-box">
+            <p className="premium-only-title">프리미엄 회원 전용 기능</p>
+            <p className="premium-only-desc">
+              진료 기록 캘린더는 프리미엄 회원만 이용할 수 있습니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="medical-record-page">
